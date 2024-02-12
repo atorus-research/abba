@@ -1,0 +1,70 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: jobtest2
+  generateName: jobtest2
+  namespace: rstudio
+  labels:
+    app.kubernetes.io/managed-by: Connect
+  annotations:
+    batch.kubernetes.io/job-tracking: ''
+spec:
+  parallelism: 1
+  completions: 1
+  backoffLimit: 0
+  selector:
+   # matchLabels:
+     # batch.kubernetes.io/controller-uid: 8f09f032-2de5-49cd-a0a3-e76487340662
+  template:
+    metadata:
+      generateName: TestJob
+      creationTimestamp: null
+      labels:
+        #batch.kubernetes.io/controller-uid: 8f09f032-2de5-49cd-a0a3-e76487340662
+       # batch.kubernetes.io/job-name: elijobr-c7br2
+        #controller-uid: 8f09f032-2de5-49cd-a0a3-e76487340662
+        job-name: jobtest2
+      annotations:
+        USER_TAG_0: rstudio-r-script-job:~/eliJob.R
+        name: eliJob.R
+        service_ports: '[]'
+        stdin: ''
+        user: eli.miller
+    spec:
+      volumes:
+        - name: mount0
+          nfs:
+            server: 10.14.0.6
+            path: /home/eli.miller
+      containers:
+        - name: rs-launcher-container
+          image: atoruscontainers.azurecr.io/jammy-1.0.1-workbench
+          command:
+            - /bin/bash
+          args:
+            - '-c'
+            - cd ~ && R --slave --no-save --no-restore -f ~/rmd-plus-k8s/test.R
+          env:
+            - name: HOME
+              value: /home/eli.miller
+          resources:
+            limits:
+              cpu: '1'
+              memory: 512M
+          volumeMounts:
+            - name: mount0
+              mountPath: /home/eli.miller
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          stdinOnce: true
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      shareProcessNamespace: true
+      securityContext:
+        runAsUser: 1182601113
+        runAsGroup: 1182600513
+      schedulerName: default-scheduler
+  completionMode: NonIndexed
+  suspend: false
