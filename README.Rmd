@@ -1,0 +1,29 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# abba
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+-   Users can submit non-interactive jobs to run on Kubernetes
+-   Non-interactive jobs can be sent to Kubernetes from Posit Connect
+-   Jobs sent to Kubernetes from Posit Connect can be called through an R function 
+-   Jobs sent to Kubernetes from Posit Connect can see R programs stored in a shared storage space.
+-   While the job is running on Kubernetes, the submitting function monitors the job and waits for its completion
+-   Upon completion of the job, the resulting log file is collected and is viewable
+-   When executing from Posit Connect, the job is submitted using the kubectl utility locally
+-   The kubectl utility on Posit Connect can only be run under a service account identity, and the user submitting the jobs cannot be modifed
+-   The service account identity must be granted explicit access to files it may have to access

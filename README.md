@@ -1,20 +1,24 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+# abba
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+<!-- badges: start -->
+<!-- badges: end -->
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+- Users can submit non-interactive jobs to run on Kubernetes
+- Non-interactive jobs can be sent to Kubernetes from Posit Connect
+- Jobs sent to Kubernetes from Posit Connect can be called through an R
+  function 
+- Jobs sent to Kubernetes from Posit Connect can see R programs stored
+  in a shared storage space.
+- While the job is running on Kubernetes, the submitting function
+  monitors the job and waits for its completion
+- Upon completion of the job, the resulting log file is collected and is
+  viewable
+- When executing from Posit Connect, the job is submitted using the
+  kubectl utility locally
+- The kubectl utility on Posit Connect can only be run under a service
+  account identity, and the user submitting the jobs cannot be modifed
+- The service account identity must be granted explicit access to files
+  it may have to access
