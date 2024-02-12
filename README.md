@@ -27,15 +27,15 @@ proper segregation of security identities via API abstraction.
 - The service account identity must be granted explicit access to files
   it may have to access
 
-
 ## Accessing the dev Kubernetes cluster
 
 workbench-dev.atorusresearch.com
 
-1. Ensure you have the cluster configured at ~/.kube/configured (Eli will do this)
+1.  Ensure you have the cluster configured at ~/.kube/configured (Eli
+    will do this)
 
-2. Run jobs via `kubectl apply -f <file>` where file is your YAML file.
+2.  Run jobs via `kubectl apply -f <file>` where file is your YAML file.
 
-3. check jobs with `kubectl get jobs -n rstuido`
+3.  check jobs with `kubectl get jobs -n rstuido`
 
-4. Get job output with `kubectl logs -n rstudio <jobname>`
+4.  Get job output with `kubectl logs -n rstudio <jobname>`
