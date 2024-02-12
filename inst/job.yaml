@@ -1,8 +1,8 @@
 kind: Job
 apiVersion: batch/v1
 metadata:
-  name: jobtest2
-  generateName: jobtest2
+  name: XXX
+  generateName: XXX
   namespace: rstudio
   labels:
     app.kubernetes.io/managed-by: Connect
@@ -13,18 +13,14 @@ spec:
   completions: 1
   backoffLimit: 0
   selector:
-   # matchLabels:
-     # batch.kubernetes.io/controller-uid: 8f09f032-2de5-49cd-a0a3-e76487340662
   template:
     metadata:
-      generateName: TestJob
+      generateName: XXX
       creationTimestamp: null
       labels:
-        #batch.kubernetes.io/controller-uid: 8f09f032-2de5-49cd-a0a3-e76487340662
-       # batch.kubernetes.io/job-name: elijobr-c7br2
-        #controller-uid: 8f09f032-2de5-49cd-a0a3-e76487340662
-        job-name: jobtest2
+        job-name: XXX
       annotations:
+        # Not sure if these matter?
         USER_TAG_0: rstudio-r-script-job:~/eliJob.R
         name: eliJob.R
         service_ports: '[]'
@@ -32,6 +28,7 @@ spec:
         user: eli.miller
     spec:
       volumes:
+        # I assume this will have to be set to the home directory of the service account
         - name: mount0
           nfs:
             server: 10.14.0.6
@@ -43,6 +40,7 @@ spec:
             - /bin/bash
           args:
             - '-c'
+            # This will have to point to the proper program to execute
             - cd ~ && R --slave --no-save --no-restore -f ~/rmd-plus-k8s/test.R
           env:
             - name: HOME
@@ -52,6 +50,7 @@ spec:
               cpu: '1'
               memory: 512M
           volumeMounts:
+            # This will need to be configured
             - name: mount0
               mountPath: /home/eli.miller
           terminationMessagePath: /dev/termination-log
@@ -63,6 +62,7 @@ spec:
       dnsPolicy: ClusterFirst
       shareProcessNamespace: true
       securityContext:
+        # These will need to be autoset
         runAsUser: 1182601113
         runAsGroup: 1182600513
       schedulerName: default-scheduler
