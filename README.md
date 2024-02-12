@@ -3,6 +3,10 @@
 
 # abba
 
+**abba** provides management of remote batch execution of programs into
+a cluster through a simple programming interface, and additional provide
+proper segregation of security identities via API abstraction.
+
 <!-- badges: start -->
 <!-- badges: end -->
 

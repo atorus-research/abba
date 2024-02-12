@@ -1,10 +1,28 @@
 Package: abba
-Title: What the Package Does (One Line, Title Case)
+Title: Atorus Batch Backend API
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Authors@R: 
+    c(
+    person(given = "Eli",
+           family = "Miller",
+           role = "aut",
+           email = "Eli.Miller@AtorusResearch.com",
+           comment = c(ORCID = "0000-0002-2127-9456")),
+    person(given = "Mike",
+           family = "Stackhouse",
+           role = c("aut", "cre"),
+           email = "mike.stackhouse@atorusresearch.com",
+           comment = c(ORCID = "0000-0001-6030-723X")),
+    person(given = "Ross",
+           family = "Didenko",
+           role = c("aut"),
+           email = "Rostyslav.Didenko@atorusresearch.com"),
+    person(given = "Yevhenii",
+           family = "Boiko",
+           role = c("aut"),
+           email = "Yevhenii.Boiko@atorusresearch.com")
+Description: Management of remote batch execution of programs into a cluster through a simple programming interface, and additional provide proper segregation of security identities via API abstraction.
 License: file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
