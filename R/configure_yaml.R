@@ -1,14 +1,14 @@
 #' Replace placeholders in imported YAML config with values supplied by user
 #'
-#' @param yaml_file_obj a nested list representing template YAML config
-#' @param file_path full path to R file
+#' @param yaml_file_obj A nested list representing template YAML config
+#' @param file_path Full path to R file
 #' @param user_tag String that describes what kind of job will be scheduled to run
-#' @param cpu_limit maximum number of cores available for Kubernetes container
+#' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
 #' @export
-#'
+#' @noRd
 #' @examples
 #' config <- abba::load_yaml_template()
 #' config <- configure_yaml(config, file_path="/path/to/file.R", user_tag="test program")
