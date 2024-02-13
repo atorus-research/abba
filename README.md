@@ -39,16 +39,3 @@ workbench-dev.atorusresearch.com
 3.  check jobs with `kubectl get jobs -n rstuido`
 
 4.  Get job output with `kubectl logs -n rstudio <jobname>`
-
-## Explaining `inst/job.yaml` setup fields
-
-| Placeholder           | Description                                                                                                       |
-|-----------------------|-------------------------------------------------------------------------------------------------------------------|
-| `{job_name}`          | The name of the submitted job; user will give a recognizable and meaningful name upon the R function call.        |
-| `{generate_name}`     | The prefix of the name to be generated (in case you don’t want to specify a static name); usually auto-generated. |
-| `{user_tag}`          | Optional; can be specified by user to mark the job in some special way (i.e. “sdtm_batch”).                       |
-| `{program_full_name}` | Full program name, including extension and full path. Should be specified by user.                                |
-| `{program_base_name}` | Program name; auto-derived from `{program_full_name}`.                                                            |
-| `{service_user}`      | A username of account with elevated privileges. This isn’t something that needs to be exposed to a user.          |
-| `{cpu_limit}`         | A number of CPUs available to use for this Job. Could be 1 or 2.                                                  |
-| `{memory_limit}`      | An amount of memory available for this Job in MBs. Possible options: 256, 512, 1024.                              |
