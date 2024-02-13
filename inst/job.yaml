@@ -1,8 +1,10 @@
 kind: Job
 apiVersion: batch/v1
 metadata:
-  name: XXX
-  generateName: XXX
+  # User will give a recognizable and meaningful name upon the R function call.
+  name: {job_name}
+  # A service R function will generate UUID to be put here.
+  generateName: {generate_name}
   namespace: rstudio
   labels:
     app.kubernetes.io/managed-by: Connect
@@ -15,24 +17,25 @@ spec:
   selector:
   template:
     metadata:
-      generateName: XXX
+      # As we run 1 Pod at a time, there is no need to specify a different name.
+      generateName: {generate_name}
       creationTimestamp: null
       labels:
-        job-name: XXX
+        job-name: {job_name}
       annotations:
         # Not sure if these matter?
-        USER_TAG_0: rstudio-r-script-job:~/eliJob.R
-        name: eliJob.R
+        USER_TAG_0: {user_tag}
+        name: {program_base_name}
         service_ports: '[]'
         stdin: ''
-        user: eli.miller
+        user: {service_user}
     spec:
       volumes:
         # I assume this will have to be set to the home directory of the service account
         - name: mount0
           nfs:
             server: 10.14.0.6
-            path: /home/eli.miller
+            path: /home/{service_user}
       containers:
         - name: rs-launcher-container
           image: atoruscontainers.azurecr.io/jammy-1.0.1-workbench
@@ -41,18 +44,18 @@ spec:
           args:
             - '-c'
             # This will have to point to the proper program to execute
-            - cd ~ && R --slave --no-save --no-restore -f ~/rmd-plus-k8s/test.R
+            - cd ~ && R --slave --no-save --no-restore -f ~/rmd-plus-k8s/{program_full_name}
           env:
             - name: HOME
-              value: /home/eli.miller
+              value: /home/{service_user}
           resources:
             limits:
-              cpu: '1'
-              memory: 512M
+              cpu: '{cpu_limit}'
+              memory: {memory_limit}M
           volumeMounts:
             # This will need to be configured
             - name: mount0
-              mountPath: /home/eli.miller
+              mountPath: /home/{service_user}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           imagePullPolicy: Always
