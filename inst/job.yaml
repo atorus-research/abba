@@ -2,9 +2,9 @@ kind: Job
 apiVersion: batch/v1
 metadata:
   # User will give a recognizable and meaningful name upon the R function call.
-  name: {job_name}
+  name: JOB_NAME
   # A service R function will generate UUID to be put here.
-  generateName: {generate_name}
+  generateName: GENERATE_NAME
   namespace: rstudio
   labels:
     app.kubernetes.io/managed-by: Connect
@@ -18,24 +18,24 @@ spec:
   template:
     metadata:
       # As we run 1 Pod at a time, there is no need to specify a different name.
-      generateName: {generate_name}
+      generateName: GENERATE_NAME
       creationTimestamp: null
       labels:
-        job-name: {job_name}
+        job-name: JOB_NAME
       annotations:
         # Not sure if these matter?
-        USER_TAG_0: {user_tag}
-        name: {program_base_name}
+        USER_TAG_0: USER_TAG
+        name: PROGRAM_BASE_NAME
         service_ports: '[]'
         stdin: ''
-        user: {service_user}
+        user: SERVICE_USER
     spec:
       volumes:
         # I assume this will have to be set to the home directory of the service account
         - name: mount0
           nfs:
             server: 10.14.0.6
-            path: /home/{service_user}
+            path: /home/SERVICE_USER
       containers:
         - name: rs-launcher-container
           image: atoruscontainers.azurecr.io/jammy-1.0.1-workbench
@@ -44,18 +44,18 @@ spec:
           args:
             - '-c'
             # This will have to point to the proper program to execute
-            - cd ~ && R --slave --no-save --no-restore -f ~/rmd-plus-k8s/{program_full_name}
+            - cd ~ && R --slave --no-save --no-restore -f ~/rmd-plus-k8s/PROGRAM_FULL_NAME
           env:
             - name: HOME
-              value: /home/{service_user}
+              value: /home/SERVICE_USER
           resources:
             limits:
-              cpu: '{cpu_limit}'
-              memory: {memory_limit}M
+              cpu: 'CPU_LIMIT'
+              memory: MEMORY_LIMIT
           volumeMounts:
             # This will need to be configured
             - name: mount0
-              mountPath: /home/{service_user}
+              mountPath: /home/SERVICE_USER
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           imagePullPolicy: Always
