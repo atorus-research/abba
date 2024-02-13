@@ -7,6 +7,7 @@
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
+#' @importFrom uuid UUIDgenerate
 #' @export
 #' @noRd
 #' @examples
@@ -19,7 +20,7 @@ configure_yaml <- function(yaml_file_obj,
                            memory_limit='512M'){
 
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
-  generate_name <- paste0(program_name, '-', uuid::UUIDgenerate())
+  generate_name <- paste0(program_name, '-', UUIDgenerate())
   # temporary plug before figuring out where to get service user identity
   service_user <- Sys.info()[["user"]]
 
