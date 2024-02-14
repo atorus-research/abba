@@ -10,7 +10,7 @@ test_that("YAML fields are properly updated by configure_yaml", {
               yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$cpu,
               yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory)
 
-  expected <- c("test",
+  expected <- c(yaml_file_configured$metadata$generateName,
                 paste0("cd ~ && R --slave --no-save --no-restore -f ", "/tst/path/test.R"),
                 "2",
                 "512M")
