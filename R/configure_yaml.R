@@ -20,21 +20,23 @@ configure_yaml <- function(yaml_file_obj,
                            memory_limit='512M'){
 
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
-  generate_name <- paste0(program_name, '-', UUIDgenerate())
-  # temporary plug before figuring out where to get service user identity
+  # cannot have underscores in job name/generate name
+  job_name <- gsub('_', '-', program_name)
+  generate_name <- paste0(job_name, '-', UUIDgenerate())
+    # temporary plug before figuring out where to get service user identity
   service_user <- Sys.info()[["user"]]
 
 
   # a function that would try to replace all possible keywords inside the target string
   replace_func <- function(x){
-    x <- sub("JOB_NAME", program_name, x)
-    x <- sub("GENERATE_NAME", generate_name, x)
-    x <- sub("USER_TAG", user_tag, x)
-    x <- sub("PROGRAM_FULL_PATH", file_path, x)
-    x <- sub("PROGRAM_BASE_NAME", program_name, x)
-    x <- sub("SERVICE_USER", service_user, x)
-    x <- sub("CPU_LIMIT", as.character(cpu_limit), x)
-    x <- sub("MEMORY_LIMIT", memory_limit, x)
+    x <- gsub("JOB_NAME", generate_name, x)
+    x <- gsub("GENERATE_NAME", generate_name, x)
+    x <- gsub("USER_TAG", user_tag, x)
+    x <- gsub("PROGRAM_FULL_PATH", file_path, x)
+    x <- gsub("PROGRAM_BASE_NAME", program_name, x)
+    x <- gsub("SERVICE_USER", service_user, x)
+    x <- gsub("CPU_LIMIT", as.character(cpu_limit), x)
+    x <- gsub("MEMORY_LIMIT", memory_limit, x)
     return(x)
   }
 
