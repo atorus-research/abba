@@ -48,6 +48,7 @@ workbench-dev.atorusresearch.com
 |--------------------|-------------|
 | `JOB_NAME`         | The name of the submitted job; user will give a recognizable and meaningful name upon the R function call. |
 | `GENERATE_NAME`    | The prefix of the name to be generated (in case you don't want to specify a static name); usually auto-generated. |
+| `BATCH_GROUP`	     | A label used to group multiple jobs for easier management and querying. This allows for batch processing and collective operations on the jobs. |
 | `USER_TAG`         | Optional; can be specified by user to mark the job in some special way (i.e. "sdtm_batch"). |
 | `PROGRAM_FULL_PATH`| Full program path, including extension and full path. Should be specified by user. |
 | `PROGRAM_BASE_NAME`| Program name; auto-derived from `PROGRAM_FULL_NAME`. |

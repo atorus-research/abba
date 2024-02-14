@@ -8,6 +8,7 @@ metadata:
   namespace: rstudio
   labels:
     app.kubernetes.io/managed-by: Connect
+    batch-group: BATCH_GROUP_ID
   annotations:
     batch.kubernetes.io/job-tracking: ''
 spec:
@@ -22,6 +23,7 @@ spec:
       creationTimestamp: null
       labels:
         job-name: JOB_NAME
+        batch-group: BATCH_GROUP_ID
       annotations:
         # Not sure if these matter?
         USER_TAG_0: USER_TAG

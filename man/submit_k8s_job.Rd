@@ -27,6 +27,3 @@ Invisible NULL, the function is called for its side effect.
 This function allows you to submit a job to a Kubernetes cluster by modifying a YAML template
 with specific parameters and using the \code{kubectl} command.
 }
-\examples{
-submit_k8s_job("/path/to/my-script.R", user_tag="DMC", cpu_limit=1L, memory_limit="1024M")
-}

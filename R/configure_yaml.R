@@ -7,22 +7,33 @@
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
-#' @importFrom uuid UUIDgenerate
 #' @export
 #' @noRd
 #' @examples
-#' config <- abba::load_yaml_template()
-#' config <- configure_yaml(config, file_path="/path/to/file.R", user_tag="test program")
-configure_yaml <- function(yaml_file_obj,
-                           file_path='',
+#' config <- configure_yaml(file_path="/path/to/file.R", user_tag="test program")
+configure_yaml <- function(file_path='',
+                           batch_group_id='',
                            user_tag='',
                            cpu_limit= 1L,
                            memory_limit='512M'){
 
+  yaml_file_obj <- abba::load_yaml_template()
+  
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
+  
+  # Check if batch_group_id is a vector with more than one element
+  if (length(batch_group_id) > 1) {
+    stop("batch_group_id must be a single string value")
+  }
+  # By default let 'batch-group' be the lowest possible level - the program name.
+  # Otherwise, keep what user has specified.
+  if (is.null(batch_group_id) || batch_group_id == '') {
+    batch_group_id <- program_name
+  }
+  
   # cannot have underscores in job name/generate name
   job_name <- gsub('_', '-', program_name)
-  generate_name <- paste0(job_name, '-', UUIDgenerate())
+  generate_name <- paste0(job_name, '-', uuid::UUIDgenerate())
     # temporary plug before figuring out where to get service user identity
   service_user <- Sys.info()[["user"]]
   guid <- get_guid()
@@ -31,6 +42,7 @@ configure_yaml <- function(yaml_file_obj,
   replace_func <- function(x){
     x <- gsub("JOB_NAME", generate_name, x)
     x <- gsub("GENERATE_NAME", generate_name, x)
+    x <- gsub("BATCH_GROUP_ID", batch_group_id, x)
     x <- gsub("USER_TAG", user_tag, x)
     x <- gsub("PROGRAM_FULL_PATH", file_path, x)
     x <- gsub("PROGRAM_BASE_NAME", program_name, x)
