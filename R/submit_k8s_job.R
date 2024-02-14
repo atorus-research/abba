@@ -29,9 +29,9 @@ submit_k8s_job <- function(program_full_name, user_tag='', cpu_limit=1L, memory_
   temp_yaml <- save_yaml(yaml_file_updated)
 
   # Run kubectl command to submit the job
-  submit_yaml(temp_yaml)
+  job_id <- submit_yaml(temp_yaml)
 
-  return(program_full_name)
+  return(job_id)
 }
 
 
