@@ -66,8 +66,8 @@ spec:
       shareProcessNamespace: true
       securityContext:
         # These will need to be autoset
-        runAsUser: 1182601113
-        runAsGroup: 1182600513
+        runAsUser: RUN_AS_USER
+        runAsGroup: RUN_AS_GROUP
       schedulerName: default-scheduler
   completionMode: NonIndexed
   suspend: false

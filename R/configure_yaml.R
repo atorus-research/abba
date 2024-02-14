@@ -25,7 +25,7 @@ configure_yaml <- function(yaml_file_obj,
   generate_name <- paste0(job_name, '-', UUIDgenerate())
     # temporary plug before figuring out where to get service user identity
   service_user <- Sys.info()[["user"]]
-
+  guid <- get_guid()
 
   # a function that would try to replace all possible keywords inside the target string
   replace_func <- function(x){
@@ -37,6 +37,8 @@ configure_yaml <- function(yaml_file_obj,
     x <- gsub("SERVICE_USER", service_user, x)
     x <- gsub("CPU_LIMIT", as.character(cpu_limit), x)
     x <- gsub("MEMORY_LIMIT", memory_limit, x)
+    x <- gsub("RUN_AS_USER", guid$uid, x)
+    x <- gsub("RUN_AS_GROUP", guid$gid, x)
     return(x)
   }
 
@@ -48,6 +50,12 @@ configure_yaml <- function(yaml_file_obj,
   }
 
   yaml_file_obj <- recursive_replace(yaml_file_obj)
+
+  # convert to integer after replacement with strings
+  yaml_file_obj$spec$template$spec$securityContext$runAsUser <-
+    as.integer(yaml_file_obj$spec$template$spec$securityContext$runAsUser)
+  yaml_file_obj$spec$template$spec$securityContext$runAsGroup <-
+    as.integer(yaml_file_obj$spec$template$spec$securityContext$runAsGroup)
 
   return(yaml_file_obj)
 
