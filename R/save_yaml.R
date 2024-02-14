@@ -15,6 +15,12 @@ save_yaml <- function(yaml_obj, file_path=''){
 
   yaml_path <- if(file_path=='') tempfile(fileext = '.yaml') else file_path
 
+  # a hack
+  if (is.character(yaml_obj$spec$template$spec$containers[[1]]$command)){
+    yaml_obj$spec$template$spec$containers[[1]]$command <-
+      list(yaml_obj$spec$template$spec$containers[[1]]$command)
+  }
+
   yaml::write_yaml(yaml_obj, yaml_path)
 
   return(yaml_path)
