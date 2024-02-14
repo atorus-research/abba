@@ -2,7 +2,6 @@ Package: abba
 Title: Atorus Batch Backend API
 Version: 0.0.0.9000
 Authors@R: 
-Authors@R: 
     c(
     person(given = "Eli",
            family = "Miller",
@@ -22,13 +21,14 @@ Authors@R:
            family = "Boiko",
            role = c("aut"),
            email = "Yevhenii.Boiko@atorusresearch.com")
+           )
 Description: Management of remote batch execution of programs into a cluster through a simple programming interface, and additional provide proper segregation of security identities via API abstraction.
 License: file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    yaml
+    yaml,uuid,stringr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
