@@ -1,14 +1,13 @@
 #' Replace placeholders in imported YAML config with values supplied by user
 #'
-#' @param yaml_file_obj A nested list representing template YAML config
 #' @param file_path Full path to R file
+#' @param batch_group_id Group ID for batch processing
 #' @param user_tag String that describes what kind of job will be scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
 #' @export
-#' @noRd
 #' @examples
 #' config <- configure_yaml(file_path="/path/to/file.R", user_tag="test program")
 configure_yaml <- function(file_path='',
@@ -17,14 +16,10 @@ configure_yaml <- function(file_path='',
                            cpu_limit= 1L,
                            memory_limit='512M'){
 
-  yaml_file_obj <- abba::load_yaml_template()
+  yaml_file_obj <- abba:::load_yaml_template()
   
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
   
-  # Check if batch_group_id is a vector with more than one element
-  if (length(batch_group_id) > 1) {
-    stop("batch_group_id must be a single string value")
-  }
   # By default let 'batch-group' be the lowest possible level - the program name.
   # Otherwise, keep what user has specified.
   if (is.null(batch_group_id) || batch_group_id == '') {
