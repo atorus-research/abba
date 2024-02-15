@@ -17,10 +17,10 @@ configure_yaml <- function(file_path='',
                            cpu_limit= 1L,
                            memory_limit='512M'){
 
-  yaml_file_obj <- abba::load_yaml_template()
-  
+  yaml_file_obj <- abba:::load_yaml_template()
+
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
-  
+
   # Check if batch_group_id is a vector with more than one element
   if (length(batch_group_id) > 1) {
     stop("batch_group_id must be a single string value")
@@ -30,7 +30,7 @@ configure_yaml <- function(file_path='',
   if (is.null(batch_group_id) || batch_group_id == '') {
     batch_group_id <- program_name
   }
-  
+
   # cannot have underscores in job name/generate name
   job_name <- gsub('_', '-', program_name)
   generate_name <- paste0(job_name, '-', uuid::UUIDgenerate())
