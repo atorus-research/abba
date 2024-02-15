@@ -1,6 +1,5 @@
 #' Replace placeholders in imported YAML config with values supplied by user
 #'
-#' @param yaml_file_obj A nested list representing template YAML config
 #' @param file_path Full path to R file
 #' @param user_tag String that describes what kind of job will be scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
