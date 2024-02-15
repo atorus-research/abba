@@ -2,7 +2,6 @@
 #'
 #' @return a list of uid and gid number for user executing this function
 #' @export
-#' @noRd
 #' @examples
 #' ids <- get_guid()
 get_guid <- function(){

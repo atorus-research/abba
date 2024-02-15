@@ -8,7 +8,6 @@
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
 #' @export
-#' @noRd
 #' @examples
 #' config <- configure_yaml(file_path="/path/to/file.R", user_tag="test program")
 configure_yaml <- function(file_path='',
@@ -17,14 +16,10 @@ configure_yaml <- function(file_path='',
                            cpu_limit= 1L,
                            memory_limit='512M'){
 
-  yaml_file_obj <- abba::load_yaml_template()
+  yaml_file_obj <- abba:::load_yaml_template()
   
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
   
-  # Check if batch_group_id is a vector with more than one element
-  if (length(batch_group_id) > 1) {
-    stop("batch_group_id must be a single string value")
-  }
   # By default let 'batch-group' be the lowest possible level - the program name.
   # Otherwise, keep what user has specified.
   if (is.null(batch_group_id) || batch_group_id == '') {

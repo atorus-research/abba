@@ -3,5 +3,6 @@
 export(configure_yaml)
 export(get_guid)
 export(save_yaml)
+export(submit_job_and_poll)
 export(submit_yaml)
-export(submit_yaml_and_poll)
+export(watch_job)
