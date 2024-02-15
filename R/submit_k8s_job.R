@@ -8,9 +8,6 @@
 #' @param cpu_limit The CPU limit for the job.
 #' @param memory_limit The memory limit for the job (in MB).
 #' @return Invisible NULL, the function is called for its side effect.
-#' @export
-#' @examples
-#' submit_k8s_job("/path/to/my-script.R", user_tag="DMC", cpu_limit=1L, memory_limit="1024M")
 submit_k8s_job <- function(program_full_name, user_tag='', cpu_limit=1L, memory_limit="512M") {
 
   # Load the YAML file
