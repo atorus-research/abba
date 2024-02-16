@@ -17,7 +17,7 @@ configure_yaml <- function(file_path='',
                            cpu_limit= 1L,
                            memory_limit='512M'){
 
-  yaml_file_obj <- abba:::load_yaml_template()
+  yaml_file_obj <- load_yaml_template()
 
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
 
