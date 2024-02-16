@@ -1,7 +1,7 @@
 #' Get job log from Kubernetes for a single job
 #'
 #' @param job_id a string that uniquely identifies the job
-#'
+#' @noRd
 #' @return A character vector containing job's log
 #'
 get_job_log0 <- function(job_id){
@@ -25,10 +25,26 @@ get_job_log0 <- function(job_id){
 #' Get log for every job specified in an input vector/list
 #'
 #' @param job_ids A list of job IDs to get logs for
-#'
+#' @noRd
 #' @return A list of job logs. Each list entry will contain complete log for a job
 #'
 get_job_log <- function(job_ids){
   logs <- lapply(job_ids, get_job_log0)
+  return(logs)
+}
+
+#' Return list of logs for jobs that are marked with a given batch ID
+#'
+#' @param batch_id string containing batch ID
+#' @noRd
+#' @return Job logs in a from of list consisting of character vectors
+#'
+get_batch_log <- function(batch_id){
+
+  # get all job IDs belonging to a given batch
+  job_ids <- get_batch_ids(batch_id)
+
+  logs <- lapply(job_ids, get_job_log0)
+
   return(logs)
 }
