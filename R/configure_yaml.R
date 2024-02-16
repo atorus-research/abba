@@ -1,11 +1,7 @@
 #' Replace placeholders in imported YAML config with values supplied by user
 #'
 #' @param file_path Full path to R file
-<<<<<<< HEAD
 #' @param batch_group_id A tag to mark jobs inside one batch(i.e. SDTM, ADaM etc.)
-=======
-#' @param batch_group_id Group ID for batch processing
->>>>>>> Moved watcher function to 'submit_job.R'. Created wrapper for 'configure_yaml', 'submit' and 'watch_job'. Added unit tests.
 #' @param user_tag String that describes what kind of job will be scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
