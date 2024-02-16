@@ -40,6 +40,12 @@ workbench-dev.atorusresearch.com
 
 4.  Get job output with `kubectl logs -n rstudio <jobname>`
 
+## Getting Started with ‘abba’
+
+- Use `submit_job_and_poll("path/to/your/program")` to execute and watch
+  job.
+- Use `get_job_log0("job-id")` to get the job’s output.
+
 ## Explaining `inst/job.yaml` setup fields
 
 | Placeholder         | Description                                                                                                                                     |
