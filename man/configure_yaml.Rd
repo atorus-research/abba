@@ -15,7 +15,7 @@ configure_yaml(
 \arguments{
 \item{file_path}{Full path to R file}
 
-\item{batch_group_id}{Group ID for batch processing}
+\item{batch_group_id}{A tag to mark jobs inside one batch(i.e. SDTM, ADaM etc.)}
 
 \item{user_tag}{String that describes what kind of job will be scheduled to run}
 
