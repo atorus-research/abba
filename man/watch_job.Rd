@@ -24,6 +24,8 @@ A "Job completed successfully" message, or a list of failed jobs and their ID's.
 Watch a K8S job that has been submitted to Workbench, periodically polling it's exectuion status.
 }
 \examples{
+\dontrun{
 result <- watch_job("safety-tfls-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
+}
 
 }

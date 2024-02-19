@@ -36,6 +36,8 @@ A "Job completed successfully" message, or a list of failed jobs and their ID's.
 Submit a job profile for execution on a Kubernetes cluster and poll for completion
 }
 \examples{
+\dontrun{
 result <- submit_job_and_poll("path/to/your/job.yaml", "my-batch-group", 5, 600)
+}
 
 }
