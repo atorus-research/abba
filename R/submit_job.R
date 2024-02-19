@@ -25,8 +25,9 @@ submit_yaml <- function(yaml_full_path){
 #' @return A "Job completed successfully" message, or a list of failed jobs and their ID's.
 #' @export
 #' 
-#' @examples
+#' @examples \dontrun{
 #' result <- watch_job("safety-tfls-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
+#' }
 #' 
 watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seconds = 600){
   # Initialize variables for tracking job status
@@ -91,8 +92,9 @@ watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seco
 #' @return A "Job completed successfully" message, or a list of failed jobs and their ID's.
 #' @export
 #' 
-#' @examples
+#' @examples \dontrun{
 #' result <- submit_job_and_poll("path/to/your/job.yaml", "my-batch-group", 5, 600)
+#' }
 #' 
 submit_job_and_poll <- function(file_path, batch_group_id='', user_tag='', cpu_limit=1L, memory_limit='512M', poll_interval_seconds = 3, timeout_seconds = 600) {
   
