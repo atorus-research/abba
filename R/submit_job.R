@@ -34,6 +34,15 @@ watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seco
   start_time <- Sys.time()
   job_details <- list()
   
+  status_descriptions <- list(
+    Pending = "The Pod has been accepted by the Kubernetes cluster, but one or more of the containers has not been set up and made ready to run. This includes time a Pod spends waiting to be scheduled as well as the time spent downloading container images over the network.",
+    Running = "The Pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting.",
+    Succeeded = "All containers in the Pod have terminated in success, and will not be restarted.",
+    Failed = "All containers in the Pod have terminated, and at least one container has terminated in failure. That is, the container either exited with non-zero status or was terminated by the system.",
+    Unknown = "For some reason the state of the Pod could not be obtained. This phase typically occurs due to an error in communicating with the node where the Pod should be running."
+  )
+  
+  
   # Poll for job status in the specified batch group
   while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
     
@@ -54,13 +63,16 @@ watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seco
         pod_status <- get_pod_status(line)
         program_name <- get_pod_program_name(line)
         
-        # Append to job_details
+        # Ensure the list for this status exists
         if (!is.list(job_details[[pod_status]])) {
-          job_details[[pod_status]] <- list()
+          job_details[[pod_status]] <- list("Jobs" = list(), "Description" = status_descriptions[[pod_status]])
         }
-        job_details[[pod_status]] <- c(job_details[[pod_status]], list(pod_name, program_name))
+        
+        # Append the job details
+        job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(pod_name, program_name))
       }
     }
+    
     
     # Get the names of the outer list in job_details
     status_names <- names(job_details)
