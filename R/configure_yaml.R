@@ -19,7 +19,7 @@ configure_yaml <- function(file_path='',
   yaml_file_obj <- load_yaml_template()
 
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
-  
+
   # By default let 'batch-group' be the lowest possible level - the program name.
   # Otherwise, keep what user has specified.
   if (is.null(batch_group_id) || batch_group_id == '') {
@@ -32,6 +32,37 @@ configure_yaml <- function(file_path='',
     # temporary plug before figuring out where to get service user identity
   service_user <- Sys.info()[["user"]]
   guid <- get_guid()
+
+  # Enforce lower and upper limits on cpu resource
+  # use mcpu_to_cpu function to make sure compared values have equal units
+  if (mcpu_to_cpu(cpu_limit) < mcpu_to_cpu(getOption('abba.lower.cpu.limit'))){
+    message(paste0('Requested amount of CPU cores(', cpu_limit, ') is below the lower limit',
+                   '(', getOption('abba.lower.cpu.limit'), '). ',
+                   getOption('abba.lower.cpu.limit'), ' cores were specified as limit',
+                   ' for this job.'))
+    cpu_limit <- mcpu_to_cpu(getOption('abba.lower.cpu.limit'))
+  }
+  else if (mcpu_to_cpu(cpu_limit) > mcpu_to_cpu(getOption('abba.cpu.limit'))){
+    message(paste0('Requested CPU cores(', cpu_limit, ') exceed the limit',
+                   '(', getOption('abba.cpu.limit'), '). ',
+                   getOption('abba.cpu.limit'), ' cores were specified as limit',
+                   ' for this job.'))
+    cpu_limit <- mcpu_to_cpu(getOption('abba.cpu.limit'))
+  }
+
+  # Enforce lower and upper limits on memory
+  # use memory_to_bytes function to make sure compared values have equal units
+  if (memory_to_bytes(memory_limit) < memory_to_bytes(getOption('abba.lower.memory.limit'))){
+    message(paste0('Requested memory(', memory_limit, ') is too low. The minimum(',
+                   getOption('abba.lower.memory.limit'), ') was set as limit for this job.'))
+    memory_limit <- getOption('abba.lower.memory.limit')}
+
+  else if (memory_to_bytes(memory_limit) > memory_to_bytes(getOption('abba.memory.limit'))){
+    message(paste0('Requested memory(', memory_limit, ') exceed the limit(',
+                   getOption('abba.memory.limit'), '). ', getOption('abba.memory.limit'),
+                   ' units of memory were set as limit for this job.'))
+    memory_limit <- getOption('abba.memory.limit')}
+
 
   # a function that would try to replace all possible keywords inside the target string
   replace_func <- function(x){

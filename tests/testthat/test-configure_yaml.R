@@ -11,7 +11,7 @@ test_that("YAML fields are properly updated by configure_yaml", {
               yaml_file_configured$spec$template$spec$containers[[1]]$args[[2]],
               yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$cpu,
               yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory)
-  
+
   expected <- c(yaml_file_configured$metadata$generateName,
                 "group_A",
                 "group_A",
@@ -21,5 +21,49 @@ test_that("YAML fields are properly updated by configure_yaml", {
                 "512M")
 
   expect_equal(actual, expected)
+
+})
+
+test_that("Lower cpu limit is enforced", {
+  yaml_file_configured <- abba::configure_yaml(file_path="/tst/path/test.R",
+                                               cpu_limit= 0.0001)
+  actual <- yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$cpu
+
+  expected <- as.character(getOption("abba.lower.cpu.limit"))
+
+  expect_equal(actual, expected)
+
+})
+
+test_that("Upper cpu limit is enforced", {
+  yaml_file_configured <- abba::configure_yaml(file_path="/tst/path/test.R",
+                                               cpu_limit= 6)
+  actual <- yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$cpu
+
+  expected <- as.character(getOption("abba.cpu.limit"))
+
+  expect_equal(actual, expected)
+
+})
+
+test_that("Lower memory limit is enforced", {
+  yaml_file_configured <- abba::configure_yaml(file_path="/tst/path/test.R",
+                                               memory_limit= '1M')
+  actual <- yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory
+
+  expected <- as.character(getOption("abba.lower.memory.limit"))
+
+  expect_equal(memory_to_bytes(actual), memory_to_bytes(expected))
+
+})
+
+test_that("Upper memory limit is enforced", {
+  yaml_file_configured <- abba::configure_yaml(file_path="/tst/path/test.R",
+                                               memory_limit= '1T')
+  actual <- yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory
+
+  expected <- as.character(getOption("abba.memory.limit"))
+
+  expect_equal(memory_to_bytes(actual), memory_to_bytes(expected))
 
 })
