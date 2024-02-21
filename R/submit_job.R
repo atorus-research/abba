@@ -62,13 +62,15 @@ watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seco
       }
     }
     
-    # Flatten the job_details to get all statuses
-    all_statuses <- unlist(lapply(job_details, names))
+    # Get the names of the outer list in job_details
+    status_names <- names(job_details)
     
-    # Check if there are no "Pending" or "Running" jobs
-    if (!any(all_statuses %in% c("Pending", "Running"))) {
-      break # Break if no "Pending" or "Running" jobs
+    # Check if neither "Pending" nor "Running" is a name in job_details
+    if (!"Pending" %in% status_names && !"Running" %in% status_names) {
+      break # Break if no "Pending" or "Running" in the names of job_details
     }
+    
+    
     
     # Wait for the specified interval before polling again
     Sys.sleep(poll_interval_seconds)
