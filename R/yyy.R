@@ -1,5 +1,6 @@
 .onLoad <- function(libname, pkgname) {
-  options(abba.cpu.limit = 2,
+  options(abba.lower.cpu.limit=0.001,
+          abba.cpu.limit = 2,
           abba.lower.memory.limit='128M',
           abba.memory.limit='1G'
   )
