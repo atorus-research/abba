@@ -69,7 +69,7 @@ watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seco
         }
         
         # Append the job details
-        job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(pod_name, program_name))
+        job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(id=pod_name, path=program_name))
       }
     }
     
