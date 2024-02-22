@@ -2,6 +2,10 @@
 
 export(configure_yaml)
 export(get_guid)
+export(get_pod_args_string)
+export(get_pod_name)
+export(get_pod_program_name)
+export(get_pod_status)
 export(save_yaml)
 export(submit_job_and_poll)
 export(submit_yaml)

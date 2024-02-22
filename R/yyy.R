@@ -7,12 +7,6 @@
   invisible()
 }
 
-validate_cpu <- function(cpu_limit){
-  if (is.character(cpu_limit)){
-    actual_cpu_limit
-  }
-}
-
 mcpu_to_cpu <- function(cpu){
   # don't decipher anything if cpu limit was supplied as numeric
   if (is.numeric(cpu)){
