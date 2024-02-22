@@ -9,7 +9,9 @@ configure_yaml(
   batch_group_id = "",
   user_tag = "",
   cpu_limit = 1L,
-  memory_limit = "512M"
+  memory_limit = "512M",
+  container = "",
+  mounts = ""
 )
 }
 \arguments{
