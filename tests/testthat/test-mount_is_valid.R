@@ -1,11 +1,11 @@
 test_that("Mount information can only be supplied in a list type", {
-  expect_equal(mount_is_valid(1), FALSE)
+  expect_error(mount_is_valid(1))
 })
 
 test_that("Mount names in volumes and volumeMounts should not differ", {
   mount_info <- list(volumes=list(list(name='mount0')),
                      volumeMounts=list(list(name='mount1')))
-  expect_equal(mount_is_valid(mount_info), FALSE)
+  expect_error(mount_is_valid(mount_info))
 })
 
 test_that("Mount names in volumes and volumeMounts should be the same", {
@@ -17,5 +17,5 @@ test_that("Mount names in volumes and volumeMounts should be the same", {
 test_that("Length of volumes and volumeMounts should not differ", {
   mount_info <- list(volumes=list(list(name='mount0'), list(name='mount1')),
                      volumeMounts=list(list(name='mount0')))
-  expect_equal(mount_is_valid(mount_info), FALSE)
+  expect_error(mount_is_valid(mount_info))
 })
