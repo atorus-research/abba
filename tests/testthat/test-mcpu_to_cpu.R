@@ -13,3 +13,7 @@ test_that("mcpu units are correctly converted", {
 test_that("mcpu units are correctly converted - 2", {
   expect_equal(mcpu_to_cpu('1200m'), 1.2)
 })
+
+test_that("function errors when units other than m are supplied", {
+  expect_error(mcpu_to_cpu('1200Ti'))
+})

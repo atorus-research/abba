@@ -1,13 +1,13 @@
-test_that("Container information can only be supplied in a list type", {
+test_that("function errors when container information is supplied not as list", {
   expect_error(container_is_valid('1'))
 })
 
-test_that("Container information should contain name and image attributes", {
+test_that("function errors when container information does not have image attribute", {
   mount_info <- list(name='container_name')
   expect_error(container_is_valid(mount_info))
 })
 
-test_that("Container information should contain name and image attributes - 2", {
+test_that("function errors when container information does not have name attribute", {
   mount_info <- list(image='image_name')
   expect_error(container_is_valid(mount_info))
 })

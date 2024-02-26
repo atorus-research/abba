@@ -41,3 +41,7 @@ test_that("Gibibytes units are correctly converted to bytes", {
 test_that("Tebibytes units are correctly converted to bytes", {
   expect_equal(memory_to_bytes('0.5Ti'), 0.5*1024**4)
 })
+
+test_that("Function errors when crazy/unrecognized units are supplied", {
+  expect_error(memory_to_bytes('0.5P'))
+})
