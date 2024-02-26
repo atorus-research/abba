@@ -91,7 +91,9 @@ test_that("User can add custom mounts; volumeMounts are updated properly", {
 
   actual_volumeMounts <- yaml_file_configured$spec$template$spec$containers[[1]]$volumeMounts
 
-  expect_volumeMounts <- new_volumes$volumeMounts
+  expect_volumeMounts <-
+    c(yaml_file_configured$spec$template$spec$containers[[1]]$volumeMounts[1],
+      new_volumes$volumeMounts)
   expect_equal(actual_volumeMounts, expect_volumeMounts)
 
 })
@@ -105,7 +107,7 @@ test_that("User can add custom mounts; volumes information is updated properly",
                                                mounts=new_volumes)
 
   actual_volumes <- yaml_file_configured$spec$template$spec$volumes
-  expect_volumes <- new_volumes$volumes
+  expect_volumes <- c(yaml_file_configured$spec$template$spec$volumes[1], new_volumes$volumes)
   expect_equal(actual_volumes, expect_volumes)
 
 })

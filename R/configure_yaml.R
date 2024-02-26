@@ -114,9 +114,10 @@ update_mounts <- function(yaml, mounts){
   if (!mount.is.valid(mounts)){return(yaml)}
 
   # update the fields in yaml after all checks are successful
-  yaml$spec$template$spec$volumes <- mounts$volumes
+  yaml$spec$template$spec$volumes <- c(yaml$spec$template$spec$volumes, mounts$volumes)
 
-  yaml$spec$template$spec$containers[[1]]$volumeMounts <- mounts$volumeMounts
+  yaml$spec$template$spec$containers[[1]]$volumeMounts <-
+    c(yaml$spec$template$spec$containers[[1]]$volumeMounts, mounts$volumeMounts)
 
   return(yaml)
 }
