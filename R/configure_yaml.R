@@ -111,7 +111,7 @@ configure_yaml <- function(file_path='',
 update_mounts <- function(yaml, mounts){
 
   # validate mounts
-  if (!mount.is.valid(mounts)){return(yaml)}
+  if (!mount_is_valid(mounts)){return(yaml)}
 
   # update the fields in yaml after all checks are successful
   yaml$spec$template$spec$volumes <- c(yaml$spec$template$spec$volumes, mounts$volumes)
@@ -136,7 +136,7 @@ update_mounts <- function(yaml, mounts){
 #'                               image='atoruscontainers.azurecr.io/jammy-1.0.1-workbench'))}
 update_container <- function(yaml, container_info){
   # return unmodified yaml if supplied container information is not correctly specified
-  if(!container.is.valid(container_info)){return(yaml)}
+  if(!container_is_valid(container_info)){return(yaml)}
   # update the fields for ONE(first) container
   yaml$spec$template$spec$containers[[1]]$name <- container_info$name
   yaml$spec$template$spec$containers[[1]]$image <- container_info$image

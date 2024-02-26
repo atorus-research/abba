@@ -1,5 +1,5 @@
 
-mount.is.valid <- function(mounts){
+mount_is_valid <- function(mounts){
 
   if (!is.list(mounts)){
     message(paste0('Mounts should be a list, not ', typeof(mounts)))
@@ -27,7 +27,7 @@ mount.is.valid <- function(mounts){
   return(TRUE)
 }
 
-container.is.valid <- function(container_info){
+container_is_valid <- function(container_info){
   if (!is.list(container_info)){return(FALSE)}
   if(!all(c('name', 'image') %in% names(container_info))){
     message(paste0('Container info list should have 2 attributes: name and image, ',
