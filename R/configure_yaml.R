@@ -17,8 +17,8 @@ configure_yaml <- function(file_path='',
                            user_tag='',
                            cpu_limit= 1L,
                            memory_limit='512M',
-                           container='',
-                           mounts=''){
+                           container=NULL,
+                           mounts=NULL){
 
   yaml_file_obj <- load_yaml_template()
 

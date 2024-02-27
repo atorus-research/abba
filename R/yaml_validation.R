@@ -1,5 +1,8 @@
 
 mount_is_valid <- function(mounts){
+  # null is a default value for mount argument in configure_yaml function.
+  # by default, we should not add new mounts to config
+  if (is.null(mounts)){return(FALSE)}
 
   if (!is.list(mounts)){
     stop(paste0('Mounts should be a list, not ', typeof(mounts)))
@@ -27,6 +30,10 @@ mount_is_valid <- function(mounts){
 }
 
 container_is_valid <- function(container_info){
+  # null is a default value for container argument in configure_yaml function.
+  # by default, we should not change the container in config
+  if (is.null(container_info)){return(FALSE)}
+
   if (!is.list(container_info)){
     stop(paste0('Container information should be ',
                 'supplied in a list, not a ', typeof(container_info)))

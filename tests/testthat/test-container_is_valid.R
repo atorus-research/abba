@@ -2,6 +2,10 @@ test_that("function errors when container information is supplied not as list", 
   expect_error(container_is_valid('1'))
 })
 
+test_that("function returns FALSE when the input argument is NULL", {
+  expect_equal(container_is_valid(NULL), FALSE)
+})
+
 test_that("function errors when container information does not have image attribute", {
   mount_info <- list(name='container_name')
   expect_error(container_is_valid(mount_info))
