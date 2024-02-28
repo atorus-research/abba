@@ -6,6 +6,10 @@ test_that("function returns FALSE when the input argument is NULL", {
   expect_equal(mount_is_valid(NULL), FALSE)
 })
 
+test_that("function returns FALSE when the input argument is an empty string", {
+  expect_equal(mount_is_valid(''), FALSE)
+})
+
 test_that("function errors when mount names in volumes and volumeMounts differ", {
   mount_info <- list(volumes=list(list(name='mount0')),
                      volumeMounts=list(list(name='mount1')))
