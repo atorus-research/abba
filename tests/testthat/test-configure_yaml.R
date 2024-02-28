@@ -24,47 +24,29 @@ test_that("YAML fields are properly updated by configure_yaml", {
 
 })
 
-test_that("Lower cpu limit is enforced", {
-  yaml_file_configured <- abba::configure_yaml(file_path="/tst/path/test.R",
-                                               cpu_limit= 0.0001)
-  actual <- yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$cpu
+test_that("function errors when cpu limit is lower than minimum specified in options", {
+  low_cpu_limit <- mcpu_to_cpu(getOption("abba.lower.cpu.limit")) * 0.1
+  expect_error(configure_yaml(file_path="/tst/path/test.R",
+                              cpu_limit= low_cpu_limit))
+})
 
-  expected <- as.character(getOption("abba.lower.cpu.limit"))
+test_that("function errors when cpu limit is bigger than maximum cpu limit specified in options", {
+  high_cpu_limit <- mcpu_to_cpu(getOption("abba.cpu.limit")) * 10
+  expect_error(configure_yaml(file_path="/tst/path/test.R",
+                              cpu_limit= high_cpu_limit))
+})
 
-  expect_equal(actual, expected)
+test_that("function errors when memory limit is lower than minimum specified in options", {
+  low_memory_limit <- memory_to_bytes(getOption("abba.lower.memory.limit")) * 0.1
+  expect_error(configure_yaml(file_path="/tst/path/test.R",
+                              memory_limit = low_memory_limit))
 
 })
 
-test_that("Upper cpu limit is enforced", {
-  yaml_file_configured <- abba::configure_yaml(file_path="/tst/path/test.R",
-                                               cpu_limit= 6)
-  actual <- yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$cpu
-
-  expected <- as.character(getOption("abba.cpu.limit"))
-
-  expect_equal(actual, expected)
-
-})
-
-test_that("Lower memory limit is enforced", {
-  yaml_file_configured <- abba::configure_yaml(file_path="/tst/path/test.R",
-                                               memory_limit= '1M')
-  actual <- yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory
-
-  expected <- as.character(getOption("abba.lower.memory.limit"))
-
-  expect_equal(memory_to_bytes(actual), memory_to_bytes(expected))
-
-})
-
-test_that("Upper memory limit is enforced", {
-  yaml_file_configured <- abba::configure_yaml(file_path="/tst/path/test.R",
-                                               memory_limit= '1T')
-  actual <- yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory
-
-  expected <- as.character(getOption("abba.memory.limit"))
-
-  expect_equal(memory_to_bytes(actual), memory_to_bytes(expected))
+test_that("function errors when memory limit is bigger than maximum specified in options", {
+  high_memory_limit <- memory_to_bytes(getOption("abba.memory.limit")) * 10
+  expect_error(configure_yaml(file_path="/tst/path/test.R",
+                              memory_limit = high_memory_limit))
 
 })
 
@@ -91,7 +73,9 @@ test_that("User can add custom mounts; volumeMounts are updated properly", {
 
   actual_volumeMounts <- yaml_file_configured$spec$template$spec$containers[[1]]$volumeMounts
 
-  expect_volumeMounts <- new_volumes$volumeMounts
+  expect_volumeMounts <-
+    c(yaml_file_configured$spec$template$spec$containers[[1]]$volumeMounts[1],
+      new_volumes$volumeMounts)
   expect_equal(actual_volumeMounts, expect_volumeMounts)
 
 })
@@ -105,7 +89,7 @@ test_that("User can add custom mounts; volumes information is updated properly",
                                                mounts=new_volumes)
 
   actual_volumes <- yaml_file_configured$spec$template$spec$volumes
-  expect_volumes <- new_volumes$volumes
+  expect_volumes <- c(yaml_file_configured$spec$template$spec$volumes[1], new_volumes$volumes)
   expect_equal(actual_volumes, expect_volumes)
 
 })

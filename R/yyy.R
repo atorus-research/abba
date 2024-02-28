@@ -22,10 +22,9 @@ mcpu_to_cpu <- function(cpu){
   if (suffix==''){return(round(as.numeric(numeric_part), digits=3))}
   # return just numeric part without conversion if suffix is unrecognized
   else if (suffix != 'm'){
-    message('Unrecognized cpu unit. Allowed unis are: m')
-    return(numeric_part)
-
-  }# return converted value in CPU units
+    stop('Unrecognized cpu unit. Allowed unis are: m')
+  }
+  # return converted value in CPU units
   rounded_converted <- round(as.numeric(numeric_part) * suffixes[[suffix]],
                              digits=3)
   return(rounded_converted)
@@ -49,8 +48,7 @@ memory_to_bytes <- function(memory){
   if (suffix==''){return(ceiling(as.numeric(numeric_part)))}
   # return just numeric part without conversion if suffix is unrecognized
   else if (!(suffix %in% names(suffixes))){
-    message('Unrecognized unit. Defaulting to bytes. Allowed units are: k, M, G, T, ki, Mi, Gi, Ti')
-    return(numeric_part)
+    stop('Unrecognized memory unit. Allowed units are: k, M, G, T, ki, Mi, Gi, Ti')
   }
   # return converted value in bytes
   return(ceiling(as.numeric(numeric_part) * suffixes[[suffix]]))

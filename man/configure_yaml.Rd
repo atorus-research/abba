@@ -10,8 +10,8 @@ configure_yaml(
   user_tag = "",
   cpu_limit = 1L,
   memory_limit = "512M",
-  container = "",
-  mounts = ""
+  container = NULL,
+  mounts = NULL
 )
 }
 \arguments{
@@ -24,6 +24,10 @@ configure_yaml(
 \item{cpu_limit}{Maximum number of cores available for Kubernetes container}
 
 \item{memory_limit}{Maximum amount of RAM available for Kubernetes container}
+
+\item{container}{list that contains container name and image name}
+
+\item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
 }
 \value{
 A nested named list, yaml_file_obj, with placeholders replaced by actual values
