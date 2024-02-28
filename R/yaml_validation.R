@@ -3,7 +3,7 @@ mount_is_valid <- function(mounts){
   # null is a default value for mount argument in configure_yaml function.
   # by default, we should not add new mounts to config
   if (is.null(mounts) || (is.character(mounts) && mounts == '')){return(FALSE)}
-  
+
   if (!is.list(mounts)){
     stop(paste0('Mounts should be a list, not ', typeof(mounts)))
     }
@@ -35,7 +35,7 @@ container_is_valid <- function(container_info){
   if (is.null(container_info) || (is.character(container_info) && container_info == '')){
     return(FALSE)
     }
-  
+
   if (!is.list(container_info)){
     stop(paste0('Container information should be ',
                 'supplied in a list, not a ', typeof(container_info)))
@@ -74,4 +74,14 @@ determine_memory_limit <- function(memory_limit){
   # in case lower/upper limits were not triggered, return originally supplied memory_limit value
   return(memory_limit)
 
+}
+
+batch_id_is_valid <- function(batch_group_id){
+  if (!is.character(batch_group_id)) {
+    stop(sprintf("batch_group_id must be a string, not %s", typeof(batch_group_id)))
+  }
+  if (length(batch_group_id) > 1) {
+    stop("batch_group_id must be a single string value")
+  }
+  return(TRUE)
 }
