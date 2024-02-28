@@ -92,7 +92,7 @@ watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seco
 }
 
 
-#' Submit a job profile for execution on a Kubernetes cluster
+#' Submit an R program for execution on a Kubernetes cluster
 #'
 #' @param file_path Full path to R file
 #' @param batch_group_id Group ID for batch processing
@@ -106,7 +106,7 @@ watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seco
 #' @export
 #'
 #' @examples \dontrun{
-#' job_id <- submit_job("path/to/your/job.yaml")
+#' job_info <- submit_job("path/to/your/program.R", batch_group_id='SDTM')
 #' }
 #'
 submit_job <- function(file_path,
