@@ -1,7 +1,9 @@
 options(
-  abba.cpu.limit = 8,
-  abba.memory.limit = 32000
-)
+  abba.lower.cpu.limit=0.5,
+  abba.cpu.limit = 2,
+  abba.lower.memory.limit='128M',
+  abba.memory.limit='1G'
+  )
 
 #* Submit a and monitor a job on Kubernetes
 #' @param file_path Full path to R file
