@@ -176,7 +176,9 @@ submit_job <- function(file_path,
 #' }
 #'
 #'
-submit_job_and_poll <- function(file_path, batch_group_id='', user_tag='',
+submit_job_and_poll <- function(file_path, 
+                                batch_group_id='', 
+                                user_tag='',
                                 cpu_limit=1L,
                                 memory_limit='512M',
                                 container='',
