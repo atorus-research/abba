@@ -2,7 +2,7 @@
 % Please edit documentation in R/submit_job.R
 \name{watch_job}
 \alias{watch_job}
-\title{Watch a K8S job that has been submitted to Workbench, periodically polling it's exectuion status.}
+\title{Watch a K8S job that has been submitted to Workbench, periodically polling it's execution status.}
 \usage{
 watch_job(
   batch_group_id = "",
@@ -21,7 +21,7 @@ watch_job(
 A "Job completed successfully" message, or a list of failed jobs and their ID's.
 }
 \description{
-Watch a K8S job that has been submitted to Workbench, periodically polling it's exectuion status.
+Watch a K8S job that has been submitted to Workbench, periodically polling it's execution status.
 }
 \examples{
 \dontrun{

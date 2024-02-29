@@ -37,7 +37,7 @@ Submit a job profile for execution on a Kubernetes cluster and poll for completi
 }
 \examples{
 \dontrun{
-result <- submit_job_and_poll("path/to/your/job.yaml", "my-batch-group", 5, 600)
+result <- submit_job_and_poll("path/to/your/job.yaml")
 }
 
 }
