@@ -23,7 +23,7 @@ function(file_path,
          container='', 
          mounts='') {
 
-  result <- submit_job(
+  result <- abba::submit_job(
     file_path,
     batch_group_id=batch_group_id,
     user_tag=user_tag,
@@ -65,7 +65,7 @@ function(file_path,
   if (is.na(poll_interval_seconds)) stop("poll_interval_seconds must be provided as an integer")
   if (is.na(timeout_seconds)) stop("timeout_seconds must be provided as an integer")
   
-  result <- submit_job_and_poll(
+  result <- abba::submit_job_and_poll(
     file_path,
     batch_group_id=batch_group_id,
     user_tag=user_tag,
