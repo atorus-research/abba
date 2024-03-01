@@ -79,3 +79,33 @@ function(file_path,
   
   return(result)
 }
+
+#* Get Job logs
+#' @param job_ids list of job IDs
+#* @get /job-log
+function(job_ids) {
+  
+  result <- abba::get_job_log(job_ids)
+  
+  return(result)
+}
+
+#* Get Job logs of a batch
+#' @param batch_id unique identifier for a batch
+#* @get /batch-log
+function(batch_id) {
+  
+  result <- abba::get_batch_log(batch_id)
+  
+  return(result)
+}
+
+#* Get status of every job in a batch
+#' @param batch_id unique identifier for a batch
+#* @get /batch-status
+function(batch_id='') {
+  
+  result <- abba::get_batch_status(batch_id)
+  
+  return(result)
+}

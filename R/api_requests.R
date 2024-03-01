@@ -91,6 +91,54 @@ send_submit_job_and_watch <-
   }
 
 
+#' Send GET request to get logs of specified Jobs
+#'
+#' @param job_ids A list of job IDs to get logs for
+#'
+#' @return body of request`s response in a list format
+#' @export
+#'
+#' @examples \dontrun{
+#' response <- send_get_job_log('1234j-13j4l5k-ajslfd')}
+send_get_job_log <-
+  function(job_ids, api_address=getOption("abba.api.address")) {
+
+    # address for a submit_job_and_watch endpoint
+    req <- httr2::request(paste(api_address, 'job-log', sep='/'))
+
+    # add a json body with all parameters
+    req <- httr2::req_body_json(req, list(job_ids=job_ids)) %>% httr2::req_method("GET")
+    # send the request to API
+    resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
+
+    # return response as a list
+    return(httr2::resp_body_json(resp))
+  }
+
+#' Send GET request to get batch job statuses
+#'
+#' @param batch_id job ID to get status for
+#'
+#' @return body of request`s response in a list format
+#' @export
+#'
+#' @examples \dontrun{
+#' response <- send_get_batch_status('1234j-13j4l5k-ajslfd')}
+send_get_batch_status <-
+  function(batch_id, api_address=getOption("abba.api.address")) {
+
+    # address for a submit_job_and_watch endpoint
+    req <- httr2::request(paste(api_address, 'batch-status', sep='/'))
+
+    # add a json body with all parameters
+    req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>% httr2::req_method("GET")
+    # send the request to API
+    resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
+
+    # return response as a list
+    return(httr2::resp_body_json(resp))
+  }
+
 #' Function used to extract error message from response body
 #'
 #' @param resp httr2`s response
