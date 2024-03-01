@@ -35,7 +35,7 @@ send_submit_job <-
                                           mounts=mounts,
                                           container=container))
     # send the request to API
-    resp <- httr2::req_perform(req)
+    resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
 
     # return response as a list
     return(httr2::resp_body_json(resp))
@@ -84,8 +84,19 @@ send_submit_job_and_watch <-
                                           poll_interval_seconds=poll_interval_seconds,
                                           timeout_seconds=timeout_seconds))
     # send the request to API
-    resp <- httr2::req_perform(req)
+    resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
 
     # return response as a list
     return(httr2::resp_body_json(resp))
   }
+
+
+#' Function used to extract error message from response body
+#'
+#' @param resp httr2`s response
+#'
+#' @return message attribute from response body
+#'
+submit_job_error_body <- function(resp) {
+  httr2::resp_body_json(resp)$message
+}
