@@ -2,7 +2,7 @@
 % Please edit documentation in R/submit_job.R
 \name{submit_job}
 \alias{submit_job}
-\title{Submit a job profile for execution on a Kubernetes cluster}
+\title{Submit an R program for execution on a Kubernetes cluster}
 \usage{
 submit_job(
   file_path,
@@ -33,11 +33,11 @@ submit_job(
 A list with job_id and batch_id attributes in case of successful submission
 }
 \description{
-Submit a job profile for execution on a Kubernetes cluster
+Submit an R program for execution on a Kubernetes cluster
 }
 \examples{
 \dontrun{
-job_id <- submit_job("path/to/your/job.yaml")
+job_info <- submit_job("path/to/your/program.R", batch_group_id='SDTM')
 }
 
 }

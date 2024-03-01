@@ -28,6 +28,8 @@ send_submit_job(
 \item{container}{list that contains container name and image name}
 
 \item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
+
+\item{api_address}{IP address to send requests to}
 }
 \value{
 body of request`s response in a list format
