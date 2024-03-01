@@ -15,6 +15,55 @@ submit_yaml <- function(yaml_full_path){
 }
 
 
+#' Get status of all jobs in a batch
+#'
+#' @param batch_id unique identifier for a batch
+#'
+#' @return list of statuses for every job in a batch
+#' @export
+#'
+get_batch_status <- function(batch_id){
+  job_details <- list()
+
+  status_descriptions <- list(
+    Pending = "The Pod has been accepted by the Kubernetes cluster, but one or more of the containers has not been set up and made ready to run. This includes time a Pod spends waiting to be scheduled as well as the time spent downloading container images over the network.",
+    Running = "The Pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting.",
+    Succeeded = "All containers in the Pod have terminated in success, and will not be restarted.",
+    Failed = "All containers in the Pod have terminated, and at least one container has terminated in failure. That is, the container either exited with non-zero status or was terminated by the system.",
+    Unknown = "For some reason the state of the Pod could not be obtained. This phase typically occurs due to an error in communicating with the node where the Pod should be running."
+  )
+
+  # Get the status and args of all pods in the batch group
+  command <- sprintf(
+    "kubectl get pods -n rstudio -l batch-group=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
+    shQuote(batch_id)
+  )
+  print(command)
+  pod_info <- system(command, intern = TRUE)
+  pod_lines <- unlist(strsplit(pod_info, "\n"))
+
+  # Reset job_details for each iteration
+  job_details <- list()
+
+  for (line in pod_lines) {
+    if (line != "") {
+      pod_name <- get_pod_name(line)
+      pod_status <- get_pod_status(line)
+      program_name <- get_pod_program_name(line)
+
+      # Ensure the list for this status exists
+      if (!is.list(job_details[[pod_status]])) {
+        job_details[[pod_status]] <- list("Jobs" = list(), "Description" = status_descriptions[[pod_status]])
+      }
+
+      # Append the job details
+      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(id=pod_name, path=program_name))
+    }
+  }
+
+  return(job_details)
+}
+
 
 #' Watch a K8S job that has been submitted to Workbench, periodically polling it's execution status.
 #'
@@ -176,8 +225,8 @@ submit_job <- function(file_path,
 #' }
 #'
 #'
-submit_job_and_poll <- function(file_path, 
-                                batch_group_id='', 
+submit_job_and_poll <- function(file_path,
+                                batch_group_id='',
                                 user_tag='',
                                 cpu_limit=1L,
                                 memory_limit='512M',
