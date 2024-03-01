@@ -2,6 +2,7 @@
 #'
 #' @param job_id a string that uniquely identifies the job
 #' @noRd
+#' @export
 #' @return A character vector containing job's log
 #'
 get_job_log0 <- function(job_id){
@@ -26,6 +27,7 @@ get_job_log0 <- function(job_id){
 #'
 #' @param job_ids A list of job IDs to get logs for
 #' @noRd
+#' @export
 #' @return A list of job logs. Each list entry will contain complete log for a job
 #'
 get_job_log <- function(job_ids){
@@ -37,6 +39,7 @@ get_job_log <- function(job_ids){
 #'
 #' @param batch_id string containing batch ID
 #' @noRd
+#' @export
 #' @return Job logs in a from of list consisting of character vectors
 #'
 get_batch_log <- function(batch_id){

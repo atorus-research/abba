@@ -2,7 +2,8 @@
   options(abba.lower.cpu.limit=0.001,
           abba.cpu.limit = 2,
           abba.lower.memory.limit='128M',
-          abba.memory.limit='1G'
+          abba.memory.limit='1G',
+          abba.api.address="http://127.0.0.1:5794"
   )
   invisible()
 }
