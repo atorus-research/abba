@@ -31,7 +31,8 @@ Imports:
     yaml,
     uuid,
     stringr,
-    httr2
+    httr2,
+    magrittr
 Suggests: 
     testthat (>= 3.0.0), mockery
 Config/testthat/edition: 3

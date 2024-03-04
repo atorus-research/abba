@@ -2,7 +2,7 @@
 % Please edit documentation in R/submit_job.R
 \name{get_job_status}
 \alias{get_job_status}
-\title{Get status of all job's pods}
+\title{Get status of all pods that belong to a job}
 \usage{
 get_job_status(job_id)
 }
@@ -10,8 +10,8 @@ get_job_status(job_id)
 \item{job_id}{unique identifier for a job}
 }
 \value{
-list of statuses for every pod in a job(usually just one)
+list of statuses for every pod in a job(typically just one).
 }
 \description{
-Get status of all job's pods
+Get status of all pods that belong to a job
 }

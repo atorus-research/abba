@@ -13,7 +13,8 @@ send_submit_job_and_watch(
   container = "",
   mounts = "",
   poll_interval_seconds = 3,
-  timeout_seconds = 600
+  timeout_seconds = 600,
+  api_address = getOption("abba.api.address")
 )
 }
 \arguments{
