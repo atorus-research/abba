@@ -107,6 +107,14 @@ function(batch_id) {
 function(batch_id='') {
   
   result <- abba::get_batch_status(batch_id)
+  return(result)
+}
+
+#* Get status of a job as a collection of statuses of its pods
+#' @param job_id job id to get status for
+#* @get /job-status
+function(job_id='') {
   
+  result <- abba::get_job_status(job_id)
   return(result)
 }
