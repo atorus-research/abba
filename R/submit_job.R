@@ -15,6 +15,47 @@ submit_yaml <- function(yaml_full_path){
 }
 
 
+#' Get status of all pods that belong to a job
+#'
+#' @param job_id unique identifier for a job
+#'
+#' @return list of statuses for every pod in a job(typically just one). 
+#' @export
+#'
+get_job_status <- function(job_id){
+  job_details <- list()
+  
+  # Get the status and args of all pods in the batch group
+  command <- sprintf(
+    "kubectl get pods -n rstudio --selector=batch.kubernetes.io/job-name=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
+    shQuote(job_id)
+  )
+  pod_info <- system(command, intern = TRUE)
+  pod_lines <- unlist(strsplit(pod_info, "\n"))
+  
+  # Reset job_details for each iteration
+  job_details <- list()
+  
+  for (line in pod_lines) {
+    if (line != "") {
+      pod_name <- get_pod_name(line)
+      pod_status <- get_pod_status(line)
+      program_name <- get_pod_program_name(line)
+      
+      # Ensure the list for this status exists
+      if (!is.list(job_details[[pod_status]])) {
+        job_details[[pod_status]] <- list("Jobs" = list())
+      }
+      
+      # Append the job details
+      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(list(id=unlist(pod_name), path=unlist(program_name))))
+    }
+  }
+  
+  return(job_details)
+}
+
+
 #' Get status of all jobs in a batch
 #'
 #' @param batch_id unique identifier for a batch
@@ -23,7 +64,6 @@ submit_yaml <- function(yaml_full_path){
 #' @export
 #'
 get_batch_status <- function(batch_id){
-  job_details <- list()
 
   status_descriptions <- list(
     Pending = "The Pod has been accepted by the Kubernetes cluster, but one or more of the containers has not been set up and made ready to run. This includes time a Pod spends waiting to be scheduled as well as the time spent downloading container images over the network.",
@@ -38,7 +78,6 @@ get_batch_status <- function(batch_id){
     "kubectl get pods -n rstudio -l batch-group=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
     shQuote(batch_id)
   )
-  print(command)
   pod_info <- system(command, intern = TRUE)
   pod_lines <- unlist(strsplit(pod_info, "\n"))
 
@@ -50,14 +89,14 @@ get_batch_status <- function(batch_id){
       pod_name <- get_pod_name(line)
       pod_status <- get_pod_status(line)
       program_name <- get_pod_program_name(line)
-
+      
       # Ensure the list for this status exists
       if (!is.list(job_details[[pod_status]])) {
         job_details[[pod_status]] <- list("Jobs" = list(), "Description" = status_descriptions[[pod_status]])
       }
 
       # Append the job details
-      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(id=pod_name, path=program_name))
+      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(list(id=unlist(pod_name), path=unlist(program_name))))
     }
   }
 
@@ -65,78 +104,78 @@ get_batch_status <- function(batch_id){
 }
 
 
-#' Watch a K8S job that has been submitted to Workbench, periodically polling it's execution status.
+#' Watch a K8S batch that has been submitted to Workbench, periodically polling it's execution status.
 #'
-#' @param batch_group_id Group ID for batch processing
-#' @param poll_interval_seconds Time interval for polling job status in seconds
+#' @param batch_group_id Batch ID that was specified when submitting a group of jobs
+#' @param poll_interval_seconds Time interval for polling batch status in seconds
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #'
-#' @return A "Job completed successfully" message, or a list of failed jobs and their ID's.
+#' @return a list of jobs IDs and statuses that belong to batch named batch_group_id
 #' @export
 #'
 #' @examples \dontrun{
-#' result <- watch_job("safety-tfls-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
+#' result <- watch_batch("safety-tfls-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
 #' }
 #'
-watch_job <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seconds = 600){
+watch_batch <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seconds = 600){
   # Initialize variables for tracking job status
   start_time <- Sys.time()
-  job_details <- list()
-
-  status_descriptions <- list(
-    Pending = "The Pod has been accepted by the Kubernetes cluster, but one or more of the containers has not been set up and made ready to run. This includes time a Pod spends waiting to be scheduled as well as the time spent downloading container images over the network.",
-    Running = "The Pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting.",
-    Succeeded = "All containers in the Pod have terminated in success, and will not be restarted.",
-    Failed = "All containers in the Pod have terminated, and at least one container has terminated in failure. That is, the container either exited with non-zero status or was terminated by the system.",
-    Unknown = "For some reason the state of the Pod could not be obtained. This phase typically occurs due to an error in communicating with the node where the Pod should be running."
-  )
-
-
+  
   # Poll for job status in the specified batch group
   while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
-
-    # Get the status and args of all pods in the batch group
-    command <- sprintf(
-      "kubectl get pods -n rstudio -l batch-group=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
-      shQuote(batch_group_id)
-    )
-    pod_info <- system(command, intern = TRUE)
-    pod_lines <- unlist(strsplit(pod_info, "\n"))
-
-    # Reset job_details for each iteration
-    job_details <- list()
-
-    for (line in pod_lines) {
-      if (line != "") {
-        pod_name <- get_pod_name(line)
-        pod_status <- get_pod_status(line)
-        program_name <- get_pod_program_name(line)
-
-        # Ensure the list for this status exists
-        if (!is.list(job_details[[pod_status]])) {
-          job_details[[pod_status]] <- list("Jobs" = list(), "Description" = status_descriptions[[pod_status]])
-        }
-
-        # Append the job details
-        job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(id=pod_name, path=program_name))
-      }
-    }
-
-
+    
+    job_details <- get_batch_status(batch_group_id)
+    
     # Get the names of the outer list in job_details
     status_names <- names(job_details)
-
+    
     # Check if neither "Pending" nor "Running" is a name in job_details
     if (!"Pending" %in% status_names && !"Running" %in% status_names) {
       break # Break if no "Pending" or "Running" in the names of job_details
     }
-
-
-
+    
     # Wait for the specified interval before polling again
     Sys.sleep(poll_interval_seconds)
   }
+  
+  return(job_details)
+}
 
+
+#' Watch a K8S job that has been submitted to Workbench, periodically polling it's execution status.
+#'
+#' @param job_id Job ID. Typically obtained as a return value from submit_job and similar functions
+#' @param poll_interval_seconds Time interval for polling job status in seconds
+#' @param timeout_seconds Total time to wait before timeout in seconds
+#'
+#' @return a list of pods, their IDs and execution statuses
+#' @export
+#'
+#' @examples \dontrun{
+#' result <- watch_job("job-sdtm-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
+#' }
+#'
+watch_job <- function(job_id='', poll_interval_seconds = 3, timeout_seconds = 600){
+  # Initialize variables for tracking job status
+  start_time <- Sys.time()
+  
+  # Poll for job status in the specified batch group
+  while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
+    
+    job_details <- get_job_status(job_id)
+    
+    # Get the names of the outer list in job_details
+    status_names <- names(job_details)
+    
+    # Check if neither "Pending" nor "Running" is a name in job_details
+    if (!"Pending" %in% status_names && !"Running" %in% status_names) {
+      break # Break if no "Pending" or "Running" in the names of job_details
+    }
+    
+    # Wait for the specified interval before polling again
+    Sys.sleep(poll_interval_seconds)
+  }
+  
   return(job_details)
 }
 
@@ -244,7 +283,7 @@ submit_job_and_poll <- function(file_path,
                        container=container,
                        mounts=mounts)
 
-  result <- watch_job(job_info$batch_id)
+  result <- watch_job(job_info$job_id)
 
   return(result)
 

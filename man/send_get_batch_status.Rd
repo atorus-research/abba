@@ -7,7 +7,7 @@
 send_get_batch_status(batch_id, api_address = getOption("abba.api.address"))
 }
 \arguments{
-\item{batch_id}{job ID to get status for}
+\item{batch_id}{batch ID to get status for}
 
 \item{api_address}{IP address to send requests to}
 }

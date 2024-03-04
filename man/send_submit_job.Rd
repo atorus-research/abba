@@ -11,7 +11,8 @@ send_submit_job(
   cpu_limit = 1L,
   memory_limit = "512M",
   container = "",
-  mounts = ""
+  mounts = "",
+  api_address = getOption("abba.api.address")
 )
 }
 \arguments{
