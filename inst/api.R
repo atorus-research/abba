@@ -3,7 +3,7 @@ options(
   abba.cpu.limit = 2,
   abba.lower.memory.limit='128M',
   abba.memory.limit='1G',
-  abba.api.address="http://127.0.0.1:5794,
+  abba.api.address="http://127.0.0.1:5794",
   "plumber.port" = 5794
   )
 
