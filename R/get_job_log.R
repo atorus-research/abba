@@ -1,9 +1,9 @@
 #' Get job log from Kubernetes for a single job
 #'
 #' @param job_id a string that uniquely identifies the job
-#' @noRd
+#'
 #' @export
-#' @return A character vector containing job's log
+#' @return A list containing job_id and a character vector with jobs log
 #'
 get_job_log0 <- function(job_id){
 
@@ -20,13 +20,39 @@ get_job_log0 <- function(job_id){
       return(paste0("Job ", job_id, " not found."))
       }
     }
-  return(as.character(log))
+  return(list(job_id=job_id, log=as.character(log)))
 }
+
+
+#' Get log for a pod
+#'
+#' @param pod_id Pod ID to get logs for
+#'
+#' @export
+#' @return A character vector containing pod log.
+#'
+get_pod_log0 <- function(pod_id){
+  # run the command for outputting job log
+  # this command will generate warning in case job with a given ID does not exist
+  # that's why there is a suppressWarnings in place
+  log <- suppressWarnings(system2(command="kubectl",
+                                  args=c("logs", "-n" ,"rstudio", pod_id),
+                                  stdout=TRUE, stderr=TRUE))
+
+  # return custom error message about invalid job ID if job was not found
+  if(!is.null(attributes(log))){
+    if("status" %in% names(attributes(log)) & attr(log, "status")==1){
+      return(paste0("Pod ", pod_id, " not found."))
+    }
+  }
+  return(list(pod_id=pod_id, log=as.character(log)))
+}
+
 
 #' Get log for every job specified in an input vector/list
 #'
 #' @param job_ids A list of job IDs to get logs for
-#' @noRd
+#'
 #' @export
 #' @return A list of job logs. Each list entry will contain complete log for a job
 #'
@@ -35,19 +61,20 @@ get_job_log <- function(job_ids){
   return(logs)
 }
 
+
 #' Return list of logs for jobs that are marked with a given batch ID
 #'
 #' @param batch_id string containing batch ID
-#' @noRd
+#'
 #' @export
 #' @return Job logs in a from of list consisting of character vectors
 #'
 get_batch_log <- function(batch_id){
 
-  # get all job IDs belonging to a given batch
-  job_ids <- get_batch_ids(batch_id)
+  # get all pod IDs belonging to a given batch
+  pod_ids <- get_batch_ids(batch_id)
 
-  logs <- lapply(job_ids, get_job_log0)
+  logs <- lapply(pod_ids, get_pod_log0)
 
   return(logs)
 }
