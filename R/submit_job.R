@@ -15,6 +15,47 @@ submit_yaml <- function(yaml_full_path){
 }
 
 
+#' Get status of all pods that belong to a job
+#'
+#' @param job_id unique identifier for a job
+#'
+#' @return list of statuses for every pod in a job(typically just one). 
+#' @export
+#'
+get_job_status <- function(job_id){
+  job_details <- list()
+  
+  # Get the status and args of all pods in the batch group
+  command <- sprintf(
+    "kubectl get pods -n rstudio --selector=batch.kubernetes.io/job-name=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
+    shQuote(job_id)
+  )
+  pod_info <- system(command, intern = TRUE)
+  pod_lines <- unlist(strsplit(pod_info, "\n"))
+  
+  # Reset job_details for each iteration
+  job_details <- list()
+  
+  for (line in pod_lines) {
+    if (line != "") {
+      pod_name <- get_pod_name(line)
+      pod_status <- get_pod_status(line)
+      program_name <- get_pod_program_name(line)
+      
+      # Ensure the list for this status exists
+      if (!is.list(job_details[[pod_status]])) {
+        job_details[[pod_status]] <- list("Jobs" = list())
+      }
+      
+      # Append the job details
+      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(list(id=unlist(pod_name), path=unlist(program_name))))
+    }
+  }
+  
+  return(job_details)
+}
+
+
 #' Get status of all jobs in a batch
 #'
 #' @param batch_id unique identifier for a batch
