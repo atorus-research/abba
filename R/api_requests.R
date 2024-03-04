@@ -252,7 +252,18 @@ send_get_batch_status <-
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
 
     # return response as a list
-    return(httr2::resp_body_json(resp))
+    result <- httr2::resp_body_json(resp)
+    # unlist id and path
+    statuses <- names(result)
+    for (status in statuses){
+      for (i in 1:length(result[[status]]$Jobs)){
+        for (name in names(result[[status]]$Jobs[[i]])){
+          result[[status]]$Jobs[[i]][[name]]=unlist(result[[status]]$Jobs[[i]][[name]])
+        }
+      }
+    }
+
+    return(result)
   }
 
 #' Function used to extract error message from response body
