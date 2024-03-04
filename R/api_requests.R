@@ -235,7 +235,7 @@ send_get_job_log <-
 
 #' Send GET request to get batch job statuses
 #'
-#' @param batch_id job ID to get status for
+#' @param batch_id batch ID to get status for
 #' @param api_address IP address to send requests to
 #'
 #' @return body of request`s response in a list format
@@ -245,15 +245,15 @@ send_get_job_log <-
 #' response <- send_get_batch_status('1234j-13j4l5k-ajslfd')}
 send_get_batch_status <-
   function(batch_id, api_address=getOption("abba.api.address")) {
-
+    
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'batch-status', sep='/'))
-
+    
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>% httr2::req_method("GET")
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
-
+    
     # return response as a list
     result <- httr2::resp_body_json(resp)
     # unlist id and path
@@ -265,7 +265,43 @@ send_get_batch_status <-
         }
       }
     }
+    
+    return(result)
+  }
 
+#' Send GET request to get job status
+#'
+#' @param job_id job IDs to get status for
+#' @param api_address IP address to send requests to
+#'
+#' @return body of request`s response in a list format
+#' @export
+#'
+#' @examples \dontrun{
+#' response <- send_get_job_status('1234j-13j4l5k-ajslfd')}
+send_get_job_status <-
+  function(job_id, api_address=getOption("abba.api.address")) {
+    
+    # address for a submit_job_and_watch endpoint
+    req <- httr2::request(paste(api_address, 'job-status', sep='/'))
+    
+    # add a json body with all parameters
+    req <- httr2::req_body_json(req, list(job_id=job_id)) %>% httr2::req_method("GET")
+    # send the request to 
+    resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
+    
+    # return response as a list
+    result <- httr2::resp_body_json(resp)
+    # unlist id and path
+    statuses <- names(result)
+    for (status in statuses){
+      for (i in 1:length(result[[status]]$Jobs)){
+        for (name in names(result[[status]]$Jobs[[i]])){
+          result[[status]]$Jobs[[i]][[name]]=unlist(result[[status]]$Jobs[[i]][[name]])
+        }
+      }
+    }
+    
     return(result)
   }
 
