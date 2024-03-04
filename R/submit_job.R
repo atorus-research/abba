@@ -38,7 +38,6 @@ get_batch_status <- function(batch_id){
     "kubectl get pods -n rstudio -l batch-group=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
     shQuote(batch_id)
   )
-  print(command)
   pod_info <- system(command, intern = TRUE)
   pod_lines <- unlist(strsplit(pod_info, "\n"))
 
@@ -50,14 +49,14 @@ get_batch_status <- function(batch_id){
       pod_name <- get_pod_name(line)
       pod_status <- get_pod_status(line)
       program_name <- get_pod_program_name(line)
-
+      
       # Ensure the list for this status exists
       if (!is.list(job_details[[pod_status]])) {
         job_details[[pod_status]] <- list("Jobs" = list(), "Description" = status_descriptions[[pod_status]])
       }
 
       # Append the job details
-      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(id=pod_name, path=program_name))
+      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(list(id=unlist(pod_name), path=unlist(program_name))))
     }
   }
 
