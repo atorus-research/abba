@@ -184,7 +184,7 @@ send_wait_for_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- send_get_batch_status(jbatch_id, api_address=api_address)
+      job_details <- send_get_batch_status(batch_id, api_address=api_address)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
