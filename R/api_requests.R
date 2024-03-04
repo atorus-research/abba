@@ -21,10 +21,11 @@ send_submit_job <-
            cpu_limit=1L,
            memory_limit='512M',
            container='',
-           mounts='') {
+           mounts='',
+           api_address=getOption("abba.api.address")) {
 
     # address for a submit_job_and_watch endpoint
-    req <- httr2::request(paste(getOption("abba.api.address"),
+    req <- httr2::request(paste(api_address,
                                 'submit-job', sep='/'))
 
     # add a json body with all parameters
@@ -72,10 +73,11 @@ send_submit_job_and_watch <-
            container='',
            mounts='',
            poll_interval_seconds = 3,
-           timeout_seconds = 600) {
+           timeout_seconds = 600,
+           api_address=getOption("abba.api.address")) {
 
     # address for a submit_job_and_watch endpoint
-    req <- httr2::request(paste(getOption("abba.api.address"),
+    req <- httr2::request(paste(api_address,
                                 'submit-job-and-watch', sep='/'))
 
     # add a json body with all parameters
@@ -91,8 +93,18 @@ send_submit_job_and_watch <-
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
 
+    result <- httr2::resp_body_json(resp)
+    # unlist id and path
+    statuses <- names(result)
+    for (status in statuses){
+      for (i in 1:length(result[[status]]$Jobs)){
+        for (name in names(result[[status]]$Jobs[[i]])){
+          result[[status]]$Jobs[[i]][[name]]=unlist(result[[status]]$Jobs[[i]][[name]])
+        }
+      }
+    }
     # return response as a list
-    return(httr2::resp_body_json(resp))
+    return(result)
   }
 
 #' Send job and poll for status. This function sends multiple requests so it won't
@@ -141,7 +153,7 @@ send_submit_job_and_wait_for_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- send_get_batch_status(job_id$batch_id, api_address=api_address)
+      job_details <- send_get_job_status(job_id$job_id, api_address=api_address)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
@@ -159,13 +171,13 @@ send_submit_job_and_wait_for_log <-
     logs <- send_get_job_log(job_id$job_id, api_address = api_address)
 
     # return response as a list
-    return(list(job=job_id, logs=logs))
+    return(list(job_id=job_id$job_id, batch_id=job_id$batch_id, logs=logs))
   }
 
 
-#' Monitor batch status and retrieve its log when the job finishes running
+#' Monitor job status and retrieve its log when the job finishes running
 #'
-#' @param batch_id unique batch identificator
+#' @param job_id unique job identificator
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
 #' @param api_address IP address to send requests to
@@ -174,9 +186,9 @@ send_submit_job_and_wait_for_log <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_wait_for_log('sdfj4-asdjlk-bjslk')}
-send_wait_for_log <-
-  function(batch_id,
+#' response <- send_wait_for_job_log('sdfj4-asdjlk-bjslk')}
+send_wait_for_job_log <-
+  function(job_id,
            poll_interval_seconds = 3,
            timeout_seconds = 600,
            api_address=getOption("abba.api.address")) {
@@ -187,7 +199,7 @@ send_wait_for_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- send_get_batch_status(batch_id, api_address=api_address)
+      job_details <- send_get_job_status(job_id, api_address=api_address)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
@@ -202,11 +214,58 @@ send_wait_for_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- send_get_job_log(batch_id, api_address = api_address)
+    logs <- send_get_job_log(job_id, api_address = api_address)
 
     # return response as a list
-    return(list(batch_id=batch_id, logs=logs))
+    return(logs)
   }
+
+
+#' Monitor batch status and retrieve its log when the all jobs in batch finish running
+#'
+#' @param batch_id unique batch identificator
+#' @param timeout_seconds Total time to wait before timeout in seconds
+#' @param poll_interval_seconds Total time to wait before timeout in seconds
+#' @param api_address IP address to send requests to
+#'
+#' @return list with 2 sublists: job_ids and their logs
+#' @export
+#'
+#' @examples \dontrun{
+#' response <- send_wait_for_batch_log('batch-sdtm-sdfj4-asdjlk-bjslk')}
+send_wait_for_batch_log <-
+  function(batch_id,
+           poll_interval_seconds = 3,
+           timeout_seconds = 600,
+           api_address=getOption("abba.api.address")) {
+
+    start_time <- Sys.time()
+
+    # Poll for job status in the specified batch group
+    while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
+
+      # Get the status
+      batch_details <- send_get_batch_status(batch_id, api_address=api_address)
+
+      # Get the names of the outer list in job_details
+      status_names <- names(batch_details)
+
+      # Check if neither "Pending" nor "Running" is a name in job_details
+      if (!"Pending" %in% status_names && !"Running" %in% status_names) {
+        break # Break if no "Pending" or "Running" in the names of job_details
+      }
+
+      # Wait for the specified interval before polling again
+      Sys.sleep(poll_interval_seconds)
+    }
+
+    # get logs after job is no long in pending/running stage
+    logs <- send_get_batch_log(batch_id, api_address = api_address)
+
+    # return response as a list
+    return(logs)
+  }
+
 
 #' Send GET request to get logs of specified Jobs
 #'
@@ -228,10 +287,47 @@ send_get_job_log <-
     req <- httr2::req_body_json(req, list(job_ids=job_ids)) %>% httr2::req_method("GET")
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
-
+    result <- httr2::resp_body_json(resp)
+    # unlist the log
+    for (i in 1:length(result)){
+      result[[i]]$job_id <- unlist(result[[i]]$job_id)
+      result[[i]]$log <- unlist(result[[i]]$log)
+    }
     # return response as a list
-    return(httr2::resp_body_json(resp))
+    return(result)
   }
+
+
+#' Send GET request to get logs of all jobs in a batch
+#'
+#' @param batch_id unique batch identificator
+#' @param api_address IP address to send requests to
+#'
+#' @return body of request`s response in a list format
+#' @export
+#'
+#' @examples \dontrun{
+#' response <- send_get_job_log('1234j-13j4l5k-ajslfd')}
+send_get_batch_log <-
+  function(batch_id, api_address=getOption("abba.api.address")) {
+
+    # address for a submit_job_and_watch endpoint
+    req <- httr2::request(paste(api_address, 'batch-log', sep='/'))
+
+    # add a json body with all parameters
+    req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>% httr2::req_method("GET")
+    # send the request to API
+    resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
+    result <- httr2::resp_body_json(resp)
+    # unlist the log
+    for (i in 1:length(result)){
+      result[[i]]$pod_id <- unlist(result[[i]]$pod_id)
+      result[[i]]$log <- unlist(result[[i]]$log)
+    }
+    # return response as a list
+    return(result)
+  }
+
 
 #' Send GET request to get batch job statuses
 #'
@@ -245,15 +341,15 @@ send_get_job_log <-
 #' response <- send_get_batch_status('1234j-13j4l5k-ajslfd')}
 send_get_batch_status <-
   function(batch_id, api_address=getOption("abba.api.address")) {
-    
+
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'batch-status', sep='/'))
-    
+
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>% httr2::req_method("GET")
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
-    
+
     # return response as a list
     result <- httr2::resp_body_json(resp)
     # unlist id and path
@@ -265,7 +361,7 @@ send_get_batch_status <-
         }
       }
     }
-    
+
     return(result)
   }
 
@@ -281,15 +377,15 @@ send_get_batch_status <-
 #' response <- send_get_job_status('1234j-13j4l5k-ajslfd')}
 send_get_job_status <-
   function(job_id, api_address=getOption("abba.api.address")) {
-    
+
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'job-status', sep='/'))
-    
+
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(job_id=job_id)) %>% httr2::req_method("GET")
-    # send the request to 
+    # send the request to
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
-    
+
     # return response as a list
     result <- httr2::resp_body_json(resp)
     # unlist id and path
@@ -301,7 +397,7 @@ send_get_job_status <-
         }
       }
     }
-    
+
     return(result)
   }
 
