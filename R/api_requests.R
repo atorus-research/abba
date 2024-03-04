@@ -37,9 +37,12 @@ send_submit_job <-
                                           container=container))
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
-
+    result <- httr2::resp_body_json(resp)
+    # unlist values inside the results
+    result$job_id <- unlist(result$job_id)
+    result$batch_id <- unlist(result$batch_id)
     # return response as a list
-    return(httr2::resp_body_json(resp))
+    return(result)
   }
 
 #' Send POST request to submit-job-and-watch endpoint
