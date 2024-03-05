@@ -46,66 +46,6 @@ send_submit_job <-
     return(result)
   }
 
-#' Send POST request to submit-job-and-watch endpoint
-#'
-#' @param file_path Full path to R file
-#' @param batch_group_id Group ID for batch processing
-#' @param user_tag Optional; a string that describes what kind of job will be scheduled to run
-#' @param cpu_limit Maximum number of cores available for Kubernetes container
-#' @param memory_limit Maximum amount of RAM available for Kubernetes container
-#' @param container list that contains container name and image name
-#' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
-#' @param timeout_seconds Total time to wait before timeout in seconds
-#' @param poll_interval_seconds Total time to wait before timeout in seconds
-#' @param api_address IP address to send requests to
-#'
-#' @return body of request`s response in a list format
-#' @export
-#'
-#' @examples \dontrun{
-#' response <- send_submit_job_and_watch('/path/to/R/program.R', batch_group_id='SDTM')}
-send_submit_job_and_watch <-
-  function(file_path,
-           batch_group_id='',
-           user_tag='',
-           cpu_limit=1L,
-           memory_limit='512M',
-           container='',
-           mounts='',
-           poll_interval_seconds = 3,
-           timeout_seconds = 600,
-           api_address=getOption("abba.api.address")) {
-
-    # address for a submit_job_and_watch endpoint
-    req <- httr2::request(paste(api_address,
-                                'submit-job-and-watch', sep='/'))
-
-    # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(file_path=file_path,
-                                          batch_group_id=batch_group_id,
-                                          user_tag=user_tag,
-                                          cpu_limit=cpu_limit,
-                                          memory_limit=memory_limit,
-                                          mounts=mounts,
-                                          container=container,
-                                          poll_interval_seconds=poll_interval_seconds,
-                                          timeout_seconds=timeout_seconds))
-    # send the request to API
-    resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
-
-    result <- httr2::resp_body_json(resp)
-    # unlist id and path
-    statuses <- names(result)
-    for (status in statuses){
-      for (i in 1:length(result[[status]]$Jobs)){
-        for (name in names(result[[status]]$Jobs[[i]])){
-          result[[status]]$Jobs[[i]][[name]]=unlist(result[[status]]$Jobs[[i]][[name]])
-        }
-      }
-    }
-    # return response as a list
-    return(result)
-  }
 
 #' Send job and poll for status. This function sends multiple requests so it won't
 #' time out on heavy jobs
