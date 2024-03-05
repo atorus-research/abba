@@ -24,7 +24,7 @@ function(file_path,
          container='', 
          mounts='') {
 
-  result <- abba::submit_job(
+  result <- abba::abba_submit_k8s_job_local(
     file_path,
     batch_group_id=batch_group_id,
     user_tag=user_tag,
@@ -42,7 +42,7 @@ function(file_path,
 #* @get /job-log
 function(job_ids) {
   
-  result <- abba::get_job_log(job_ids)
+  result <- abba::abba_get_k8s_job_log_local(job_ids)
   
   return(result)
 }
@@ -52,7 +52,7 @@ function(job_ids) {
 #* @get /batch-log
 function(batch_id) {
   
-  result <- abba::get_batch_log(batch_id)
+  result <- abba::abba_get_k8s_batch_log_local(batch_id)
   
   return(result)
 }
@@ -62,7 +62,7 @@ function(batch_id) {
 #* @get /batch-status
 function(batch_id='') {
   
-  result <- abba::get_batch_status(batch_id)
+  result <- abba::abba_get_k8s_batch_status_local(batch_id)
   return(result)
 }
 
@@ -71,6 +71,6 @@ function(batch_id='') {
 #* @get /job-status
 function(job_id='') {
   
-  result <- abba::get_job_status(job_id)
+  result <- abba::abba_get_k8s_job_status_local(job_id)
   return(result)
 }

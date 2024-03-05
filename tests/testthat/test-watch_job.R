@@ -16,10 +16,10 @@ mock_system <- function(command, intern = TRUE) {
 # Unit test for watch_job function
 test_that("watch_job returns correctly for different batch groups", {
   # stub(watch_job, "system", mock_system)
-  stub(watch_job, "system", mock_system, depth=2)
+  stub(abba_watch_k8s_job_local, "system", mock_system, depth=2)
 
   # Test case for a batch group with various job statuses
-  result <- watch_job("batch-group")
+  result <- abba_watch_k8s_job_local("batch-group")
 
   # Manually define expected result
   expected_result <- list(Succeeded=list(

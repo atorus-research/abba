@@ -4,7 +4,7 @@
 #' @noRd
 #' @return a character vector of job IDs
 #'
-get_batch_ids <- function(group_batch_id){
+abba_get_k8s_job_ids_from_batch_local <- function(group_batch_id){
 
   # get list of job IDs with a given batch group
   output <- system2(command="kubectl",

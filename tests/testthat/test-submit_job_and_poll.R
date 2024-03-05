@@ -27,12 +27,12 @@ mock_system <- function(command, intern = TRUE) {
 }
 
 test_that("submit_job_and_poll works correctly", {
-  stub(submit_job_and_poll, "configure_yaml", mock_configure_yaml)
-  stub(submit_job_and_poll, "save_yaml", mock_save_yaml)
-  stub(submit_job_and_poll, "submit_yaml", mock_submit_yaml)
-  stub(submit_job_and_poll, "watch_job", mock_watch_job)
-  stub(submit_job_and_poll, "system", mock_system)
-  
-  result <- submit_job_and_poll("/path/to/file.R", "test-group")
+  stub(abba_submit_k8s_job_and_poll_local, "configure_yaml", mock_configure_yaml)
+  stub(abba_submit_k8s_job_and_poll_local, "save_yaml", mock_save_yaml)
+  stub(abba_submit_k8s_job_and_poll_local, "abba_submit_k8s_yaml_local", mock_submit_yaml)
+  stub(abba_submit_k8s_job_and_poll_local, "abba_watch_k8s_job_local", mock_watch_job)
+  stub(abba_submit_k8s_job_and_poll_local, "system", mock_system)
+
+  result <- abba_submit_k8s_job_and_poll_local("/path/to/file.R", "test-group")
   expect_equal(result, "Job completed successfully")
 })

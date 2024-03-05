@@ -11,8 +11,8 @@
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
 #' @export
 #' @examples
-#' config <- configure_yaml(file_path="/path/to/file.R", user_tag="test program")
-configure_yaml <- function(file_path='',
+#' config <- abba_configure_k8s_yaml_local(file_path="/path/to/file.R", user_tag="test program")
+abba_configure_k8s_yaml_local <- function(file_path='',
                            batch_group_id='',
                            user_tag='',
                            cpu_limit= 1L,
@@ -20,7 +20,7 @@ configure_yaml <- function(file_path='',
                            container=NULL,
                            mounts=NULL){
 
-  yaml_file_obj <- load_yaml_template()
+  yaml_file_obj <- abba_load_k8s_yaml_template_local()
 
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
 
@@ -35,21 +35,21 @@ configure_yaml <- function(file_path='',
   generate_name <- paste0(job_name, '-', uuid::UUIDgenerate())
     # temporary plug before figuring out where to get service user identity
   service_user <- Sys.info()[["user"]]
-  guid <- get_guid()
+  guid <- abba_get_guid_local()
 
   # Enforce lower and upper limits on cpu resource
   # use mcpu_to_cpu function to make sure compared values have equal units
-  cpu_limit <- determine_cpu_limit(cpu_limit)
+  cpu_limit <- abba_validate_cpu_limit(cpu_limit)
 
   # Enforce lower and upper limits on memory
   # use memory_to_bytes function to make sure compared values have equal units
-  memory_limit <- determine_memory_limit(memory_limit)
+  memory_limit <- abba_validate_memory_limit(memory_limit)
 
   # update container info in configuration file
-  yaml_file_obj <- update_container(yaml_file_obj, container)
+  yaml_file_obj <- abba_update_k8s_container_local(yaml_file_obj, container)
 
   # add specified mounts to configuration file
-  yaml_file_obj <- update_mounts(yaml_file_obj, mounts)
+  yaml_file_obj <- abba_update_k8s_mounts_local(yaml_file_obj, mounts)
 
   # a function that would try to replace all possible keywords inside the target string
   replace_func <- function(x){
@@ -102,16 +102,16 @@ configure_yaml <- function(file_path='',
 #' @noRd
 #'
 #' @examples \dontrun{
-#' yaml <- update_mounts(yaml,
+#' yaml <- abba_update_k8s_mounts_local(yaml,
 #'                       list(volumes=list(list(name='mount1',
 #'                                              nfs=list(server='0.0.0.0',
 #'                                                       path='/mnt/mount1'))),
 #'                            volumeMounts=list(list(name='mount1',
 #'                                                   mountPath='/mnt/mount1'))))}
-update_mounts <- function(yaml, mounts){
+abba_update_k8s_mounts_local <- function(yaml, mounts){
 
   # validate mounts
-  if (!mount_is_valid(mounts)){return(yaml)}
+  if (!abba_validate_k8s_mount(mounts)){return(yaml)}
 
   # update the fields in yaml after all checks are successful
   yaml$spec$template$spec$volumes <- c(yaml$spec$template$spec$volumes, mounts$volumes)
@@ -131,12 +131,12 @@ update_mounts <- function(yaml, mounts){
 #' @noRd
 #'
 #' @examples \dontrun{
-#' yaml <- update_container(yaml,
+#' yaml <- abba_update_k8s_container_local(yaml,
 #'                          list(name='rs-launcher-container',
 #'                               image='atoruscontainers.azurecr.io/jammy-1.0.1-workbench'))}
-update_container <- function(yaml, container_info){
+abba_update_k8s_container_local <- function(yaml, container_info){
   # return unmodified yaml if supplied container information is not correctly specified
-  if(!container_is_valid(container_info)){return(yaml)}
+  if(!abba_validate_k8s_container(container_info)){return(yaml)}
   # update the fields for ONE(first) container
   yaml$spec$template$spec$containers[[1]]$name <- container_info$name
   yaml$spec$template$spec$containers[[1]]$image <- container_info$image
