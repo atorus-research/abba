@@ -13,8 +13,8 @@
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_submit_job('/path/to/R/program.R')}
-send_submit_job <-
+#' response <- abba_submit_job('/path/to/R/program.R')}
+abba_submit_job <-
   function(file_path,
            batch_group_id='',
            user_tag='',
@@ -65,8 +65,8 @@ send_submit_job <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_submit_job_and_watch('/path/to/R/program.R', batch_group_id='SDTM')}
-send_submit_job_and_wait_for_log <-
+#' response <- abba_submit_job_and_watch('/path/to/R/program.R', batch_group_id='SDTM')}
+abba_submit_job_and_wait_for_log <-
   function(file_path,
            batch_group_id='',
            user_tag='',
@@ -79,7 +79,7 @@ send_submit_job_and_wait_for_log <-
            api_address=getOption("abba.api.address")) {
 
     # submit the job
-    job_id <- send_submit_job(file_path=file_path,
+    job_id <- abba_submit_job(file_path=file_path,
                               batch_group_id=batch_group_id,
                               user_tag=user_tag,
                               cpu_limit=cpu_limit,
@@ -93,7 +93,7 @@ send_submit_job_and_wait_for_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- send_get_job_status(job_id$job_id, api_address=api_address)
+      job_details <- abba_get_job_status(job_id$job_id, api_address=api_address)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
@@ -108,7 +108,7 @@ send_submit_job_and_wait_for_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- send_get_job_log(job_id$job_id, api_address = api_address)
+    logs <- abba_get_job_log(job_id$job_id, api_address = api_address)
 
     # return response as a list
     return(list(job_id=job_id$job_id, batch_id=job_id$batch_id, logs=logs))
@@ -126,8 +126,8 @@ send_submit_job_and_wait_for_log <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_wait_for_job_log('sdfj4-asdjlk-bjslk')}
-send_wait_for_job_log <-
+#' response <- abba_wait_for_job_log('sdfj4-asdjlk-bjslk')}
+abba_wait_for_job_log <-
   function(job_id,
            poll_interval_seconds = 3,
            timeout_seconds = 600,
@@ -139,7 +139,7 @@ send_wait_for_job_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- send_get_job_status(job_id, api_address=api_address)
+      job_details <- abba_get_job_status(job_id, api_address=api_address)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
@@ -154,7 +154,7 @@ send_wait_for_job_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- send_get_job_log(job_id, api_address = api_address)
+    logs <- abba_get_job_log(job_id, api_address = api_address)
 
     # return response as a list
     return(logs)
@@ -172,8 +172,8 @@ send_wait_for_job_log <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_wait_for_batch_log('batch-sdtm-sdfj4-asdjlk-bjslk')}
-send_wait_for_batch_log <-
+#' response <- abba_wait_for_batch_log('batch-sdtm-sdfj4-asdjlk-bjslk')}
+abba_wait_for_batch_log <-
   function(batch_id,
            poll_interval_seconds = 3,
            timeout_seconds = 600,
@@ -185,7 +185,7 @@ send_wait_for_batch_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      batch_details <- send_get_batch_status(batch_id, api_address=api_address)
+      batch_details <- abba_get_batch_status(batch_id, api_address=api_address)
 
       # Get the names of the outer list in job_details
       status_names <- names(batch_details)
@@ -200,7 +200,7 @@ send_wait_for_batch_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- send_get_batch_log(batch_id, api_address = api_address)
+    logs <- abba_get_batch_log(batch_id, api_address = api_address)
 
     # return response as a list
     return(logs)
@@ -216,8 +216,8 @@ send_wait_for_batch_log <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_get_job_log('1234j-13j4l5k-ajslfd')}
-send_get_job_log <-
+#' response <- abba_get_job_log('1234j-13j4l5k-ajslfd')}
+abba_get_job_log <-
   function(job_ids, api_address=getOption("abba.api.address")) {
 
     # address for a submit_job_and_watch endpoint
@@ -247,8 +247,8 @@ send_get_job_log <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_get_job_log('1234j-13j4l5k-ajslfd')}
-send_get_batch_log <-
+#' response <- abba_get_job_log('1234j-13j4l5k-ajslfd')}
+abba_get_batch_log <-
   function(batch_id, api_address=getOption("abba.api.address")) {
 
     # address for a submit_job_and_watch endpoint
@@ -278,8 +278,8 @@ send_get_batch_log <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_get_batch_status('1234j-13j4l5k-ajslfd')}
-send_get_batch_status <-
+#' response <- abba_get_batch_status('1234j-13j4l5k-ajslfd')}
+abba_get_batch_status <-
   function(batch_id, api_address=getOption("abba.api.address")) {
 
     # address for a submit_job_and_watch endpoint
@@ -314,8 +314,8 @@ send_get_batch_status <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- send_get_job_status('1234j-13j4l5k-ajslfd')}
-send_get_job_status <-
+#' response <- abba_get_job_status('1234j-13j4l5k-ajslfd')}
+abba_get_job_status <-
   function(job_id, api_address=getOption("abba.api.address")) {
 
     # address for a submit_job_and_watch endpoint
