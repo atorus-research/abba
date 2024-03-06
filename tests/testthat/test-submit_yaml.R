@@ -15,9 +15,9 @@ mock_read_yaml <- function(file_path) {
 }
 
 test_that("submit_yaml returns the correct job ID", {
-  stub(submit_yaml, "system", mock_system)
-  stub(submit_yaml, "yaml::read_yaml", mock_read_yaml)
-  
-  job_id <- submit_yaml("path/to/job.yaml")
+  stub(abba_submit_k8s_yaml_local, "system", mock_system)
+  stub(abba_submit_k8s_yaml_local, "yaml::read_yaml", mock_read_yaml)
+
+  job_id <- abba_submit_k8s_yaml_local("path/to/job.yaml")
   expect_equal(job_id, "test-job-id")
 })

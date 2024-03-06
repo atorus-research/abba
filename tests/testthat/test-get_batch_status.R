@@ -15,10 +15,10 @@ mock_system <- function(command, intern = TRUE) {
 
 # Unit test for watch_job function
 test_that("get_batch_status returns statuses in expected format", {
-  stub(get_batch_status, "system", mock_system)
+  stub(abba_get_k8s_batch_status_local, "system", mock_system)
 
   # Test case for a batch group with various job statuses
-  result <- get_batch_status("batch-group")
+  result <- abba_get_k8s_batch_status_local("batch-group")
 
   # Manually define expected result
   desc_success <- "All containers in the Pod have terminated in success, and will not be restarted."

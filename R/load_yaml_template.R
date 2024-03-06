@@ -2,7 +2,7 @@
 #'
 #' @return Imported YAML as list
 #' @noRd
-load_yaml_template <- function() {
+abba_load_k8s_yaml_template_local <- function() {
   yaml::read_yaml(system.file("job.yaml", package="abba"))
 }
 

@@ -32,7 +32,8 @@ Imports:
     uuid,
     stringr,
     httr2,
-    magrittr
+    magrittr,
+    tools
 Suggests: 
     testthat (>= 3.0.0), mockery
 Config/testthat/edition: 3

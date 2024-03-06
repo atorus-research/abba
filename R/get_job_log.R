@@ -5,7 +5,7 @@
 #' @export
 #' @return A list containing job_id and a character vector with jobs log
 #'
-get_job_log0 <- function(job_id){
+abba_get_k8s_job_log0_local <- function(job_id){
 
   # run the command for outputting job log
   # this command will generate warning in case job with a given ID does not exist
@@ -31,7 +31,7 @@ get_job_log0 <- function(job_id){
 #' @export
 #' @return A character vector containing pod log.
 #'
-get_pod_log0 <- function(pod_id){
+abba_get_k8s_pod_log0_local <- function(pod_id){
   # run the command for outputting job log
   # this command will generate warning in case job with a given ID does not exist
   # that's why there is a suppressWarnings in place
@@ -56,8 +56,8 @@ get_pod_log0 <- function(pod_id){
 #' @export
 #' @return A list of job logs. Each list entry will contain complete log for a job
 #'
-get_job_log <- function(job_ids){
-  logs <- lapply(job_ids, get_job_log0)
+abba_get_k8s_job_log_local <- function(job_ids){
+  logs <- lapply(job_ids, abba_get_k8s_job_log0_local)
   return(logs)
 }
 
@@ -69,12 +69,12 @@ get_job_log <- function(job_ids){
 #' @export
 #' @return Job logs in a from of list consisting of character vectors
 #'
-get_batch_log <- function(batch_id){
+abba_get_k8s_batch_log_local <- function(batch_id){
 
   # get all pod IDs belonging to a given batch
-  pod_ids <- get_batch_ids(batch_id)
+  pod_ids <- abba_get_k8s_job_ids_from_batch_local(batch_id)
 
-  logs <- lapply(pod_ids, get_pod_log0)
+  logs <- lapply(pod_ids, abba_get_k8s_pod_log0_local)
 
   return(logs)
 }

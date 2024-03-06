@@ -1,5 +1,5 @@
 
-mount_is_valid <- function(mounts){
+abba_validate_k8s_mount <- function(mounts){
   # null is a default value for mount argument in configure_yaml function.
   # by default, we should not add new mounts to config
   if (is.null(mounts) || (is.character(mounts) && mounts == '')){return(FALSE)}
@@ -26,7 +26,7 @@ mount_is_valid <- function(mounts){
   return(TRUE)
 }
 
-container_is_valid <- function(container_info){
+abba_validate_k8s_container <- function(container_info){
   # null is a default value for container argument in configure_yaml function.
   # by default, we should not change the container in config
   if (is.null(container_info) || (is.character(container_info) && container_info == '')){
@@ -44,7 +44,7 @@ container_is_valid <- function(container_info){
   return(TRUE)
 }
 
-determine_cpu_limit <- function(cpu_limit){
+abba_validate_cpu_limit <- function(cpu_limit){
   if (mcpu_to_cpu(cpu_limit) < mcpu_to_cpu(getOption('abba.lower.cpu.limit'))){
     stop(sprintf('CPU limit(%s) is below the lower limit set by abba.lower.cpu.limit(%s).',
                  cpu_limit, getOption('abba.lower.cpu.limit')))
@@ -57,7 +57,7 @@ determine_cpu_limit <- function(cpu_limit){
   return(cpu_limit)
 }
 
-determine_memory_limit <- function(memory_limit){
+abba_validate_memory_limit <- function(memory_limit){
   if (memory_to_bytes(memory_limit) < memory_to_bytes(getOption('abba.lower.memory.limit'))){
     stop(sprintf('Requested memory limit(%s) is lower than the minimum set by abba.lower.memory.limit(%s).',
                  memory_limit, getOption('abba.lower.memory.limit')))
@@ -73,7 +73,7 @@ determine_memory_limit <- function(memory_limit){
 
 }
 
-batch_id_is_valid <- function(batch_group_id){
+abba_validate_batch_id <- function(batch_group_id){
   if (!is.character(batch_group_id)) {
     stop(sprintf("batch_group_id must be a string, not %s", typeof(batch_group_id)))
   }
