@@ -65,8 +65,8 @@ abba_submit_job <-
 #' @export
 #'
 #' @examples \dontrun{
-#' response <- abba_submit_job_and_watch('/path/to/R/program.R', batch_group_id='SDTM')}
-abba_submit_job_and_wait_for_log <-
+#' response <- abba_submit_and_get_log('/path/to/R/program.R', batch_group_id='SDTM')}
+abba_submit_and_get_log <-
   function(file_path,
            batch_group_id='',
            user_tag='',
@@ -108,10 +108,10 @@ abba_submit_job_and_wait_for_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- abba_get_job_log(job_id$job_id, api_address = api_address)
+    logs <- abba_get_job_log(program_name=list(job_id$job_id, api_address = api_address))
 
     # return response as a list
-    return(list(job_id=job_id$job_id, batch_id=job_id$batch_id, logs=logs))
+    return(logs)
   }
 
 
