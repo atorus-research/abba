@@ -108,10 +108,12 @@ abba_submit_and_get_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- abba_get_job_log(program_name=list(job_id$job_id, api_address = api_address))
-
+    program_name <- tools::file_path_sans_ext(basename(job_details[[1]]$Jobs[[1]]$path))
+    logs <- abba_get_job_log(job_id$job_id, api_address = api_address)
+    result = list()
+    result[[program_name]] = logs[[1]]
     # return response as a list
-    return(logs)
+    return(result)
   }
 
 
