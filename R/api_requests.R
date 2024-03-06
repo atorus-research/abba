@@ -8,6 +8,7 @@
 #' @param container list that contains container name and image name
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #' @param api_address IP address to send requests to
+#' @param api_key API Key for accessing restricted endpoints
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -22,11 +23,12 @@ abba_submit_job <-
            memory_limit='512M',
            container='',
            mounts='',
-           api_address=getOption("abba.api.address")) {
+           api_address=getOption("abba.api.address"),
+           api_key=Sys.getenv("CONNECT_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
-    req <- httr2::request(paste(api_address,
-                                'submit-job', sep='/'))
+    req <- httr2::request(paste(api_address, 'submit-job', sep='/')) %>%
+      add_api_key_to_header(api_key=api_key)
 
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(file_path=file_path,
@@ -60,6 +62,7 @@ abba_submit_job <-
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
 #' @param api_address IP address to send requests to
+#' @param api_key API Key for accessing restricted endpoints
 #'
 #' @return list with 2 attributes: job_id for submitted job`s id, and its logs
 #' @export
@@ -76,7 +79,8 @@ abba_submit_and_get_log <-
            mounts='',
            poll_interval_seconds = 3,
            timeout_seconds = 600,
-           api_address=getOption("abba.api.address")) {
+           api_address=getOption("abba.api.address"),
+           api_key=Sys.getenv("CONNECT_API_KEY")) {
 
     # submit the job
     job_id <- abba_submit_job(file_path=file_path,
@@ -85,7 +89,9 @@ abba_submit_and_get_log <-
                               cpu_limit=cpu_limit,
                               memory_limit=memory_limit,
                               mounts=mounts,
-                              container=container)
+                              container=container,
+                              api_address=api_address,
+                              api_key=api_key)
 
     start_time <- Sys.time()
 
@@ -93,7 +99,8 @@ abba_submit_and_get_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- abba_get_job_status(job_id$job_id, api_address=api_address)
+      job_details <- abba_get_job_status(job_id$job_id, api_address=api_address,
+                                         api_key=api_key)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
@@ -109,7 +116,7 @@ abba_submit_and_get_log <-
 
     # get logs after job is no long in pending/running stage
     program_name <- tools::file_path_sans_ext(basename(job_details[[1]]$Jobs[[1]]$path))
-    logs <- abba_get_job_log(job_id$job_id, api_address = api_address)
+    logs <- abba_get_job_log(job_id$job_id, api_address = api_address, api_key=api_key)
     result = list()
     result[[program_name]] = logs[[1]]
     # return response as a list
@@ -123,6 +130,7 @@ abba_submit_and_get_log <-
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
 #' @param api_address IP address to send requests to
+#' @param api_key API Key for accessing restricted endpoints
 #'
 #' @return list with 2 attributes: job_id for submitted job`s id, and its logs
 #' @export
@@ -133,7 +141,8 @@ abba_wait_for_job_log <-
   function(job_id,
            poll_interval_seconds = 3,
            timeout_seconds = 600,
-           api_address=getOption("abba.api.address")) {
+           api_address=getOption("abba.api.address"),
+           api_key=Sys.getenv("CONNECT_API_KEY")) {
 
     start_time <- Sys.time()
 
@@ -141,7 +150,7 @@ abba_wait_for_job_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- abba_get_job_status(job_id, api_address=api_address)
+      job_details <- abba_get_job_status(job_id, api_address=api_address, api_key=api_key)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
@@ -156,7 +165,7 @@ abba_wait_for_job_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- abba_get_job_log(job_id, api_address = api_address)
+    logs <- abba_get_job_log(job_id, api_address = api_address, api_key=api_key)
 
     # return response as a list
     return(logs)
@@ -169,6 +178,7 @@ abba_wait_for_job_log <-
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
 #' @param api_address IP address to send requests to
+#' @param api_key API Key for accessing restricted endpoints
 #'
 #' @return list with 2 sublists: job_ids and their logs
 #' @export
@@ -179,7 +189,8 @@ abba_wait_for_batch_log <-
   function(batch_id,
            poll_interval_seconds = 3,
            timeout_seconds = 600,
-           api_address=getOption("abba.api.address")) {
+           api_address=getOption("abba.api.address"),
+           api_key=Sys.getenv("CONNECT_API_KEY")) {
 
     start_time <- Sys.time()
 
@@ -187,7 +198,8 @@ abba_wait_for_batch_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      batch_details <- abba_get_batch_status(batch_id, api_address=api_address)
+      batch_details <- abba_get_batch_status(batch_id, api_address=api_address,
+                                             api_key=api_key)
 
       # Get the names of the outer list in job_details
       status_names <- names(batch_details)
@@ -202,7 +214,8 @@ abba_wait_for_batch_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- abba_get_batch_log(batch_id, api_address = api_address)
+    logs <- abba_get_batch_log(batch_id, api_address = api_address,
+                               api_key=api_key)
 
     # return response as a list
     return(logs)
@@ -213,6 +226,7 @@ abba_wait_for_batch_log <-
 #'
 #' @param job_ids A list of job IDs to get logs for
 #' @param api_address IP address to send requests to
+#' @param api_key API Key for accessing restricted endpoints
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -220,13 +234,17 @@ abba_wait_for_batch_log <-
 #' @examples \dontrun{
 #' response <- abba_get_job_log('1234j-13j4l5k-ajslfd')}
 abba_get_job_log <-
-  function(job_ids, api_address=getOption("abba.api.address")) {
+  function(job_ids,
+           api_address=getOption("abba.api.address"),
+           api_key=Sys.getenv("CONNECT_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'job-log', sep='/'))
 
     # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(job_ids=job_ids)) %>% httr2::req_method("GET")
+    req <- httr2::req_body_json(req, list(job_ids=job_ids)) %>%
+      httr2::req_method("GET") %>%
+      add_api_key_to_header(api_key=api_key)
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
     result <- httr2::resp_body_json(resp)
@@ -244,6 +262,7 @@ abba_get_job_log <-
 #'
 #' @param batch_id unique batch identificator
 #' @param api_address IP address to send requests to
+#' @param api_key API Key for accessing restricted endpoints
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -251,13 +270,17 @@ abba_get_job_log <-
 #' @examples \dontrun{
 #' response <- abba_get_job_log('1234j-13j4l5k-ajslfd')}
 abba_get_batch_log <-
-  function(batch_id, api_address=getOption("abba.api.address")) {
+  function(batch_id,
+           api_address=getOption("abba.api.address"),
+           api_key=Sys.getenv("CONNECT_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'batch-log', sep='/'))
 
     # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>% httr2::req_method("GET")
+    req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>%
+      httr2::req_method("GET") %>%
+      add_api_key_to_header(api_key=api_key)
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
     result <- httr2::resp_body_json(resp)
@@ -275,6 +298,7 @@ abba_get_batch_log <-
 #'
 #' @param batch_id batch ID to get status for
 #' @param api_address IP address to send requests to
+#' @param api_key API Key for accessing restricted endpoints
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -282,13 +306,17 @@ abba_get_batch_log <-
 #' @examples \dontrun{
 #' response <- abba_get_batch_status('1234j-13j4l5k-ajslfd')}
 abba_get_batch_status <-
-  function(batch_id, api_address=getOption("abba.api.address")) {
+  function(batch_id,
+           api_address=getOption("abba.api.address"),
+           api_key=Sys.getenv("CONNECT_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'batch-status', sep='/'))
 
     # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>% httr2::req_method("GET")
+    req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>%
+      httr2::req_method("GET") %>%
+      add_api_key_to_header(api_key=api_key)
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
 
@@ -311,6 +339,7 @@ abba_get_batch_status <-
 #'
 #' @param job_id job IDs to get status for
 #' @param api_address IP address to send requests to
+#' @param api_key API Key for accessing restricted endpoints
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -318,13 +347,17 @@ abba_get_batch_status <-
 #' @examples \dontrun{
 #' response <- abba_get_job_status('1234j-13j4l5k-ajslfd')}
 abba_get_job_status <-
-  function(job_id, api_address=getOption("abba.api.address")) {
+  function(job_id,
+           api_address=getOption("abba.api.address"),
+           api_key=Sys.getenv("CONNECT_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'job-status', sep='/'))
 
     # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(job_id=job_id)) %>% httr2::req_method("GET")
+    req <- httr2::req_body_json(req, list(job_id=job_id)) %>%
+      httr2::req_method("GET") %>%
+      add_api_key_to_header(api_key=api_key)
     # send the request to
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
 

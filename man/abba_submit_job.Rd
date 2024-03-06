@@ -12,7 +12,8 @@ abba_submit_job(
   memory_limit = "512M",
   container = "",
   mounts = "",
-  api_address = getOption("abba.api.address")
+  api_address = getOption("abba.api.address"),
+  api_key = Sys.getenv("CONNECT_API_KEY")
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ abba_submit_job(
 \item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
 
 \item{api_address}{IP address to send requests to}
+
+\item{api_key}{API Key for accessing restricted endpoints}
 }
 \value{
 body of request`s response in a list format
