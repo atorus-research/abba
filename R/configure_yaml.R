@@ -18,7 +18,8 @@ abba_configure_k8s_yaml_local <- function(file_path='',
                            cpu_limit= 1L,
                            memory_limit='512M',
                            container=NULL,
-                           mounts=NULL){
+                           mounts=NULL,
+                           username=NULL){
 
   yaml_file_obj <- abba_load_k8s_yaml_template_local()
 
@@ -33,8 +34,12 @@ abba_configure_k8s_yaml_local <- function(file_path='',
   # cannot have underscores in job name/generate name
   job_name <- gsub('_', '-', program_name)
   generate_name <- paste0(job_name, '-', uuid::UUIDgenerate())
-    # temporary plug before figuring out where to get service user identity
-  service_user <- Sys.info()[["user"]]
+  # Pull supplied username if provided, otherwise default to local user
+  if (is.null(username)){
+    service_user <- Sys.info()[["user"]]
+  } else {
+    service_user <- username
+  }
   guid <- abba_get_guid_local()
 
   # Enforce lower and upper limits on cpu resource
