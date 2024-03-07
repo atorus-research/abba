@@ -1,11 +1,26 @@
+library(plumber)
+devtools::load_all()
+
 options(
   abba.lower.cpu.limit=0.5,
   abba.cpu.limit = 2,
   abba.lower.memory.limit='128M',
-  abba.memory.limit='1G',
-  abba.api.address="http://127.0.0.1:5794",
-  "plumber.port" = 5794
+  abba.memory.limit='1G'
   )
+
+# Returns a list containing "user" and "groups" information
+# populated by incoming request data.
+getUserMetadata <- function(req) {
+  rawUserData <- req[["HTTP_RSTUDIO_CONNECT_CREDENTIALS"]]
+  if (!is.null(rawUserData)) {
+    jsonlite::fromJSON(rawUserData)
+  } else {
+    list()
+  }
+}
+
+#* @apiTitle {abba} API
+#* @apiDescription Backend submission API for {abba}
 
 #* Submit a job on Kubernetes
 #' @param file_path Full path to R file
@@ -16,24 +31,30 @@ options(
 #' @param container list that contains container name and image name
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #* @post /submit-job
-function(file_path, 
-         batch_group_id='', 
-         user_tag='', 
-         cpu_limit="1", 
-         memory_limit="512M", 
-         container='', 
-         mounts='') {
+function(file_path,
+         batch_group_id='',
+         user_tag='',
+         cpu_limit="1",
+         memory_limit="512M",
+         container='',
+         mounts='',
+         req,
+         res) {
 
-  result <- abba::abba_submit_k8s_job_local(
+  user <- getUserMetadata(req)
+  username <- user[["user"]]
+
+  result <- abba_submit_k8s_job_local(
     file_path,
     batch_group_id=batch_group_id,
     user_tag=user_tag,
     cpu_limit=cpu_limit,
     memory_limit=memory_limit,
     container=container,
-    mounts=mounts
+    mounts=mounts,
+    username=username
   )
-  
+
   return(result)
 }
 
@@ -41,9 +62,9 @@ function(file_path,
 #' @param job_ids list of job IDs
 #* @get /job-log
 function(job_ids) {
-  
-  result <- abba::abba_get_k8s_job_log_local(job_ids)
-  
+
+  result <- abba_get_k8s_job_log_local(job_ids)
+
   return(result)
 }
 
@@ -51,9 +72,9 @@ function(job_ids) {
 #' @param batch_id unique identifier for a batch
 #* @get /batch-log
 function(batch_id) {
-  
-  result <- abba::abba_get_k8s_batch_log_local(batch_id)
-  
+
+  result <- abba_get_k8s_batch_log_local(batch_id)
+
   return(result)
 }
 
@@ -61,8 +82,8 @@ function(batch_id) {
 #' @param batch_id unique identifier for a batch
 #* @get /batch-status
 function(batch_id='') {
-  
-  result <- abba::abba_get_k8s_batch_status_local(batch_id)
+
+  result <- abba_get_k8s_batch_status_local(batch_id)
   return(result)
 }
 
@@ -70,7 +91,7 @@ function(batch_id='') {
 #' @param job_id job id to get status for
 #* @get /job-status
 function(job_id='') {
-  
-  result <- abba::abba_get_k8s_job_status_local(job_id)
+
+  result <- abba_get_k8s_job_status_local(job_id)
   return(result)
 }

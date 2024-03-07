@@ -5,7 +5,7 @@
 #'
 #' @param line A single line of output from `kubectl`, formatted as "name,status,args".
 #' @return A character string representing the name of the pod.
-#' @export
+#' @noRd
 abba_get_k8s_pod_name_local <- function(line) {
   parts <- strsplit(line, ",")[[1]]
   return(parts[1])
@@ -17,7 +17,7 @@ abba_get_k8s_pod_name_local <- function(line) {
 #'
 #' @param line A single line of output from `kubectl`, formatted as "name,status,args".
 #' @return A character string representing the status of the pod.
-#' @export
+#' @noRd
 abba_get_k8s_pod_status_local <- function(line) {
   parts <- strsplit(line, ",")[[1]]
   return(parts[2])
@@ -29,7 +29,7 @@ abba_get_k8s_pod_status_local <- function(line) {
 #'
 #' @param line A single line of output from `kubectl`, formatted as "name,status,args".
 #' @return A character string representing the args of the pod.
-#' @export
+#' @noRd
 abba_get_k8s_pod_args_string_local <- function(line) {
   parts <- strsplit(line, ",")[[1]]
   return(paste(parts[-c(1,2)], collapse = ","))
@@ -42,7 +42,7 @@ abba_get_k8s_pod_args_string_local <- function(line) {
 #'
 #' @param line A single line of output from `kubectl`, formatted as "name,status,args".
 #' @return A character string representing the program name used by the pod.
-#' @export
+#' @noRd
 abba_get_k8s_pod_program_name_local <- function(line) {
   args_string <- abba_get_k8s_pod_args_string_local(line)
   pattern <- "-f ([^,]+\\.R)"

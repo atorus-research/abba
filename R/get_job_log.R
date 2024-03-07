@@ -2,7 +2,7 @@
 #'
 #' @param job_id a string that uniquely identifies the job
 #'
-#' @export
+#' @noRd
 #' @return A list containing job_id and a character vector with jobs log
 #'
 abba_get_k8s_job_log0_local <- function(job_id){
@@ -28,7 +28,7 @@ abba_get_k8s_job_log0_local <- function(job_id){
 #'
 #' @param pod_id Pod ID to get logs for
 #'
-#' @export
+#' @noRd
 #' @return A character vector containing pod log.
 #'
 abba_get_k8s_pod_log0_local <- function(pod_id){
