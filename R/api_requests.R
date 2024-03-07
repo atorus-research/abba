@@ -1,3 +1,21 @@
+
+#' Pick up the Connect API key and add it to the request header
+#'
+#' @param req httr2 request object
+#'
+#' @return httr2 request object
+#' @noRd
+update_auth_headers <- function(req) {
+  # Add the auth header
+  connectAPIKey <- Sys.getenv("CONNECT_API_KEY")
+  if (connectAPIKey != "") {
+    req <- httr2::req_headers(req, Authorization = paste0("Key ", connectAPIKey))
+  } else {
+    warning("No API key has been saved in the CONNECT_API_KEY environment variable.")
+  }
+  req
+}
+
 #' Send POST request to submit-job endpoint
 #'
 #' @param file_path Full path to R file
@@ -27,6 +45,9 @@ abba_submit_job <-
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address,
                                 'submit-job', sep='/'))
+
+    # Auth headers
+    req <- update_auth_headers(req)
 
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(file_path=file_path,
@@ -224,6 +245,7 @@ abba_get_job_log <-
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'job-log', sep='/'))
+    req <- update_auth_headers(req)
 
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(job_ids=job_ids)) %>% httr2::req_method("GET")
@@ -255,6 +277,7 @@ abba_get_batch_log <-
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'batch-log', sep='/'))
+    req <- update_auth_headers(req)
 
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>% httr2::req_method("GET")
@@ -286,6 +309,7 @@ abba_get_batch_status <-
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'batch-status', sep='/'))
+    req <- update_auth_headers(req)
 
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>% httr2::req_method("GET")
@@ -322,6 +346,7 @@ abba_get_job_status <-
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'job-status', sep='/'))
+    req <- update_auth_headers(req)
 
     # add a json body with all parameters
     req <- httr2::req_body_json(req, list(job_id=job_id)) %>% httr2::req_method("GET")
