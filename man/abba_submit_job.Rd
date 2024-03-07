@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_requests.R
 \name{abba_submit_job}
 \alias{abba_submit_job}
-\title{Send POST request to submit-job endpoint}
+\title{Submit a job to an available abba API}
 \usage{
 abba_submit_job(
   file_path,
@@ -33,10 +33,10 @@ abba_submit_job(
 \item{api_address}{IP address to send requests to}
 }
 \value{
-body of request`s response in a list format
+Job / Batch ID identifier in a list object
 }
 \description{
-Send POST request to submit-job endpoint
+Submit a job to an available abba API
 }
 \examples{
 \dontrun{

@@ -9,7 +9,7 @@
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
-#' @export
+#' @noRd
 #' @examples
 #' config <- abba_configure_k8s_yaml_local(file_path="/path/to/file.R", user_tag="test program")
 abba_configure_k8s_yaml_local <- function(file_path='',

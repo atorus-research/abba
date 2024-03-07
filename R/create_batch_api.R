@@ -20,10 +20,10 @@
 create_batch_api <- function(path=".") {
 
   if (grepl("\\.", path)) {
-    path <- file.path(".", "api.R")
+    path <- file.path(".", "plumber.R")
   }
 
-  success <- file.copy(system.file("api.R", package="abba"),
+  success <- file.copy(system.file("plumber.R", package="abba"),
                        path,
                        overwrite=FALSE)
   if(success) {

@@ -5,7 +5,7 @@
 #' @param file_path Optional. Full filepath for to-be-saved YAML config
 #'
 #' @return Full path to the saved YAML file
-#' @export
+#' @noRd
 abba_save_yaml_local <- function(yaml_obj, file_path=''){
 
   yaml_path <- if(file_path=='') tempfile(fileext = '.yaml') else file_path

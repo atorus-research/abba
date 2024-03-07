@@ -11,7 +11,8 @@ abba_submit_k8s_job_local(
   cpu_limit = 1L,
   memory_limit = "512M",
   container = "",
-  mounts = ""
+  mounts = "",
+  username = NULL
 )
 }
 \arguments{

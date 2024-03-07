@@ -16,7 +16,7 @@ update_auth_headers <- function(req) {
   req
 }
 
-#' Send POST request to submit-job endpoint
+#' Submit a job to an available abba API
 #'
 #' @param file_path Full path to R file
 #' @param batch_group_id Group ID for batch processing
@@ -27,7 +27,7 @@ update_auth_headers <- function(req) {
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #' @param api_address IP address to send requests to
 #'
-#' @return body of request`s response in a list format
+#' @return Job / Batch ID identifier in a list object
 #' @export
 #'
 #' @examples \dontrun{
@@ -373,7 +373,7 @@ abba_get_job_status <-
 #' @param resp httr2`s response
 #'
 #' @return message attribute from response body
-#'
+#' @noRd
 submit_job_error_body <- function(resp) {
   httr2::resp_body_json(resp)$message
 }

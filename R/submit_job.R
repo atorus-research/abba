@@ -3,7 +3,7 @@
 #' @param yaml_full_path Path to YAML config file
 #'
 #' @return A string containing Job ID
-#' @export
+#' @noRd
 abba_submit_k8s_yaml_local <- function(yaml_full_path){
 
   # send the job for execution
@@ -20,8 +20,7 @@ abba_submit_k8s_yaml_local <- function(yaml_full_path){
 #' @param job_id unique identifier for a job
 #'
 #' @return list of statuses for every pod in a job(typically just one).
-#' @export
-#'
+#' @noRd
 abba_get_k8s_job_status_local <- function(job_id){
   job_details <- list()
 

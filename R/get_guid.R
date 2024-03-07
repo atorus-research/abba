@@ -1,7 +1,7 @@
 #' Get numerical User ID/ Group ID on linux
 #'
 #' @return a list of uid and gid number for user executing this function
-#' @export
+#' @noRd
 #' @examples
 #' ids <- abba_get_guid_local()
 abba_get_guid_local <- function(){
