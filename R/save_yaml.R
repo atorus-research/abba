@@ -6,7 +6,7 @@
 #'
 #' @return Full path to the saved YAML file
 #' @noRd
-abba_save_yaml_local <- function(yaml_obj, file_path=''){
+save_yaml <- function(yaml_obj, file_path=''){
 
   yaml_path <- if(file_path=='') tempfile(fileext = '.yaml') else file_path
 

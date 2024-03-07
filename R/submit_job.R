@@ -4,7 +4,7 @@
 #'
 #' @return A string containing Job ID
 #' @noRd
-abba_submit_k8s_yaml_local <- function(yaml_full_path){
+submit_k8s_yaml <- function(yaml_full_path){
 
   # send the job for execution
   system(paste("kubectl apply -f", yaml_full_path))
@@ -20,7 +20,8 @@ abba_submit_k8s_yaml_local <- function(yaml_full_path){
 #' @param job_id unique identifier for a job
 #'
 #' @return list of statuses for every pod in a job(typically just one).
-#' @noRd
+#' @export
+#'
 abba_get_k8s_job_status_local <- function(job_id){
   job_details <- list()
 
@@ -37,9 +38,9 @@ abba_get_k8s_job_status_local <- function(job_id){
 
   for (line in pod_lines) {
     if (line != "") {
-      pod_name <- abba_get_k8s_pod_name_local(line)
-      pod_status <- abba_get_k8s_pod_status_local(line)
-      program_name <- abba_get_k8s_pod_program_name_local(line)
+      pod_name <- get_k8s_pod_name(line)
+      pod_status <- get_k8s_pod_status(line)
+      program_name <- get_k8s_pod_program_name(line)
 
       # Ensure the list for this status exists
       if (!is.list(job_details[[pod_status]])) {
@@ -47,7 +48,10 @@ abba_get_k8s_job_status_local <- function(job_id){
       }
 
       # Append the job details
-      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(list(id=unlist(pod_name), path=unlist(program_name))))
+      job_details[[pod_status]]$Jobs <-
+        c(job_details[[pod_status]]$Jobs,
+          list(list(id=unlist(pod_name),
+                    path=unlist(program_name))))
     }
   }
 
@@ -85,9 +89,9 @@ abba_get_k8s_batch_status_local <- function(batch_id){
 
   for (line in pod_lines) {
     if (line != "") {
-      pod_name <- abba_get_k8s_pod_name_local(line)
-      pod_status <- abba_get_k8s_pod_status_local(line)
-      program_name <- abba_get_k8s_pod_program_name_local(line)
+      pod_name <- get_k8s_pod_name(line)
+      pod_status <- get_k8s_pod_status(line)
+      program_name <- get_k8s_pod_program_name(line)
 
       # Ensure the list for this status exists
       if (!is.list(job_details[[pod_status]])) {
@@ -95,7 +99,9 @@ abba_get_k8s_batch_status_local <- function(batch_id){
       }
 
       # Append the job details
-      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(list(id=unlist(pod_name), path=unlist(program_name))))
+      job_details[[pod_status]]$Jobs <-
+        c(job_details[[pod_status]]$Jobs,
+          list(list(id=unlist(pod_name), path=unlist(program_name))))
     }
   }
 
@@ -202,11 +208,10 @@ abba_submit_k8s_job_local <- function(file_path,
                        cpu_limit=1L,
                        memory_limit='512M',
                        container='',
-                       mounts='',
-                       username=NULL) {
+                       mounts='') {
 
   # Check if batch_group_id is a vector with more than one element
-  abba_validate_batch_id(batch_group_id)
+  validate_batch_id(batch_group_id)
   # By default let 'batch-group' be the lowest possible level - the program name.
   # Otherwise, keep what user has specified.
   if (is.null(batch_group_id) || batch_group_id == '') {
@@ -226,20 +231,19 @@ abba_submit_k8s_job_local <- function(file_path,
   }
 
   # Configure job to run our program
-  job_config <- abba_configure_k8s_yaml_local(file_path=file_path,
-                               batch_group_id=batch_group_id,
-                               user_tag=user_tag,
-                               cpu_limit= cpu_limit,
-                               memory_limit=memory_limit,
-                               container=container,
-                               mounts=mounts,
-                               username=username)
+  job_config <- configure_k8s_yaml(file_path=file_path,
+                                   batch_group_id=batch_group_id,
+                                   user_tag=user_tag,
+                                   cpu_limit= cpu_limit,
+                                   memory_limit=memory_limit,
+                                   container=container,
+                                   mounts=mounts)
 
   # Save yaml to temp folders
-  job_config_path <- abba_save_yaml_local(job_config)
+  job_config_path <- save_yaml(job_config)
 
   # Send the job for execution and read job id
-  job_id <- abba_submit_k8s_yaml_local(job_config_path)
+  job_id <- submit_k8s_yaml(job_config_path)
 
   return(list(job_id=job_id, batch_id=batch_group_id))
 
