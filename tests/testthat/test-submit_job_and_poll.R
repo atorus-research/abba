@@ -27,7 +27,7 @@ mock_system <- function(command, intern = TRUE) {
 }
 
 test_that("submit_job_and_poll works correctly", {
-  stub(abba_submit_k8s_job_and_poll_local, "configure_yaml", mock_configure_yaml)
+  stub(abba_submit_k8s_job_and_poll_local, "configure_k8s_yaml", mock_configure_yaml, depth=2)
   stub(abba_submit_k8s_job_and_poll_local, "save_yaml", mock_save_yaml)
   stub(abba_submit_k8s_job_and_poll_local, "abba_submit_k8s_yaml_local", mock_submit_yaml)
   stub(abba_submit_k8s_job_and_poll_local, "abba_watch_k8s_job_local", mock_watch_job)

@@ -12,6 +12,7 @@ abba_submit_k8s_job_and_poll_local(
   memory_limit = "512M",
   container = "",
   mounts = "",
+  username = NULL,
   poll_interval_seconds = 3,
   timeout_seconds = 600
 )

@@ -114,3 +114,19 @@ validate_batch_id <- function(batch_group_id){
   }
   return(TRUE)
 }
+
+#' Evaluate unit_type
+#'
+#' @param unit_type a string to specify unit - either a 'job' or 'batch'
+#'
+#' @return TRUE if unit_type passed all checks, otherwise function errors out
+#' @noRd
+validate_unit_type <- function(unit_type){
+  if (!is.character(unit_type)) {
+    stop(sprintf("unit_type must be a string, not %s", typeof(unit_type)))
+  }
+  if (!(unit_type %in% c('job', 'batch'))) {
+    stop(sprintf("unit_type must be one of 'job', 'batch', not %s", unit_type))
+  }
+  return(TRUE)
+}

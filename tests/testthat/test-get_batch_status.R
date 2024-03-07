@@ -15,7 +15,7 @@ mock_system <- function(command, intern = TRUE) {
 
 # Unit test for watch_job function
 test_that("get_batch_status returns statuses in expected format", {
-  stub(abba_get_k8s_batch_status_local, "system", mock_system)
+  stub(abba_get_k8s_batch_status_local, "system", mock_system, depth=2)
 
   # Test case for a batch group with various job statuses
   result <- abba_get_k8s_batch_status_local("batch-group")
