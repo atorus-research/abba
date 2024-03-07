@@ -4,12 +4,18 @@
 \alias{abba_get_job_status}
 \title{Send GET request to get job status}
 \usage{
-abba_get_job_status(job_id, api_address = getOption("abba.api.address"))
+abba_get_job_status(
+  job_id,
+  api_address = getOption("abba.api.address"),
+  api_key = Sys.getenv("CONNECT_API_KEY")
+)
 }
 \arguments{
 \item{job_id}{job IDs to get status for}
 
 \item{api_address}{IP address to send requests to}
+
+\item{api_key}{API Key for accessing restricted endpoints}
 }
 \value{
 body of request`s response in a list format

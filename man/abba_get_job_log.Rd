@@ -4,12 +4,18 @@
 \alias{abba_get_job_log}
 \title{Send GET request to get logs of specified Jobs}
 \usage{
-abba_get_job_log(job_ids, api_address = getOption("abba.api.address"))
+abba_get_job_log(
+  job_ids,
+  api_address = getOption("abba.api.address"),
+  api_key = Sys.getenv("CONNECT_API_KEY")
+)
 }
 \arguments{
 \item{job_ids}{A list of job IDs to get logs for}
 
 \item{api_address}{IP address to send requests to}
+
+\item{api_key}{API Key for accessing restricted endpoints}
 }
 \value{
 body of request`s response in a list format

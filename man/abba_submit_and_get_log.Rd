@@ -15,7 +15,8 @@ abba_submit_and_get_log(
   mounts = "",
   poll_interval_seconds = 3,
   timeout_seconds = 600,
-  api_address = getOption("abba.api.address")
+  api_address = getOption("abba.api.address"),
+  api_key = Sys.getenv("CONNECT_API_KEY")
 )
 }
 \arguments{
@@ -38,6 +39,8 @@ abba_submit_and_get_log(
 \item{timeout_seconds}{Total time to wait before timeout in seconds}
 
 \item{api_address}{IP address to send requests to}
+
+\item{api_key}{API Key for accessing restricted endpoints}
 }
 \value{
 list with 2 attributes: job_id for submitted job`s id, and its logs
