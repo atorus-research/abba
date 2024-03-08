@@ -3,8 +3,8 @@
 #' @param yaml_full_path Path to YAML config file
 #'
 #' @return A string containing Job ID
-#' @noRd
-abba_submit_k8s_yaml_local <- function(yaml_full_path){
+#' @export
+submit_k8s_yaml <- function(yaml_full_path){
 
   # send the job for execution
   system(paste("kubectl apply -f", yaml_full_path))
@@ -15,19 +15,32 @@ abba_submit_k8s_yaml_local <- function(yaml_full_path){
 }
 
 
-#' Get status of all pods that belong to a job
+#' Get status of all pods that belong to a job or batch
 #'
-#' @param job_id unique identifier for a job
-#'
-#' @return list of statuses for every pod in a job(typically just one).
+#' @param unit_id unique identifier for a job/batch
+#' @param unit_type type of unit - can be 'job' or 'batch'
+#' @return list of statuses for every pod in a job/batch.
 #' @noRd
-abba_get_k8s_job_status_local <- function(job_id){
+#'
+abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job'){
+
+  status_descriptions <- list(
+    Pending = "The Pod has been accepted by the Kubernetes cluster, but one or more of the containers has not been set up and made ready to run. This includes time a Pod spends waiting to be scheduled as well as the time spent downloading container images over the network.",
+    Running = "The Pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting.",
+    Succeeded = "All containers in the Pod have terminated in success, and will not be restarted.",
+    Failed = "All containers in the Pod have terminated, and at least one container has terminated in failure. That is, the container either exited with non-zero status or was terminated by the system.",
+    Unknown = "For some reason the state of the Pod could not be obtained. This phase typically occurs due to an error in communicating with the node where the Pod should be running."
+  )
   job_details <- list()
 
+  # determine selector depending on unit_type
+  validate_unit_type(unit_type)
+  if (unit_type=='job') {unit_selector <- "--selector=batch.kubernetes.io/job-name"}
+  else if (unit_type=='batch') {unit_selector <- "-l batch-group"}
   # Get the status and args of all pods in the batch group
   command <- sprintf(
-    "kubectl get pods -n rstudio --selector=batch.kubernetes.io/job-name=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
-    shQuote(job_id)
+    "kubectl get pods -n rstudio %s=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
+    unit_selector, shQuote(unit_id)
   )
   pod_info <- system(command, intern = TRUE)
   pod_lines <- unlist(strsplit(pod_info, "\n"))
@@ -37,19 +50,36 @@ abba_get_k8s_job_status_local <- function(job_id){
 
   for (line in pod_lines) {
     if (line != "") {
-      pod_name <- abba_get_k8s_pod_name_local(line)
-      pod_status <- abba_get_k8s_pod_status_local(line)
-      program_name <- abba_get_k8s_pod_program_name_local(line)
+      pod_name <- get_k8s_pod_name(line)
+      pod_status <- get_k8s_pod_status(line)
+      program_name <- get_k8s_pod_program_name(line)
 
       # Ensure the list for this status exists
       if (!is.list(job_details[[pod_status]])) {
-        job_details[[pod_status]] <- list("Jobs" = list())
+        job_details[[pod_status]] <- list("Jobs" = list(), "Description" = status_descriptions[[pod_status]])
       }
 
       # Append the job details
-      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(list(id=unlist(pod_name), path=unlist(program_name))))
+      job_details[[pod_status]]$Jobs <-
+        c(job_details[[pod_status]]$Jobs,
+          list(list(id=unlist(pod_name),
+                    path=unlist(program_name))))
     }
   }
+
+  return(job_details)
+}
+
+#' Get status of all pods that belong to a job
+#'
+#' @param job_id unique identifier for a job
+#'
+#' @return list of statuses for every pod in a job(typically just one).
+#' @export
+#'
+abba_get_k8s_job_status_local <- function(job_id){
+
+  job_details <- abba_get_k8s_unit_status_local(unit_id=job_id, unit_type='job')
 
   return(job_details)
 }
@@ -64,39 +94,48 @@ abba_get_k8s_job_status_local <- function(job_id){
 #'
 abba_get_k8s_batch_status_local <- function(batch_id){
 
-  status_descriptions <- list(
-    Pending = "The Pod has been accepted by the Kubernetes cluster, but one or more of the containers has not been set up and made ready to run. This includes time a Pod spends waiting to be scheduled as well as the time spent downloading container images over the network.",
-    Running = "The Pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting.",
-    Succeeded = "All containers in the Pod have terminated in success, and will not be restarted.",
-    Failed = "All containers in the Pod have terminated, and at least one container has terminated in failure. That is, the container either exited with non-zero status or was terminated by the system.",
-    Unknown = "For some reason the state of the Pod could not be obtained. This phase typically occurs due to an error in communicating with the node where the Pod should be running."
-  )
+  job_details <- abba_get_k8s_unit_status_local(unit_id=batch_id, unit_type='batch')
 
-  # Get the status and args of all pods in the batch group
-  command <- sprintf(
-    "kubectl get pods -n rstudio -l batch-group=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
-    shQuote(batch_id)
-  )
-  pod_info <- system(command, intern = TRUE)
-  pod_lines <- unlist(strsplit(pod_info, "\n"))
+  return(job_details)
+}
 
-  # Reset job_details for each iteration
-  job_details <- list()
 
-  for (line in pod_lines) {
-    if (line != "") {
-      pod_name <- abba_get_k8s_pod_name_local(line)
-      pod_status <- abba_get_k8s_pod_status_local(line)
-      program_name <- abba_get_k8s_pod_program_name_local(line)
+#' Watch a K8S job/batch that has been submitted to Workbench, periodically polling it's execution status.
+#'
+#' @param unit_id job/batch ID that was specified when submitting job/batch
+#' @param unit_type specify whether to watch a job or a batch
+#' @param poll_interval_seconds Time interval for polling batch status in seconds
+#' @param timeout_seconds Total time to wait before timeout in seconds
+#'
+#' @return a list of job ID(s) and status(es)
+#' @noRd
+#'
+#' @examples \dontrun{
+#' result <- abba_watch_k8s_unit_local("safety-tfls-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
+#' }
+#'
+abba_watch_k8s_unit_local <- function(unit_id='', unit_type='job', poll_interval_seconds = 3, timeout_seconds = 600){
+  # Initialize variables for tracking job status
+  start_time <- Sys.time()
 
-      # Ensure the list for this status exists
-      if (!is.list(job_details[[pod_status]])) {
-        job_details[[pod_status]] <- list("Jobs" = list(), "Description" = status_descriptions[[pod_status]])
-      }
+  validate_unit_type(unit_type)
+  if (unit_type=='job'){get_status <- abba_get_k8s_job_status_local}
+  else if (unit_type=='batch'){get_status <- abba_get_k8s_batch_status_local}
+  # Poll for job status in the specified batch group
+  while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
-      # Append the job details
-      job_details[[pod_status]]$Jobs <- c(job_details[[pod_status]]$Jobs, list(list(id=unlist(pod_name), path=unlist(program_name))))
+    job_details <- get_status(unit_id)
+
+    # Get the names of the outer list in job_details
+    status_names <- names(job_details)
+
+    # Check if neither "Pending" nor "Running" is a name in job_details
+    if (!"Pending" %in% status_names && !"Running" %in% status_names) {
+      break # Break if no "Pending" or "Running" in the names of job_details
     }
+
+    # Wait for the specified interval before polling again
+    Sys.sleep(poll_interval_seconds)
   }
 
   return(job_details)
@@ -117,25 +156,8 @@ abba_get_k8s_batch_status_local <- function(batch_id){
 #' }
 #'
 abba_watch_k8s_batch_local <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seconds = 600){
-  # Initialize variables for tracking job status
-  start_time <- Sys.time()
 
-  # Poll for job status in the specified batch group
-  while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
-
-    job_details <- abba_get_k8s_batch_status_local(batch_group_id)
-
-    # Get the names of the outer list in job_details
-    status_names <- names(job_details)
-
-    # Check if neither "Pending" nor "Running" is a name in job_details
-    if (!"Pending" %in% status_names && !"Running" %in% status_names) {
-      break # Break if no "Pending" or "Running" in the names of job_details
-    }
-
-    # Wait for the specified interval before polling again
-    Sys.sleep(poll_interval_seconds)
-  }
+  job_details <- abba_watch_k8s_unit_local(unit_id=batch_group_id, unit_type='batch', poll_interval_seconds=poll_interval_seconds, timeout_seconds=timeout_seconds)
 
   return(job_details)
 }
@@ -155,25 +177,8 @@ abba_watch_k8s_batch_local <- function(batch_group_id='', poll_interval_seconds 
 #' }
 #'
 abba_watch_k8s_job_local <- function(job_id='', poll_interval_seconds = 3, timeout_seconds = 600){
-  # Initialize variables for tracking job status
-  start_time <- Sys.time()
 
-  # Poll for job status in the specified batch group
-  while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
-
-    job_details <- abba_get_k8s_job_status_local(job_id)
-
-    # Get the names of the outer list in job_details
-    status_names <- names(job_details)
-
-    # Check if neither "Pending" nor "Running" is a name in job_details
-    if (!"Pending" %in% status_names && !"Running" %in% status_names) {
-      break # Break if no "Pending" or "Running" in the names of job_details
-    }
-
-    # Wait for the specified interval before polling again
-    Sys.sleep(poll_interval_seconds)
-  }
+  job_details <- abba_watch_k8s_unit_local(unit_id=job_id, unit_type='job', poll_interval_seconds=poll_interval_seconds, timeout_seconds=timeout_seconds)
 
   return(job_details)
 }
@@ -197,16 +202,16 @@ abba_watch_k8s_job_local <- function(job_id='', poll_interval_seconds = 3, timeo
 #' }
 #'
 abba_submit_k8s_job_local <- function(file_path,
-                       batch_group_id='',
-                       user_tag='',
-                       cpu_limit=1L,
-                       memory_limit='512M',
-                       container='',
-                       mounts='',
-                       username=NULL) {
+                                      batch_group_id='',
+                                      user_tag='',
+                                      cpu_limit=1L,
+                                      memory_limit='512M',
+                                      container='',
+                                      mounts='',
+                                      username=NULL) {
 
   # Check if batch_group_id is a vector with more than one element
-  abba_validate_batch_id(batch_group_id)
+  validate_batch_id(batch_group_id)
   # By default let 'batch-group' be the lowest possible level - the program name.
   # Otherwise, keep what user has specified.
   if (is.null(batch_group_id) || batch_group_id == '') {
@@ -226,20 +231,20 @@ abba_submit_k8s_job_local <- function(file_path,
   }
 
   # Configure job to run our program
-  job_config <- abba_configure_k8s_yaml_local(file_path=file_path,
-                               batch_group_id=batch_group_id,
-                               user_tag=user_tag,
-                               cpu_limit= cpu_limit,
-                               memory_limit=memory_limit,
-                               container=container,
-                               mounts=mounts,
-                               username=username)
+  job_config <- configure_k8s_yaml(file_path=file_path,
+                                   batch_group_id=batch_group_id,
+                                   user_tag=user_tag,
+                                   cpu_limit= cpu_limit,
+                                   memory_limit=memory_limit,
+                                   container=container,
+                                   mounts=mounts,
+                                   username=username)
 
   # Save yaml to temp folders
-  job_config_path <- abba_save_yaml_local(job_config)
+  job_config_path <- save_yaml(job_config)
 
   # Send the job for execution and read job id
-  job_id <- abba_submit_k8s_yaml_local(job_config_path)
+  job_id <- submit_k8s_yaml(job_config_path)
 
   return(list(job_id=job_id, batch_id=batch_group_id))
 
@@ -266,23 +271,25 @@ abba_submit_k8s_job_local <- function(file_path,
 #'
 #'
 abba_submit_k8s_job_and_poll_local <- function(file_path,
-                                batch_group_id='',
-                                user_tag='',
-                                cpu_limit=1L,
-                                memory_limit='512M',
-                                container='',
-                                mounts='',
-                                poll_interval_seconds = 3,
-                                timeout_seconds = 600) {
+                                               batch_group_id='',
+                                               user_tag='',
+                                               cpu_limit=1L,
+                                               memory_limit='512M',
+                                               container='',
+                                               mounts='',
+                                               username=NULL,
+                                               poll_interval_seconds = 3,
+                                               timeout_seconds = 600) {
 
   # Send the job for execution and read job id
   job_info <- abba_submit_k8s_job_local(file_path=file_path,
-                       batch_group_id=batch_group_id,
-                       user_tag=user_tag,
-                       cpu_limit=cpu_limit,
-                       memory_limit=memory_limit,
-                       container=container,
-                       mounts=mounts)
+                                        batch_group_id=batch_group_id,
+                                        user_tag=user_tag,
+                                        cpu_limit=cpu_limit,
+                                        memory_limit=memory_limit,
+                                        container=container,
+                                        mounts=mounts,
+                                        username=username)
 
   result <- abba_watch_k8s_job_local(job_info$job_id)
 

@@ -11,17 +11,17 @@
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
 #' @noRd
 #' @examples
-#' config <- abba_configure_k8s_yaml_local(file_path="/path/to/file.R", user_tag="test program")
-abba_configure_k8s_yaml_local <- function(file_path='',
-                           batch_group_id='',
-                           user_tag='',
-                           cpu_limit= 1L,
-                           memory_limit='512M',
-                           container=NULL,
-                           mounts=NULL,
-                           username=NULL){
+#' config <- configure_k8s_yaml(file_path="/path/to/file.R", user_tag="test program")
+configure_k8s_yaml <- function(file_path='',
+                               batch_group_id='',
+                               user_tag='',
+                               cpu_limit= 1L,
+                               memory_limit='512M',
+                               container=NULL,
+                               mounts=NULL,
+                               username=NULL){
 
-  yaml_file_obj <- abba_load_k8s_yaml_template_local()
+  yaml_file_obj <- load_k8s_yaml_template()
 
   program_name <- unlist(strsplit(basename(file_path), '.', fixed = TRUE))[1]
 
@@ -40,21 +40,21 @@ abba_configure_k8s_yaml_local <- function(file_path='',
   } else {
     service_user <- username
   }
-  guid <- abba_get_guid_local()
+  guid <- get_guid()
 
   # Enforce lower and upper limits on cpu resource
   # use mcpu_to_cpu function to make sure compared values have equal units
-  cpu_limit <- abba_validate_cpu_limit(cpu_limit)
+  cpu_limit <- validate_cpu_limit(cpu_limit)
 
   # Enforce lower and upper limits on memory
   # use memory_to_bytes function to make sure compared values have equal units
-  memory_limit <- abba_validate_memory_limit(memory_limit)
+  memory_limit <- validate_memory_limit(memory_limit)
 
   # update container info in configuration file
-  yaml_file_obj <- abba_update_k8s_container_local(yaml_file_obj, container)
+  yaml_file_obj <- update_k8s_container(yaml_file_obj, container)
 
   # add specified mounts to configuration file
-  yaml_file_obj <- abba_update_k8s_mounts_local(yaml_file_obj, mounts)
+  yaml_file_obj <- update_k8s_mounts(yaml_file_obj, mounts)
 
   # a function that would try to replace all possible keywords inside the target string
   replace_func <- function(x){
@@ -107,16 +107,16 @@ abba_configure_k8s_yaml_local <- function(file_path='',
 #' @noRd
 #'
 #' @examples \dontrun{
-#' yaml <- abba_update_k8s_mounts_local(yaml,
+#' yaml <- update_k8s_mounts(yaml,
 #'                       list(volumes=list(list(name='mount1',
 #'                                              nfs=list(server='0.0.0.0',
 #'                                                       path='/mnt/mount1'))),
 #'                            volumeMounts=list(list(name='mount1',
 #'                                                   mountPath='/mnt/mount1'))))}
-abba_update_k8s_mounts_local <- function(yaml, mounts){
+update_k8s_mounts <- function(yaml, mounts){
 
   # validate mounts
-  if (!abba_validate_k8s_mount(mounts)){return(yaml)}
+  if (!validate_k8s_mount(mounts)){return(yaml)}
 
   # update the fields in yaml after all checks are successful
   yaml$spec$template$spec$volumes <- c(yaml$spec$template$spec$volumes, mounts$volumes)
@@ -136,12 +136,12 @@ abba_update_k8s_mounts_local <- function(yaml, mounts){
 #' @noRd
 #'
 #' @examples \dontrun{
-#' yaml <- abba_update_k8s_container_local(yaml,
+#' yaml <- update_k8s_container(yaml,
 #'                          list(name='rs-launcher-container',
 #'                               image='atoruscontainers.azurecr.io/jammy-1.0.1-workbench'))}
-abba_update_k8s_container_local <- function(yaml, container_info){
+update_k8s_container <- function(yaml, container_info){
   # return unmodified yaml if supplied container information is not correctly specified
-  if(!abba_validate_k8s_container(container_info)){return(yaml)}
+  if(!validate_k8s_container(container_info)){return(yaml)}
   # update the fields for ONE(first) container
   yaml$spec$template$spec$containers[[1]]$name <- container_info$name
   yaml$spec$template$spec$containers[[1]]$image <- container_info$image

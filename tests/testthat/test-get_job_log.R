@@ -1,5 +1,5 @@
 test_that("Supplying non-existing job id returns an error message", {
-  log <- abba_get_k8s_job_log0_local("non_exst_job_id")
+  log <- get_k8s_job_log0("non_exst_job_id")
   expect_equal(log, "Job non_exst_job_id not found.")
 })
 
