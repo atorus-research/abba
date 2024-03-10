@@ -5,7 +5,7 @@
 #' @param user_tag String that describes what kind of job will be scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
-#' @param container list that contains container name and image name
+#' @param container A character string containing a valid container path
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
@@ -130,21 +130,17 @@ update_k8s_mounts <- function(yaml, mounts){
 #' Update container information in yaml configuration object
 #'
 #' @param yaml yaml file representation in a form of nested list
-#' @param container_info list that contains information about container that user wants to use.
+#' @param container A character string containing a valid container path
 #'
 #' @return updated yaml object
 #' @noRd
 #'
 #' @examples \dontrun{
-#' yaml <- update_k8s_container(yaml,
-#'                          list(name='rs-launcher-container',
-#'                               image='atoruscontainers.azurecr.io/jammy-1.0.1-workbench'))}
-update_k8s_container <- function(yaml, container_info){
+#' yaml <- update_k8s_container(yaml, 'mycompany.registry.io/container-1.0.0')}
+update_k8s_container <- function(yaml, container){
   # return unmodified yaml if supplied container information is not correctly specified
-  if(!validate_k8s_container(container_info)){return(yaml)}
-  # update the fields for ONE(first) container
-  yaml$spec$template$spec$containers[[1]]$name <- container_info$name
-  yaml$spec$template$spec$containers[[1]]$image <- container_info$image
+  validate_k8s_container(container)
+  yaml$spec$template$spec$containers[[1]]$image <- container
   return(yaml)
 }
 

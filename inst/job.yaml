@@ -40,7 +40,7 @@ spec:
             path: /home/SERVICE_USER
       containers:
         - name: rs-launcher-container
-          image: atoruscontainers.azurecr.io/jammy-1.0.1-workbench
+          image:
           command:
             - /bin/bash
           args:
