@@ -1,12 +1,13 @@
+# {abba} API Template
+
 library(plumber)
-devtools::load_all()
 
 options(
   abba.lower.cpu.limit=0.5,
   abba.cpu.limit = 2,
   abba.lower.memory.limit='128M',
   abba.memory.limit='1G'
-  )
+)
 
 # Returns a list containing "user" and "groups" information
 # populated by incoming request data.

@@ -28,7 +28,7 @@ getUserMetadata <- function(req) {
 #' @param user_tag Optional; a string that describes what kind of job will be scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
-#' @param container list that contains container name and image name
+#' @param container A string containing a permitted container name.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #* @post /submit-job
 function(file_path,
