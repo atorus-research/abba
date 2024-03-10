@@ -5,9 +5,9 @@ account: mike.stackhouse
 server: connect-dev.atorusresearch.com
 hostUrl: https://connect-dev.atorusresearch.com/__api__
 appId: 9
-bundleId: 12
-url: https://connect-dev.atorusresearch.com/content/b3b80534-578d-4db9-a7fb-08b90b247031/
+bundleId: 39
+url: https://connect-dev.atorusresearch.com/abba_api/
 version: 1
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: tests
+ignoredFiles: inst/job.Rmd|inst/plumber.R|test_programs/test_program.R|whoami/plumber.R|tests
