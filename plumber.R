@@ -5,7 +5,13 @@ options(
   abba.lower.cpu.limit=0.5,
   abba.cpu.limit = 2,
   abba.lower.memory.limit='128M',
-  abba.memory.limit='1G'
+  abba.memory.limit='1G',
+  abba.permitted.containers = c("atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02",
+                                "atoruscontainers.azurecr.io/openval_4.2.1_focal:latest",
+                                "atoruscontainers.azurecr.io/openval_base_4.3.2_focal:2024.03.01",
+                                "atoruscontainers.azurecr.io/openval_base_4.3.2_focal:latest",
+                                "atoruscontainers.azurecr.io/openval-dev-focal:latest"),
+  abba.default.container = "atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02"
   )
 
 # Returns a list containing "user" and "groups" information
@@ -28,7 +34,7 @@ getUserMetadata <- function(req) {
 #' @param user_tag Optional; a string that describes what kind of job will be scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
-#' @param container A string containing a permitted container name.
+#' @param container A string containing a permitted container name. Default is specified by API administrator.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #* @post /submit-job
 function(file_path,
@@ -36,13 +42,35 @@ function(file_path,
          user_tag='',
          cpu_limit="1",
          memory_limit="512M",
-         container='',
+         container=getOption('abba.default.container'),
          mounts='',
          req,
          res) {
 
   user <- getUserMetadata(req)
   username <- user[["user"]]
+
+  # Request may come in as empty string
+  if (container == "") {
+    container <- getOption('abba.default.container')
+  }
+
+  # If specified, is the container name an allowable choice?
+  permitted_containers <- getOption('abba.permitted.containers')
+  if (!is.null(permitted_containers) && !(container %in% permitted_containers)) {
+    err_msg <-sprintf(
+      "The container %s is not an permitted image. Permitted images are:\n\t- %s",
+      container,
+      paste0(permitted_containers, collapse = "\n\t- ")
+    )
+
+    res$status <- 400
+    res$body$message = jsonlite::unbox(err_msg)
+    return(list(
+      message=jsonlite::unbox(err_msg),
+      error=jsonlite::unbox(err_msg)
+      ))
+  }
 
   result <- abba_submit_k8s_job_local(
     file_path,
@@ -79,7 +107,7 @@ function(batch_id) {
 }
 
 #* Get status of every job in a batch
-#' @param batch_id unique identifier for a batch
+#* @param batch_id unique identifier for a batch
 #* @get /batch-status
 function(batch_id='') {
 
@@ -91,7 +119,12 @@ function(batch_id='') {
 #' @param job_id job id to get status for
 #* @get /job-status
 function(job_id='') {
-
   result <- abba_get_k8s_job_status_local(job_id)
   return(result)
+}
+
+#* Get the list of permitted containers available in the API
+#* @get /permitted-containers
+function() {
+  return(sort(getOption('abba.permitted.containers')))
 }
