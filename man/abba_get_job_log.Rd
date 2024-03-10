@@ -6,16 +6,18 @@
 \usage{
 abba_get_job_log(
   job_ids,
-  api_address = getOption("abba.api.address"),
-  api_key = Sys.getenv("CONNECT_API_KEY")
+  api_address = Sys.getenv("ABBA_API_ADDRESS"),
+  api_key = Sys.getenv("ABBA_API_KEY")
 )
 }
 \arguments{
 \item{job_ids}{A list of job IDs to get logs for}
 
-\item{api_address}{IP address to send requests to}
+\item{api_address}{URL to send requests to, hosted in Posit Connect. Defaults
+to environment variable ABBA_API_ADDRESS.}
 
-\item{api_key}{API Key for accessing restricted endpoints}
+\item{api_key}{API Key for accessing restricted endpoints. Defaults to
+environment variable ABBA_API_KEY}
 }
 \value{
 body of request`s response in a list format

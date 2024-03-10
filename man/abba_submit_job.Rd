@@ -12,8 +12,8 @@ abba_submit_job(
   memory_limit = "512M",
   container = "",
   mounts = "",
-  api_address = getOption("abba.api.address"),
-  api_key = Sys.getenv("CONNECT_API_KEY")
+  api_address = Sys.getenv("ABBA_API_ADDRESS"),
+  api_key = Sys.getenv("ABBA_API_KEY")
 )
 }
 \arguments{
@@ -21,7 +21,8 @@ abba_submit_job(
 
 \item{batch_group_id}{Group ID for batch processing}
 
-\item{user_tag}{Optional; a string that describes what kind of job will be scheduled to run}
+\item{user_tag}{Optional; a string that describes what kind of job will be
+scheduled to run}
 
 \item{cpu_limit}{Maximum number of cores available for Kubernetes container}
 
@@ -29,11 +30,14 @@ abba_submit_job(
 
 \item{container}{list that contains container name and image name}
 
-\item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
+\item{mounts}{Specifically formatted list with information bout volumes that
+container would have access to during the run}
 
-\item{api_address}{IP address to send requests to}
+\item{api_address}{URL to send requests to, hosted in Posit Connect. Defaults
+to environment variable ABBA_API_ADDRESS.}
 
-\item{api_key}{API Key for accessing restricted endpoints}
+\item{api_key}{API Key for accessing restricted endpoints. Defaults to
+environment variable ABBA_API_KEY.}
 }
 \value{
 body of request`s response in a list format
