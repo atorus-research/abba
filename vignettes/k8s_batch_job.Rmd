@@ -1,0 +1,30 @@
+---
+title: "Kubernetes Batch Jobs"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Kubernetes Batch Jobs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(abba)
+```
+
+# Create a Batch File
+
+
+# Deploy a Batch File to Connect
+
+
+# Schedule Your Cron Job
+
+
+# 

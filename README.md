@@ -1,63 +1,70 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# abba
+# **abba**
 
-**abba** provides management of remote batch execution of programs into
-a cluster through a simple programming interface, and additional provide
-proper segregation of security identities via API abstraction.
+**abba** enables users to submit programs for background execution,
+allowing you to continue work as usual and not concern yourself with the
+job being terminated when you end your interactive session. Furthermore,
+by combining **abba** with services like Posit Connect, you can schedule
+jobs to run on a routine basis, such as nightly. While services like
+Connect allow you to run your work within a designated R environment,
+**abba** expands these capabilities by allowing you to send your work to
+a server or cluster environment, such as Kubernetes, in a secure manner.
 
-<!-- badges: start -->
-<!-- badges: end -->
+**abba** has three major components:
 
-- Users can submit non-interactive jobs to run on Kubernetes
-- Non-interactive jobs can be sent to Kubernetes from Posit Connect
-- Jobs sent to Kubernetes from Posit Connect can be called through an R
-  function 
-- Jobs sent to Kubernetes from Posit Connect can see R programs stored
-  in a shared storage space.
-- While the job is running on Kubernetes, the submitting function
-  monitors the job and waits for its completion
-- Upon completion of the job, the resulting log file is collected and is
-  viewable
-- When executing from Posit Connect, the job is submitted using the
-  kubectl utility locally
-- The kubectl utility on Posit Connect can only be run under a service
-  account identity, and the user submitting the jobs cannot be modifed
-- The service account identity must be granted explicit access to files
-  it may have to access
+- End user job submission functions
+- Cluster/server interface functions
+- Server API template
 
-## Accessing the dev Kubernetes cluster
+The server API template serves as the driver for the actual submission
+of jobs where they need to execute. This is intentionally separated to
+ensure job submission can be done securely, without giving an end user
+too much power or access.
 
-workbench-dev.atorusresearch.com
+The cluster/server interface functions simplify the management of job
+submission into a cluster. Currently only Kubernetes is supported. These
+methods manage that process and are utilized on within the API template.
 
-1.  Ensure you have the cluster configured at ~/.kube/configured (Eli
-    will do this)
+The end user job submission functions are what the typical **abba** user
+will utilize. These functions provide a simple interface to target what
+the end user must concern themselves with, such as the program being
+submitted, the resources necessary, the container environment to run
+within, and necessary mounts.
 
-2.  Run jobs via `kubectl apply -f <file>` where file is your YAML file.
+# Run a Program
 
-3.  check jobs with `kubectl get jobs -n rstuido`
+Using function in **abba**, users can send a program to run and retrieve
+the results.
 
-4.  Get job output with `kubectl logs -n rstudio <jobname>`
+``` r
+abba_submit_and_get_log(
+  "/home/mike.stackhouse/repos/abba/test_programs/test_program.R"
+)
+```
 
-## Getting Started with ‘abba’
+# Create a Batch File
 
-- Use `submit_job_and_poll("path/to/your/program")` to execute and watch
-  job.
-- Use `get_job_log0("job-id")` to get the job’s output.
+**abba** has some convenience functions to simplify the setup of a job
+that you intend to schedule.
 
-## Explaining `inst/job.yaml` setup fields
+``` r
+create_batch_job()
+```
 
-| Placeholder         | Description                                                                                                                                     |
-|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `JOB_NAME`          | The name of the submitted job; user will give a recognizable and meaningful name upon the R function call.                                      |
-| `GENERATE_NAME`     | The prefix of the name to be generated (in case you don’t want to specify a static name); usually auto-generated.                               |
-| `BATCH_GROUP`       | A label used to group multiple jobs for easier management and querying. This allows for batch processing and collective operations on the jobs. |
-| `USER_TAG`          | Optional; can be specified by user to mark the job in some special way (i.e. “sdtm_batch”).                                                     |
-| `PROGRAM_FULL_PATH` | Full program path, including extension and full path. Should be specified by user.                                                              |
-| `PROGRAM_BASE_NAME` | Program name; auto-derived from `PROGRAM_FULL_NAME`.                                                                                            |
-| `SERVICE_USER`      | A username of account with elevated privileges. This isn’t something that needs to be exposed to a user.                                        |
-| `CPU_LIMIT`         | A number of CPUs available to use for this Job. Could be 1 or 2.                                                                                |
-| `MEMORY_LIMIT`      | An amount of memory available for this Job in MBs. Possible options: 256M, 512M, 1024M.                                                         |
-| `RUN_AS_USER`       | ID of user whose identity would be used to execute the job                                                                                      |
-| `RUN_AS_GROUP`      | Group ID whose identity would be used to execute the job                                                                                        |
+This creates an Rmd file in your local directory following a simple
+template.
+
+# Create an **abba** API
+
+**abba** also makes it simple to create the necessary **plumber** API
+when setting up within your own environment.
+
+``` r
+create_batch_api()
+```
+
+## Support
+
+If in need of support, contact <support@atorusresearch.com>

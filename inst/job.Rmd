@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r test}
 abba::abba_submit_and_get_log(
   "/path/to/file.R",
-  container = "<container_image_name>",
-  api_address="https://connect-dev.atorusresearch.com/abba_api/"
+  container = "<container_image_name>"
   )
 ```
