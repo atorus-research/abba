@@ -28,7 +28,7 @@ scheduled to run}
 
 \item{memory_limit}{Maximum amount of RAM available for Kubernetes container}
 
-\item{container}{list that contains container name and image name}
+\item{container}{A string containing a permitted container name.}
 
 \item{mounts}{Specifically formatted list with information bout volumes that
 container would have access to during the run}

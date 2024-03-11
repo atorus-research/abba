@@ -402,7 +402,7 @@ abba_get_job_status <-
 #' @param resp httr2`s response
 #'
 #' @return message attribute from response body
-#'
+#' @noRd
 submit_job_error_body <- function(resp) {
   httr2::resp_body_json(resp)$message
 }
