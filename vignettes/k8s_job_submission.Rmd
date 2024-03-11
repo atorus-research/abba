@@ -24,7 +24,7 @@ In support for Kubernetes, **abba** has several local submission functions to ma
 - Get job status
 - Retrieve the log of the job
 
-Functions specifically for interfacing with Kubernetes follow the naming convention `abba_k8s_*`, and more generally functions intended for local submission (i.e. not interface with the *abba* API) are suffixed with `_local()`. 
+Functions specifically for interfacing with Kubernetes follow the naming convention `abba_*_k8s_*`, and more generally functions intended for local submission (i.e. not interface with the *abba* API) are suffixed with `_local()`. 
 
 ## Submit a Job
 Job submission is handled by the function `abba_submit_k8s_job_local()`. This is the function used to submit a job on the API side.

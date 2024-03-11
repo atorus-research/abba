@@ -97,6 +97,14 @@ Once this is complete, you can test the API through the Swagger UI. Under the fi
 Once you fill out the appropriate fields, click "Execute". If it worked, in the boxes below you will see that you had a success 200 response and be able to view the response body.
 
 ![**abba** access panel](images/abba_api_response.png)
+## Troubleshooting
 
+If users encounter issues that they can't correct themselves based off of errors within the end user function, you can check the API logs to look for more information.  On the top toolbar of the **abba** API deployed in Posit Connect, click the notebook page icon to open the logs.
 
+From here, you can navigate the available logs from each runtime of the API since it's been deployed. 
 
+![**abba** log panel](images/abba_logs.png)
+
+In this example, you can see that the `kubectl` function is getting permission denied. This is because the user account was not yet switched to use an account that has `kubectl` configured.
+
+Deeper debugging may require investigation through the Kubernetes logs themselves, and this will require assistance from a system adminstrator for the cluster. 
