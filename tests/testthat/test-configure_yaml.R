@@ -3,8 +3,10 @@ test_that("YAML fields are properly updated by configure_yaml", {
                                          batch_group_id="group_A",
                                          user_tag='user_tag',
                                          cpu_limit= 2L,
-                                         memory_limit='512M')
+                                         memory_limit='512M',
+                                         namespace='test_namespace')
   actual <- c(yaml_file_configured$metadata$name,
+              yaml_file_configured$metadata$namespace,
               yaml_file_configured$metadata$labels$`batch-group`,
               yaml_file_configured$spec$template$metadata$labels$`batch-group`,
               yaml_file_configured$spec$template$metadata$annotations$USER_TAG_0,
@@ -13,6 +15,7 @@ test_that("YAML fields are properly updated by configure_yaml", {
               yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory)
 
   expected <- c(yaml_file_configured$metadata$generateName,
+                'test_namespace',
                 "group_A",
                 "group_A",
                 "user_tag",
@@ -50,9 +53,9 @@ test_that("function errors when memory limit is bigger than maximum specified in
 
 })
 
-test_that("Container name and image can be customized", {
+test_that("Container image can be customized", {
   yaml_file_configured <- configure_k8s_yaml(file_path="/tst/path/test.R",
-                                               container='custom_container_image')
+                                             container='custom_container_image')
 
   actual <- yaml_file_configured$spec$template$spec$containers[[1]]
 

@@ -7,6 +7,7 @@ running}
 \usage{
 abba_wait_for_batch_log(
   batch_id,
+  namespace = getOption("abba.k8s_namespace"),
   poll_interval_seconds = 3,
   timeout_seconds = 600,
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
@@ -15,6 +16,8 @@ abba_wait_for_batch_log(
 }
 \arguments{
 \item{batch_id}{unique batch identificator}
+
+\item{namespace}{Kubernetes namespace}
 
 \item{poll_interval_seconds}{Total time to wait before timeout in seconds}
 

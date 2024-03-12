@@ -5,7 +5,7 @@ metadata:
   name: JOB_NAME
   # A service R function will generate UUID to be put here.
   generateName: GENERATE_NAME
-  namespace: rstudio
+  namespace: K8S_NAMESPACE
   labels:
     app.kubernetes.io/managed-by: Connect
     batch-group: BATCH_GROUP_ID

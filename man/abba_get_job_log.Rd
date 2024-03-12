@@ -6,12 +6,15 @@
 \usage{
 abba_get_job_log(
   job_ids,
+  namespace = getOption("abba.k8s_namespace"),
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
   api_key = Sys.getenv("ABBA_API_KEY")
 )
 }
 \arguments{
 \item{job_ids}{A list of job IDs to get logs for}
+
+\item{namespace}{Kubernetes namespace}
 
 \item{api_address}{URL to send requests to, hosted in Posit Connect. Defaults
 to environment variable ABBA_API_ADDRESS.}

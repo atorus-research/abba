@@ -18,11 +18,12 @@ submit_k8s_yaml <- function(yaml_full_path){
 #' Get status of all pods that belong to a job or batch
 #'
 #' @param unit_id unique identifier for a job/batch
+#' @param namespace Kubernetes namespace
 #' @param unit_type type of unit - can be 'job' or 'batch'
 #' @return list of statuses for every pod in a job/batch.
 #' @noRd
 #'
-abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job'){
+abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job', namespace=getOption('abba.k8s_namespace')){
 
   status_descriptions <- list(
     Pending = "The Pod has been accepted by the Kubernetes cluster, but one or more of the containers has not been set up and made ready to run. This includes time a Pod spends waiting to be scheduled as well as the time spent downloading container images over the network.",
@@ -39,8 +40,8 @@ abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job'){
   else if (unit_type=='batch') {unit_selector <- "-l batch-group"}
   # Get the status and args of all pods in the batch group
   command <- sprintf(
-    "kubectl get pods -n rstudio %s=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
-    unit_selector, shQuote(unit_id)
+    "kubectl get pods -n %s %s=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
+    namespace, unit_selector, shQuote(unit_id)
   )
   pod_info <- system(command, intern = TRUE)
   pod_lines <- unlist(strsplit(pod_info, "\n"))
@@ -73,13 +74,14 @@ abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job'){
 #' Get status of all pods that belong to a job
 #'
 #' @param job_id unique identifier for a job
+#' @param namespace Kubernetes namespace
 #'
 #' @return list of statuses for every pod in a job(typically just one).
 #' @export
 #'
-abba_get_k8s_job_status_local <- function(job_id){
+abba_get_k8s_job_status_local <- function(job_id, namespace=getOption('abba.k8s_namespace')){
 
-  job_details <- abba_get_k8s_unit_status_local(unit_id=job_id, unit_type='job')
+  job_details <- abba_get_k8s_unit_status_local(unit_id=job_id, unit_type='job', namespace=namespace)
 
   return(job_details)
 }
@@ -88,13 +90,14 @@ abba_get_k8s_job_status_local <- function(job_id){
 #' Get status of all jobs in a batch
 #'
 #' @param batch_id unique identifier for a batch
+#' @param namespace Kubernetes namespace
 #'
 #' @return list of statuses for every job in a batch
 #' @export
 #'
-abba_get_k8s_batch_status_local <- function(batch_id){
+abba_get_k8s_batch_status_local <- function(batch_id, namespace=getOption('abba.k8s_namespace')){
 
-  job_details <- abba_get_k8s_unit_status_local(unit_id=batch_id, unit_type='batch')
+  job_details <- abba_get_k8s_unit_status_local(unit_id=batch_id, unit_type='batch', namespace=namespace)
 
   return(job_details)
 }
@@ -106,6 +109,7 @@ abba_get_k8s_batch_status_local <- function(batch_id){
 #' @param unit_type specify whether to watch a job or a batch
 #' @param poll_interval_seconds Time interval for polling batch status in seconds
 #' @param timeout_seconds Total time to wait before timeout in seconds
+#' @param namespace Kubernetes namespace
 #'
 #' @return a list of job ID(s) and status(es)
 #' @noRd
@@ -114,7 +118,11 @@ abba_get_k8s_batch_status_local <- function(batch_id){
 #' result <- abba_watch_k8s_unit_local("safety-tfls-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
 #' }
 #'
-abba_watch_k8s_unit_local <- function(unit_id='', unit_type='job', poll_interval_seconds = 3, timeout_seconds = 600){
+abba_watch_k8s_unit_local <- function(unit_id='',
+                                      unit_type='job',
+                                      poll_interval_seconds = 3,
+                                      timeout_seconds = 600,
+                                      namespace=getOption('abba.k8s_namespace')){
   # Initialize variables for tracking job status
   start_time <- Sys.time()
 
@@ -124,7 +132,7 @@ abba_watch_k8s_unit_local <- function(unit_id='', unit_type='job', poll_interval
   # Poll for job status in the specified batch group
   while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
-    job_details <- get_status(unit_id)
+    job_details <- get_status(unit_id, namespace=namespace)
 
     # Get the names of the outer list in job_details
     status_names <- names(job_details)
@@ -147,6 +155,7 @@ abba_watch_k8s_unit_local <- function(unit_id='', unit_type='job', poll_interval
 #' @param batch_group_id Batch ID that was specified when submitting a group of jobs
 #' @param poll_interval_seconds Time interval for polling batch status in seconds
 #' @param timeout_seconds Total time to wait before timeout in seconds
+#' @param namespace Kubernetes namespace
 #'
 #' @return a list of jobs IDs and statuses that belong to batch named batch_group_id
 #' @export
@@ -155,9 +164,16 @@ abba_watch_k8s_unit_local <- function(unit_id='', unit_type='job', poll_interval
 #' result <- abba_watch_k8s_batch_local("safety-tfls-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
 #' }
 #'
-abba_watch_k8s_batch_local <- function(batch_group_id='', poll_interval_seconds = 3, timeout_seconds = 600){
+abba_watch_k8s_batch_local <- function(batch_group_id='',
+                                       poll_interval_seconds = 3,
+                                       timeout_seconds = 600,
+                                       namespace=getOption('abba.k8s_namespace')){
 
-  job_details <- abba_watch_k8s_unit_local(unit_id=batch_group_id, unit_type='batch', poll_interval_seconds=poll_interval_seconds, timeout_seconds=timeout_seconds)
+  job_details <- abba_watch_k8s_unit_local(unit_id=batch_group_id,
+                                           unit_type='batch',
+                                           poll_interval_seconds=poll_interval_seconds,
+                                           timeout_seconds=timeout_seconds,
+                                           namespace=namespace)
 
   return(job_details)
 }
@@ -168,6 +184,7 @@ abba_watch_k8s_batch_local <- function(batch_group_id='', poll_interval_seconds 
 #' @param job_id Job ID. Typically obtained as a return value from submit_job and similar functions
 #' @param poll_interval_seconds Time interval for polling job status in seconds
 #' @param timeout_seconds Total time to wait before timeout in seconds
+#' @param namespace Kubernetes namespace
 #'
 #' @return a list of pods, their IDs and execution statuses
 #' @export
@@ -176,9 +193,16 @@ abba_watch_k8s_batch_local <- function(batch_group_id='', poll_interval_seconds 
 #' result <- abba_watch_k8s_job_local("job-sdtm-f0bf6848-46de-45b8-9fae-0e732b104760", 10, 3000)
 #' }
 #'
-abba_watch_k8s_job_local <- function(job_id='', poll_interval_seconds = 3, timeout_seconds = 600){
+abba_watch_k8s_job_local <- function(job_id='',
+                                     poll_interval_seconds = 3,
+                                     timeout_seconds = 600,
+                                     namespace=getOption('abba.k8s_namespace')){
 
-  job_details <- abba_watch_k8s_unit_local(unit_id=job_id, unit_type='job', poll_interval_seconds=poll_interval_seconds, timeout_seconds=timeout_seconds)
+  job_details <- abba_watch_k8s_unit_local(unit_id=job_id,
+                                           unit_type='job',
+                                           poll_interval_seconds=poll_interval_seconds,
+                                           timeout_seconds=timeout_seconds,
+                                           namespace=namespace)
 
   return(job_details)
 }
@@ -193,6 +217,8 @@ abba_watch_k8s_job_local <- function(job_id='', poll_interval_seconds = 3, timeo
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #' @param container A valid container image name provided as a character string. Defaults to the option abba.default.container.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
+#' @param namespace Kubernetes namespace to put the job in
+#' @param username user whose authority will be used to run the program
 #'
 #' @return A list with job_id and batch_id attributes in case of successful submission
 #' @export
@@ -208,6 +234,7 @@ abba_submit_k8s_job_local <- function(file_path,
                                       memory_limit='512M',
                                       container=getOption('abba.default.container'),
                                       mounts='',
+                                      namespace=getOption('abba.k8s_namespace'),
                                       username=NULL) {
 
   # Check if batch_group_id is a vector with more than one element
@@ -238,6 +265,7 @@ abba_submit_k8s_job_local <- function(file_path,
                                    memory_limit=memory_limit,
                                    container=container,
                                    mounts=mounts,
+                                   namespace=namespace,
                                    username=username)
 
   # Save yaml to temp folders
@@ -259,6 +287,8 @@ abba_submit_k8s_job_local <- function(file_path,
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #' @param container A valid container image name provided as a character string. Defaults to the option abba.default.container.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
+#' @param namespace Kubernetes namespace to put the job in
+#' @param username user whose authority will be used to run the program
 #' @param poll_interval_seconds Time interval for polling job status in seconds
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #'
@@ -277,6 +307,7 @@ abba_submit_k8s_job_and_poll_local <- function(file_path,
                                                memory_limit='512M',
                                                container=getOption('abba.default.container'),
                                                mounts='',
+                                               namespace=getOption('abba.k8s_namespace'),
                                                username=NULL,
                                                poll_interval_seconds = 3,
                                                timeout_seconds = 600) {
@@ -289,9 +320,13 @@ abba_submit_k8s_job_and_poll_local <- function(file_path,
                                         memory_limit=memory_limit,
                                         container=container,
                                         mounts=mounts,
+                                        namespace=namespace,
                                         username=username)
 
-  result <- abba_watch_k8s_job_local(job_info$job_id)
+  result <- abba_watch_k8s_job_local(job_info$job_id,
+                                     poll_interval_seconds = poll_interval_seconds,
+                                     timeout_seconds = timeout_seconds,
+                                     namespace=namespace)
 
   return(result)
 

@@ -4,10 +4,15 @@
 \alias{abba_get_k8s_batch_status_local}
 \title{Get status of all jobs in a batch}
 \usage{
-abba_get_k8s_batch_status_local(batch_id)
+abba_get_k8s_batch_status_local(
+  batch_id,
+  namespace = getOption("abba.k8s_namespace")
+)
 }
 \arguments{
 \item{batch_id}{unique identifier for a batch}
+
+\item{namespace}{Kubernetes namespace}
 }
 \value{
 list of statuses for every job in a batch

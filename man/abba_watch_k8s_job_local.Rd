@@ -7,7 +7,8 @@
 abba_watch_k8s_job_local(
   job_id = "",
   poll_interval_seconds = 3,
-  timeout_seconds = 600
+  timeout_seconds = 600,
+  namespace = getOption("abba.k8s_namespace")
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ abba_watch_k8s_job_local(
 \item{poll_interval_seconds}{Time interval for polling job status in seconds}
 
 \item{timeout_seconds}{Total time to wait before timeout in seconds}
+
+\item{namespace}{Kubernetes namespace}
 }
 \value{
 a list of pods, their IDs and execution statuses

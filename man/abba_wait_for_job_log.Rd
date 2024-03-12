@@ -8,6 +8,7 @@ abba_wait_for_job_log(
   job_id,
   poll_interval_seconds = 3,
   timeout_seconds = 600,
+  namespace = getOption("abba.k8s_namespace"),
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
   api_key = Sys.getenv("ABBA_API_KEY")
 )
@@ -18,6 +19,8 @@ abba_wait_for_job_log(
 \item{poll_interval_seconds}{Total time to wait before timeout in seconds}
 
 \item{timeout_seconds}{Total time to wait before timeout in seconds}
+
+\item{namespace}{Kubernetes namespace}
 
 \item{api_address}{URL to send requests to, hosted in Posit Connect. Defaults
 to environment variable ABBA_API_ADDRESS.}

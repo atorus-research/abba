@@ -12,6 +12,7 @@ abba_submit_job(
   memory_limit = "512M",
   container = "",
   mounts = "",
+  namespace = getOption("abba.k8s_namespace"),
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
   api_key = Sys.getenv("ABBA_API_KEY")
 )
@@ -30,7 +31,9 @@ scheduled to run}
 
 \item{container}{A string containing a permitted container name.}
 
-\item{mounts}{Specifically formatted list with information bout volumes that
+\item{mounts}{Specifically formatted list with information bout volumes that}
+
+\item{namespace}{Kubernetes namespace to put the job in
 container would have access to during the run}
 
 \item{api_address}{URL to send requests to, hosted in Posit Connect. Defaults

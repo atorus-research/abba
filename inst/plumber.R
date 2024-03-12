@@ -1,15 +1,18 @@
 library(plumber)
-library(abba)
+devtools::load_all()
 
 options(
   abba.lower.cpu.limit=0.5,
   abba.cpu.limit = 2,
   abba.lower.memory.limit='128M',
   abba.memory.limit='1G',
-  abba.permitted.containers = c("registry.io/default_image:version",
-                                "registry.io/image1:version",
-                                "registry.io/image1:version"),
-  abba.default.container = "registry.io/default_image:version"
+  abba.permitted.containers = c("atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02",
+                                "atoruscontainers.azurecr.io/openval_4.2.1_focal:latest",
+                                "atoruscontainers.azurecr.io/openval_base_4.3.2_focal:2024.03.01",
+                                "atoruscontainers.azurecr.io/openval_base_4.3.2_focal:latest",
+                                "atoruscontainers.azurecr.io/openval-dev-focal:latest"),
+  abba.default.container = "atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02",
+  abba.k8s_namespace='rstudio'
 )
 
 # Returns a list containing "user" and "groups" information
@@ -34,6 +37,7 @@ getUserMetadata <- function(req) {
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #' @param container A string containing a permitted container name. Default is specified by API administrator.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
+#' @param namespace Kubernetes namespace to put the job in
 #* @post /submit-job
 function(file_path,
          batch_group_id='',
@@ -42,6 +46,7 @@ function(file_path,
          memory_limit="512M",
          container=getOption('abba.default.container'),
          mounts='',
+         namespace=getOption('abba.k8s_namespace'),
          req,
          res) {
 
@@ -86,38 +91,50 @@ function(file_path,
 
 #* Get Job logs
 #' @param job_ids list of job IDs
+#' @param namespace Kubernetes namespace to put the job in
 #* @get /job-log
-function(job_ids) {
+function(job_ids,
+         namespace=getOption('abba.k8s_namespace')) {
 
-  result <- abba_get_k8s_job_log_local(job_ids)
+  result <- abba_get_k8s_job_log_local(job_ids,
+                                       namespace=namespace)
 
   return(result)
 }
 
 #* Get Job logs of a batch
 #' @param batch_id unique identifier for a batch
+#' @param namespace Kubernetes namespace to put the job in
 #* @get /batch-log
-function(batch_id) {
+function(batch_id,
+         namespace=getOption('abba.k8s_namespace')) {
 
-  result <- abba_get_k8s_batch_log_local(batch_id)
+  result <- abba_get_k8s_batch_log_local(batch_id,
+                                         namespace=namespace)
 
   return(result)
 }
 
 #* Get status of every job in a batch
 #* @param batch_id unique identifier for a batch
+#' @param namespace Kubernetes namespace to put the job in
 #* @get /batch-status
-function(batch_id='') {
+function(batch_id='',
+         namespace=getOption('abba.k8s_namespace')) {
 
-  result <- abba_get_k8s_batch_status_local(batch_id)
+  result <- abba_get_k8s_batch_status_local(batch_id,
+                                            namespace=namespace)
   return(result)
 }
 
 #* Get status of a job as a collection of statuses of its pods
 #' @param job_id job id to get status for
+#' @param namespace Kubernetes namespace to put the job in
 #* @get /job-status
-function(job_id='') {
-  result <- abba_get_k8s_job_status_local(job_id)
+function(job_id='',
+         namespace=getOption('abba.k8s_namespace')) {
+  result <- abba_get_k8s_job_status_local(job_id,
+                                          namespace=namespace)
   return(result)
 }
 
