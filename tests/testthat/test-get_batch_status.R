@@ -1,8 +1,8 @@
 library(mockery)
 
 # Mock function to simulate 'system' calls to 'kubectl'
-mock_system <- function(command, intern = TRUE) {
-  if (grepl("kubectl get pods", command)) {
+mock_system <- function(command, ...) {
+  if (grepl("kubectl", command)) {
     if (grepl("some-group", command)) {
       # Simulate a scenario with various pod statuses including 'Unknown'
       return("pod1,Succeeded,R -f /path/to/script1.R\npod2,Failed,R -f /path/to/script2.R\npod3,Running,R -f /path/to/script3.R\npod4,Pending,R -f /path/to/script4.R\npod5,Unknown,R -f /path/to/script5.R")
@@ -15,7 +15,7 @@ mock_system <- function(command, intern = TRUE) {
 
 # Unit test for watch_job function
 test_that("get_batch_status returns statuses in expected format", {
-  stub(abba_get_k8s_batch_status_local, "system", mock_system, depth=2)
+  stub(abba_get_k8s_batch_status_local, "system2", mock_system, depth=2)
 
   # Test case for a batch group with various job statuses
   result <- abba_get_k8s_batch_status_local("batch-group")

@@ -8,7 +8,9 @@ submit_k8s_yaml <- function(yaml_full_path){
 
   # send the job for execution
   system(paste("kubectl apply -f", yaml_full_path))
-
+  suppressWarnings(system2(command="kubectl",
+                           args=c("apply", "-f" , yaml_full_path),
+                           stdout=TRUE, stderr=TRUE))
   # read job id from config and return it for further tracking and reporting
   yaml_config <- yaml::read_yaml(yaml_full_path)
   return(yaml_config$metadata$name)
@@ -39,11 +41,11 @@ abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job', namespace=g
   if (unit_type=='job') {unit_selector <- "--selector=batch.kubernetes.io/job-name"}
   else if (unit_type=='batch') {unit_selector <- "-l batch-group"}
   # Get the status and args of all pods in the batch group
-  command <- sprintf(
-    "kubectl get pods -n %s %s=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
-    namespace, unit_selector, shQuote(unit_id)
-  )
-  pod_info <- system(command, intern = TRUE)
+  cmd_args <- sprintf("get pods -n %s %s=%s -o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.status.phase}{\",\"}{.spec.containers[].args}{\"\\n\"}{end}'",
+                      namespace, unit_selector, shQuote(unit_id))
+  pod_info <- suppressWarnings(system2("kubectl",
+                                       args=cmd_args,
+                                       stdout=TRUE, stderr=TRUE))
   pod_lines <- unlist(strsplit(pod_info, "\n"))
 
   # Reset job_details for each iteration
