@@ -5,8 +5,7 @@
 #'
 #' @return if api_key is supplied - a modified req object with api key added to the request header
 #'         if api_key is not supplied - an original, unmodified req object
-#' @export
-#'
+#' @noRd
 #' @examples
 #' req <- httr2::request('base_url') %>% add_api_key_to_header(api_key=Sys.getenv("CONNECT_API_KEY"))
 #'

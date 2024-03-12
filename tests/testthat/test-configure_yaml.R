@@ -51,15 +51,13 @@ test_that("function errors when memory limit is bigger than maximum specified in
 })
 
 test_that("Container name and image can be customized", {
-  expected <- list(name='custom_container_name', image='custom_container_image')
-
   yaml_file_configured <- configure_k8s_yaml(file_path="/tst/path/test.R",
-                                               container=expected)
+                                               container='custom_container_image')
 
   actual <- yaml_file_configured$spec$template$spec$containers[[1]]
 
 
-  expect_equal(actual[c('name', 'image')], expected)
+  expect_equal(actual[['image']], 'custom_container_image')
 
 })
 

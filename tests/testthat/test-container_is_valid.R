@@ -1,27 +1,27 @@
-test_that("function errors when container information is supplied not as list", {
-  expect_error(validate_k8s_container('1'))
+test_that("Checks pass if no option is set", {
+  op <- options(abba.permitted.containers = NULL)
+
+  expect_silent(validate_k8s_container("bad_name"))
+
+  options(op)
 })
 
-test_that("function returns FALSE when the input argument is NULL", {
-  expect_equal(validate_k8s_container(NULL), FALSE)
+test_that("Error generates properly when container name is invalid", {
+  permitted_containers <- c("path.io/container-1.0.0", "path.io/container2-1.0.0", "path.io/container3-1.0.0")
+
+  op <- options(abba.permitted.containers = permitted_containers)
+
+  expect_snapshot_error(validate_k8s_container("bad_name"))
+
+  options(op)
 })
 
-test_that("function returns FALSE when the input argument is an empty string", {
-  expect_equal(validate_k8s_container(''), FALSE)
-})
+test_that("Check passes properly when container name is valid", {
+  permitted_containers <- c("path.io/container-1.0.0", "path.io/container2-1.0.0", "path.io/container3-1.0.0")
 
-test_that("function errors when container information does not have image attribute", {
-  mount_info <- list(name='container_name')
-  expect_error(validate_k8s_container(mount_info))
-})
+  op <- options(abba.permitted.containers = permitted_containers)
 
-test_that("function errors when container information does not have name attribute", {
-  mount_info <- list(image='image_name')
-  expect_error(validate_k8s_container(mount_info))
-})
+  expect_silent(validate_k8s_container("path.io/container-1.0.0"))
 
-test_that("Container information list is considered validated when it contains name and image attributes", {
-  mount_info <- list(name='container_name', image='image_name')
-  expect_equal(validate_k8s_container(mount_info), TRUE)
+  options(op)
 })
-

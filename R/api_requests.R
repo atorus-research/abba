@@ -2,13 +2,17 @@
 #'
 #' @param file_path Full path to R file
 #' @param batch_group_id Group ID for batch processing
-#' @param user_tag Optional; a string that describes what kind of job will be scheduled to run
+#' @param user_tag Optional; a string that describes what kind of job will be
+#'   scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
-#' @param container list that contains container name and image name
-#' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
-#' @param api_address IP address to send requests to
-#' @param api_key API Key for accessing restricted endpoints
+#' @param container A string containing a permitted container name.
+#' @param mounts Specifically formatted list with information bout volumes that
+#'   container would have access to during the run
+#' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
+#'   to environment variable ABBA_API_ADDRESS.
+#' @param api_key API Key for accessing restricted endpoints. Defaults to
+#'   environment variable ABBA_API_KEY.
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -23,8 +27,8 @@ abba_submit_job <-
            memory_limit='512M',
            container='',
            mounts='',
-           api_address=getOption("abba.api.address"),
-           api_key=Sys.getenv("CONNECT_API_KEY")) {
+           api_address=Sys.getenv("ABBA_API_ADDRESS"),
+           api_key=Sys.getenv("ABBA_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'submit-job', sep='/')) %>%
@@ -49,20 +53,24 @@ abba_submit_job <-
   }
 
 
-#' Send job and poll for status. This function sends multiple requests so it won't
-#' time out on heavy jobs
+#' Send job and poll for status. This function sends multiple requests so it
+#' won't time out on heavy jobs
 #'
 #' @param file_path Full path to R file
 #' @param batch_group_id Group ID for batch processing
-#' @param user_tag Optional; a string that describes what kind of job will be scheduled to run
+#' @param user_tag Optional; a string that describes what kind of job will be
+#'   scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #' @param container list that contains container name and image name
-#' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
+#' @param mounts Specifically formatted list with information bout volumes that
+#'   container would have access to during the run
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
-#' @param api_address IP address to send requests to
-#' @param api_key API Key for accessing restricted endpoints
+#' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
+#'   to environment variable ABBA_API_ADDRESS.
+#' @param api_key API Key for accessing restricted endpoints. Defaults to
+#'   environment variable ABBA_API_KEY.
 #'
 #' @return list with 2 attributes: job_id for submitted job`s id, and its logs
 #' @export
@@ -79,8 +87,8 @@ abba_submit_and_get_log <-
            mounts='',
            poll_interval_seconds = 3,
            timeout_seconds = 600,
-           api_address=getOption("abba.api.address"),
-           api_key=Sys.getenv("CONNECT_API_KEY")) {
+           api_address=Sys.getenv("ABBA_API_ADDRESS"),
+           api_key=Sys.getenv("ABBA_API_KEY")) {
 
     # submit the job
     job_id <- abba_submit_job(file_path=file_path,
@@ -129,8 +137,10 @@ abba_submit_and_get_log <-
 #' @param job_id unique job identificator
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
-#' @param api_address IP address to send requests to
-#' @param api_key API Key for accessing restricted endpoints
+#' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
+#'   to environment variable ABBA_API_ADDRESS.
+#' @param api_key API Key for accessing restricted endpoints. Defaults to
+#'   environment variable ABBA_API_KEY
 #'
 #' @return list with 2 attributes: job_id for submitted job`s id, and its logs
 #' @export
@@ -141,8 +151,8 @@ abba_wait_for_job_log <-
   function(job_id,
            poll_interval_seconds = 3,
            timeout_seconds = 600,
-           api_address=getOption("abba.api.address"),
-           api_key=Sys.getenv("CONNECT_API_KEY")) {
+           api_address=Sys.getenv("ABBA_API_ADDRESS"),
+           api_key=Sys.getenv("ABBA_API_KEY")) {
 
     start_time <- Sys.time()
 
@@ -172,13 +182,16 @@ abba_wait_for_job_log <-
   }
 
 
-#' Monitor batch status and retrieve its log when the all jobs in batch finish running
+#' Monitor batch status and retrieve its log when the all jobs in batch finish
+#' running
 #'
 #' @param batch_id unique batch identificator
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
-#' @param api_address IP address to send requests to
-#' @param api_key API Key for accessing restricted endpoints
+#' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
+#'   to environment variable ABBA_API_ADDRESS.
+#' @param api_key API Key for accessing restricted endpoints. Defaults to
+#'   environment variable ABBA_API_KEY
 #'
 #' @return list with 2 sublists: job_ids and their logs
 #' @export
@@ -189,8 +202,8 @@ abba_wait_for_batch_log <-
   function(batch_id,
            poll_interval_seconds = 3,
            timeout_seconds = 600,
-           api_address=getOption("abba.api.address"),
-           api_key=Sys.getenv("CONNECT_API_KEY")) {
+           api_address=Sys.getenv("ABBA_API_ADDRESS"),
+           api_key=Sys.getenv("ABBA_API_KEY")) {
 
     start_time <- Sys.time()
 
@@ -225,8 +238,10 @@ abba_wait_for_batch_log <-
 #' Send GET request to get logs of specified Jobs
 #'
 #' @param job_ids A list of job IDs to get logs for
-#' @param api_address IP address to send requests to
-#' @param api_key API Key for accessing restricted endpoints
+#' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
+#'   to environment variable ABBA_API_ADDRESS.
+#' @param api_key API Key for accessing restricted endpoints. Defaults to
+#'   environment variable ABBA_API_KEY
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -235,8 +250,8 @@ abba_wait_for_batch_log <-
 #' response <- abba_get_job_log('1234j-13j4l5k-ajslfd')}
 abba_get_job_log <-
   function(job_ids,
-           api_address=getOption("abba.api.address"),
-           api_key=Sys.getenv("CONNECT_API_KEY")) {
+           api_address=Sys.getenv("ABBA_API_ADDRESS"),
+           api_key=Sys.getenv("ABBA_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'job-log', sep='/'))
@@ -261,8 +276,10 @@ abba_get_job_log <-
 #' Send GET request to get logs of all jobs in a batch
 #'
 #' @param batch_id unique batch identificator
-#' @param api_address IP address to send requests to
-#' @param api_key API Key for accessing restricted endpoints
+#' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
+#'   to environment variable ABBA_API_ADDRESS.
+#' @param api_key API Key for accessing restricted endpoints. Defaults to
+#'   environment variable ABBA_API_KEY
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -271,8 +288,8 @@ abba_get_job_log <-
 #' response <- abba_get_job_log('1234j-13j4l5k-ajslfd')}
 abba_get_batch_log <-
   function(batch_id,
-           api_address=getOption("abba.api.address"),
-           api_key=Sys.getenv("CONNECT_API_KEY")) {
+           api_address=Sys.getenv("ABBA_API_ADDRESS"),
+           api_key=Sys.getenv("ABBA_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'batch-log', sep='/'))
@@ -297,8 +314,10 @@ abba_get_batch_log <-
 #' Send GET request to get batch job statuses
 #'
 #' @param batch_id batch ID to get status for
-#' @param api_address IP address to send requests to
-#' @param api_key API Key for accessing restricted endpoints
+#' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
+#'   to environment variable ABBA_API_ADDRESS.
+#' @param api_key API Key for accessing restricted endpoints. Defaults to
+#'   environment variable ABBA_API_KEY
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -307,8 +326,8 @@ abba_get_batch_log <-
 #' response <- abba_get_batch_status('1234j-13j4l5k-ajslfd')}
 abba_get_batch_status <-
   function(batch_id,
-           api_address=getOption("abba.api.address"),
-           api_key=Sys.getenv("CONNECT_API_KEY")) {
+           api_address=Sys.getenv("ABBA_API_ADDRESS"),
+           api_key=Sys.getenv("ABBA_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'batch-status', sep='/'))
@@ -338,8 +357,10 @@ abba_get_batch_status <-
 #' Send GET request to get job status
 #'
 #' @param job_id job IDs to get status for
-#' @param api_address IP address to send requests to
-#' @param api_key API Key for accessing restricted endpoints
+#' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
+#'   to environment variable ABBA_API_ADDRESS.
+#' @param api_key API Key for accessing restricted endpoints. Defaults to
+#'   environment variable ABBA_API_KEY.
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -348,8 +369,8 @@ abba_get_batch_status <-
 #' response <- abba_get_job_status('1234j-13j4l5k-ajslfd')}
 abba_get_job_status <-
   function(job_id,
-           api_address=getOption("abba.api.address"),
-           api_key=Sys.getenv("CONNECT_API_KEY")) {
+           api_address=Sys.getenv("ABBA_API_ADDRESS"),
+           api_key=Sys.getenv("ABBA_API_KEY")) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'job-status', sep='/'))
@@ -381,7 +402,7 @@ abba_get_job_status <-
 #' @param resp httr2`s response
 #'
 #' @return message attribute from response body
-#'
+#' @noRd
 submit_job_error_body <- function(resp) {
   httr2::resp_body_json(resp)$message
 }

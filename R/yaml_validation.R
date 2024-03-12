@@ -32,29 +32,24 @@ validate_k8s_mount <- function(mounts){
   return(TRUE)
 }
 
-#' Checks that container information is supplied in expected format
+#' Checks that container information supplied is valid
 #'
-#' @param container_info a named list representing k8s container information
+#' @param container A character string with the path to a container image
 #'
-#' @return TRUE if container_infos structure is as expected
+#' @return TRUE if container passes checks
 #' @noRd
 #'
-validate_k8s_container <- function(container_info){
-  # null is a default value for container argument in configure_yaml function.
-  # by default, we should not change the container in config
-  if (is.null(container_info) || (is.character(container_info) && container_info == '')){
-    return(FALSE)
-    }
-
-  if (!is.list(container_info)){
-    stop(sprintf('Container information should be supplied in a list, not a %s.',
-                 typeof(container_info)))
+validate_k8s_container <- function(container){
+  # If specified, is the container name an allowable choice?
+  permitted_containers <- getOption('abba.permitted.containers')
+  if (!is.null(permitted_containers) && !(container %in% permitted_containers)) {
+    err_msg <-sprintf(
+      "The container %s is not an permitted image. Permitted images are:\n\t- %s",
+      container,
+      paste0(permitted_containers, collapse = "\n\t- ")
+    )
+    stop(err_msg)
   }
-  if(!all(c('name', 'image') %in% names(container_info))){
-    stop(sprintf('Container info list should have 2 attributes: name and image, but it instead has %s.',
-                 names(container_info)))
-  }
-  return(TRUE)
 }
 
 #' Check that cpu_limit is between lower and upper limits specified by abba package options

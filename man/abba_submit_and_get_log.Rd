@@ -2,8 +2,8 @@
 % Please edit documentation in R/api_requests.R
 \name{abba_submit_and_get_log}
 \alias{abba_submit_and_get_log}
-\title{Send job and poll for status. This function sends multiple requests so it won't
-time out on heavy jobs}
+\title{Send job and poll for status. This function sends multiple requests so it
+won't time out on heavy jobs}
 \usage{
 abba_submit_and_get_log(
   file_path,
@@ -15,8 +15,8 @@ abba_submit_and_get_log(
   mounts = "",
   poll_interval_seconds = 3,
   timeout_seconds = 600,
-  api_address = getOption("abba.api.address"),
-  api_key = Sys.getenv("CONNECT_API_KEY")
+  api_address = Sys.getenv("ABBA_API_ADDRESS"),
+  api_key = Sys.getenv("ABBA_API_KEY")
 )
 }
 \arguments{
@@ -24,7 +24,8 @@ abba_submit_and_get_log(
 
 \item{batch_group_id}{Group ID for batch processing}
 
-\item{user_tag}{Optional; a string that describes what kind of job will be scheduled to run}
+\item{user_tag}{Optional; a string that describes what kind of job will be
+scheduled to run}
 
 \item{cpu_limit}{Maximum number of cores available for Kubernetes container}
 
@@ -32,22 +33,25 @@ abba_submit_and_get_log(
 
 \item{container}{list that contains container name and image name}
 
-\item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
+\item{mounts}{Specifically formatted list with information bout volumes that
+container would have access to during the run}
 
 \item{poll_interval_seconds}{Total time to wait before timeout in seconds}
 
 \item{timeout_seconds}{Total time to wait before timeout in seconds}
 
-\item{api_address}{IP address to send requests to}
+\item{api_address}{URL to send requests to, hosted in Posit Connect. Defaults
+to environment variable ABBA_API_ADDRESS.}
 
-\item{api_key}{API Key for accessing restricted endpoints}
+\item{api_key}{API Key for accessing restricted endpoints. Defaults to
+environment variable ABBA_API_KEY.}
 }
 \value{
 list with 2 attributes: job_id for submitted job`s id, and its logs
 }
 \description{
-Send job and poll for status. This function sends multiple requests so it won't
-time out on heavy jobs
+Send job and poll for status. This function sends multiple requests so it
+won't time out on heavy jobs
 }
 \examples{
 \dontrun{

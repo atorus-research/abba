@@ -2,3 +2,7 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^plumber\.R$
+^notes\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

@@ -10,7 +10,7 @@ abba_submit_k8s_job_and_poll_local(
   user_tag = "",
   cpu_limit = 1L,
   memory_limit = "512M",
-  container = "",
+  container = getOption("abba.default.container"),
   mounts = "",
   username = NULL,
   poll_interval_seconds = 3,
@@ -28,7 +28,7 @@ abba_submit_k8s_job_and_poll_local(
 
 \item{memory_limit}{Maximum amount of RAM available for Kubernetes container}
 
-\item{container}{list that contains container name and image name}
+\item{container}{A valid container image name provided as a character string. Defaults to the option abba.default.container.}
 
 \item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
 

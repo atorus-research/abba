@@ -191,7 +191,7 @@ abba_watch_k8s_job_local <- function(job_id='', poll_interval_seconds = 3, timeo
 #' @param user_tag Optional; a string that describes what kind of job will be scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
-#' @param container list that contains container name and image name
+#' @param container A valid container image name provided as a character string. Defaults to the option abba.default.container.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #'
 #' @return A list with job_id and batch_id attributes in case of successful submission
@@ -206,7 +206,7 @@ abba_submit_k8s_job_local <- function(file_path,
                                       user_tag='',
                                       cpu_limit=1L,
                                       memory_limit='512M',
-                                      container='',
+                                      container=getOption('abba.default.container'),
                                       mounts='',
                                       username=NULL) {
 
@@ -257,7 +257,7 @@ abba_submit_k8s_job_local <- function(file_path,
 #' @param user_tag Optional; a string that describes what kind of job will be scheduled to run
 #' @param cpu_limit Maximum number of cores available for Kubernetes container
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
-#' @param container list that contains container name and image name
+#' @param container A valid container image name provided as a character string. Defaults to the option abba.default.container.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #' @param poll_interval_seconds Time interval for polling job status in seconds
 #' @param timeout_seconds Total time to wait before timeout in seconds
@@ -275,7 +275,7 @@ abba_submit_k8s_job_and_poll_local <- function(file_path,
                                                user_tag='',
                                                cpu_limit=1L,
                                                memory_limit='512M',
-                                               container='',
+                                               container=getOption('abba.default.container'),
                                                mounts='',
                                                username=NULL,
                                                poll_interval_seconds = 3,

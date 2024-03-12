@@ -1,0 +1,56 @@
+url: ~
+template:
+  bootstrap: 5
+  bslib:
+    bg: "#FFFFFF"
+    fg: "#1D252D"
+    primary: "#1D252D"
+  params:
+    bootswatch: yeti
+  opengraph:
+    twitter:
+      creator: "@AtorusR"
+      card: summary_large_image
+
+  search:
+    exclude: ['news/index.html']
+  news:
+    cran_dates: true
+  reference:
+  - title: End User API Functions
+    desc: End user targetted functions for talking with the abba API
+  - contents:
+    - abba_submit_and_get_log
+    - abba_submit_job
+    - abba_get_batch_log
+    - abba_get_batch_status
+    - abba_get_job_log
+    - abba_get_job_status
+    - abba_wait_for_batch_log
+    - abba_wait_for_job_log
+  - title: Kubernetes Local Interface Functions
+    desc: Functions for use in the abba API for interfacing with Kubernetes locally
+  - contents:
+    - abba_get_k8s_batch_log_local
+    - abba_get_k8s_batch_status_local
+    - abba_get_k8s_job_log_local
+    - abba_get_k8s_get_status_local
+    - abba_submit_k8s_job_and_poll_local
+    - abba_submit_k8s_job_local
+    - abba_watch_k8s_batch_local
+    - abba_watch_k8s_job_local
+  - title: Create batch files
+    desc: Create an abba API or batch job
+  - contents:
+    - create_batch
+  articles:
+  - title: Kubernetes Interfaces
+    navbar: Kubernetes Interfaces
+    contents:
+    - k8s_api_setup
+    - k8s_batch_job
+    - k8s_job_submission
+  - title: abba Options
+    navbar: abba Options
+    contents:
+    - abba_options
