@@ -21,7 +21,7 @@ configure_k8s_yaml <- function(file_path='',
                                memory_limit='512M',
                                container=NULL,
                                mounts=NULL,
-                               namespace=getOption('abba.k8s_namespace'),
+                               namespace=getOption('abba.k8s.namespace'),
                                username=NULL){
 
   yaml_file_obj <- load_k8s_yaml_template()

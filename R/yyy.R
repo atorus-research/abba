@@ -5,7 +5,7 @@
           abba.memory.limit='1G',
           abba.permitted.containers=NULL,
           abba.default.container=NULL,
-          abba.k8s_namespace='rstudio'
+          abba.k8s.namespace='rstudio'
   )
   invisible()
 }

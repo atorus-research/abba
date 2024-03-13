@@ -6,7 +6,7 @@
 #' @return a character vector of job IDs
 #'
 get_k8s_job_ids_from_batch <- function(group_batch_id,
-                                       namespace=getOption('abba.k8s_namespace')){
+                                       namespace=getOption('abba.k8s.namespace')){
 
   # get list of job IDs with a given batch group
   output <- system2(command="kubectl",

@@ -25,7 +25,7 @@ submit_k8s_yaml <- function(yaml_full_path){
 #' @return list of statuses for every pod in a job/batch.
 #' @noRd
 #'
-abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job', namespace=getOption('abba.k8s_namespace')){
+abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job', namespace=getOption('abba.k8s.namespace')){
 
   status_descriptions <- list(
     Pending = "The Pod has been accepted by the Kubernetes cluster, but one or more of the containers has not been set up and made ready to run. This includes time a Pod spends waiting to be scheduled as well as the time spent downloading container images over the network.",
@@ -81,7 +81,7 @@ abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job', namespace=g
 #' @return list of statuses for every pod in a job(typically just one).
 #' @export
 #'
-abba_get_k8s_job_status_local <- function(job_id, namespace=getOption('abba.k8s_namespace')){
+abba_get_k8s_job_status_local <- function(job_id, namespace=getOption('abba.k8s.namespace')){
 
   job_details <- abba_get_k8s_unit_status_local(unit_id=job_id, unit_type='job', namespace=namespace)
 
@@ -97,7 +97,7 @@ abba_get_k8s_job_status_local <- function(job_id, namespace=getOption('abba.k8s_
 #' @return list of statuses for every job in a batch
 #' @export
 #'
-abba_get_k8s_batch_status_local <- function(batch_id, namespace=getOption('abba.k8s_namespace')){
+abba_get_k8s_batch_status_local <- function(batch_id, namespace=getOption('abba.k8s.namespace')){
 
   job_details <- abba_get_k8s_unit_status_local(unit_id=batch_id, unit_type='batch', namespace=namespace)
 
@@ -124,7 +124,7 @@ abba_watch_k8s_unit_local <- function(unit_id='',
                                       unit_type='job',
                                       poll_interval_seconds = 3,
                                       timeout_seconds = 600,
-                                      namespace=getOption('abba.k8s_namespace')){
+                                      namespace=getOption('abba.k8s.namespace')){
   # Initialize variables for tracking job status
   start_time <- Sys.time()
 
@@ -169,7 +169,7 @@ abba_watch_k8s_unit_local <- function(unit_id='',
 abba_watch_k8s_batch_local <- function(batch_group_id='',
                                        poll_interval_seconds = 3,
                                        timeout_seconds = 600,
-                                       namespace=getOption('abba.k8s_namespace')){
+                                       namespace=getOption('abba.k8s.namespace')){
 
   job_details <- abba_watch_k8s_unit_local(unit_id=batch_group_id,
                                            unit_type='batch',
@@ -198,7 +198,7 @@ abba_watch_k8s_batch_local <- function(batch_group_id='',
 abba_watch_k8s_job_local <- function(job_id='',
                                      poll_interval_seconds = 3,
                                      timeout_seconds = 600,
-                                     namespace=getOption('abba.k8s_namespace')){
+                                     namespace=getOption('abba.k8s.namespace')){
 
   job_details <- abba_watch_k8s_unit_local(unit_id=job_id,
                                            unit_type='job',
@@ -236,7 +236,7 @@ abba_submit_k8s_job_local <- function(file_path,
                                       memory_limit='512M',
                                       container=getOption('abba.default.container'),
                                       mounts='',
-                                      namespace=getOption('abba.k8s_namespace'),
+                                      namespace=getOption('abba.k8s.namespace'),
                                       username=NULL) {
 
   # Check if batch_group_id is a vector with more than one element
@@ -309,7 +309,7 @@ abba_submit_k8s_job_and_poll_local <- function(file_path,
                                                memory_limit='512M',
                                                container=getOption('abba.default.container'),
                                                mounts='',
-                                               namespace=getOption('abba.k8s_namespace'),
+                                               namespace=getOption('abba.k8s.namespace'),
                                                username=NULL,
                                                poll_interval_seconds = 3,
                                                timeout_seconds = 600) {

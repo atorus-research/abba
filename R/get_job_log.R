@@ -7,7 +7,7 @@
 #' @return A list containing job_id and a character vector with jobs log
 #'
 get_k8s_job_log0 <- function(job_id,
-                             namespace=getOption('abba.k8s_namespace')){
+                             namespace=getOption('abba.k8s.namespace')){
 
   # run the command for outputting job log
   # this command will generate warning in case job with a given ID does not exist
@@ -35,7 +35,7 @@ get_k8s_job_log0 <- function(job_id,
 #' @return A character vector containing pod log.
 #'
 get_k8s_pod_log0 <- function(pod_id,
-                             namespace=getOption('abba.k8s_namespace')){
+                             namespace=getOption('abba.k8s.namespace')){
   # run the command for outputting job log
   # this command will generate warning in case job with a given ID does not exist
   # that's why there is a suppressWarnings in place
@@ -62,7 +62,7 @@ get_k8s_pod_log0 <- function(pod_id,
 #' @return A list of job logs. Each list entry will contain complete log for a job
 #'
 abba_get_k8s_job_log_local <- function(job_ids,
-                                       namespace=getOption('abba.k8s_namespace')){
+                                       namespace=getOption('abba.k8s.namespace')){
   logs <- lapply(job_ids, function(x) get_k8s_job_log0(x, namespace=namespace))
   return(logs)
 }
@@ -77,7 +77,7 @@ abba_get_k8s_job_log_local <- function(job_ids,
 #' @return Job logs in a from of list consisting of character vectors
 #'
 abba_get_k8s_batch_log_local <- function(batch_id,
-                                         namespace=getOption('abba.k8s_namespace')){
+                                         namespace=getOption('abba.k8s.namespace')){
 
   # get all pod IDs belonging to a given batch
   pod_ids <- get_k8s_job_ids_from_batch(batch_id, namespace=namespace)
