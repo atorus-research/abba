@@ -8,7 +8,6 @@
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #' @param container A string containing a permitted container name.
 #' @param mounts Specifically formatted list with information bout volumes that
-#' @param namespace Kubernetes namespace to put the job in
 #'   container would have access to during the run
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
 #'   to environment variable ABBA_API_ADDRESS.
@@ -28,7 +27,6 @@ abba_submit_job <-
            memory_limit='512M',
            container='',
            mounts='',
-           namespace=getOption('abba.k8s_namespace'),
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
            api_key=Sys.getenv("ABBA_API_KEY")) {
 
@@ -43,8 +41,7 @@ abba_submit_job <-
                                           cpu_limit=cpu_limit,
                                           memory_limit=memory_limit,
                                           mounts=mounts,
-                                          container=container,
-                                          namespace=namespace))
+                                          container=container))
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
     result <- httr2::resp_body_json(resp)
@@ -68,7 +65,6 @@ abba_submit_job <-
 #' @param container list that contains container name and image name
 #' @param mounts Specifically formatted list with information bout volumes that
 #'   container would have access to during the run
-#' @param namespace Kubernetes namespace to put the job in
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
@@ -89,7 +85,6 @@ abba_submit_and_get_log <-
            memory_limit='512M',
            container='',
            mounts='',
-           namespace=getOption('abba.k8s_namespace'),
            poll_interval_seconds = 3,
            timeout_seconds = 600,
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
@@ -103,7 +98,6 @@ abba_submit_and_get_log <-
                               memory_limit=memory_limit,
                               mounts=mounts,
                               container=container,
-                              namespace=namespace,
                               api_address=api_address,
                               api_key=api_key)
 
@@ -115,8 +109,7 @@ abba_submit_and_get_log <-
       # Get the status
       job_details <- abba_get_job_status(job_id$job_id,
                                          api_address=api_address,
-                                         api_key=api_key,
-                                         namespace=namespace)
+                                         api_key=api_key)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
@@ -134,8 +127,7 @@ abba_submit_and_get_log <-
     program_name <- tools::file_path_sans_ext(basename(job_details[[1]]$Jobs[[1]]$path))
     logs <- abba_get_job_log(job_id$job_id,
                              api_address = api_address,
-                             api_key=api_key,
-                             namespace=namespace)
+                             api_key=api_key)
     result = list()
     result[[program_name]] = logs[[1]]
     # return response as a list
@@ -148,7 +140,6 @@ abba_submit_and_get_log <-
 #' @param job_id unique job identificator
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
-#' @param namespace Kubernetes namespace
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
@@ -163,7 +154,6 @@ abba_wait_for_job_log <-
   function(job_id,
            poll_interval_seconds = 3,
            timeout_seconds = 600,
-           namespace=getOption('abba.k8s_namespace'),
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
            api_key=Sys.getenv("ABBA_API_KEY")) {
 
@@ -174,7 +164,6 @@ abba_wait_for_job_log <-
 
       # Get the status
       job_details <- abba_get_job_status(job_id,
-                                         namespace=namespace,
                                          api_address=api_address,
                                          api_key=api_key)
 
@@ -192,7 +181,6 @@ abba_wait_for_job_log <-
 
     # get logs after job is no long in pending/running stage
     logs <- abba_get_job_log(job_id,
-                             namespace=namespace,
                              api_address = api_address,
                              api_key=api_key)
 
@@ -205,7 +193,6 @@ abba_wait_for_job_log <-
 #' running
 #'
 #' @param batch_id unique batch identificator
-#' @param namespace Kubernetes namespace
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
@@ -220,7 +207,6 @@ abba_wait_for_job_log <-
 #' response <- abba_wait_for_batch_log('batch-sdtm-sdfj4-asdjlk-bjslk')}
 abba_wait_for_batch_log <-
   function(batch_id,
-           namespace=getOption('abba.k8s_namespace'),
            poll_interval_seconds = 3,
            timeout_seconds = 600,
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
@@ -233,7 +219,6 @@ abba_wait_for_batch_log <-
 
       # Get the status
       batch_details <- abba_get_batch_status(batch_id,
-                                             namespace=namespace,
                                              api_address=api_address,
                                              api_key=api_key)
 
@@ -251,7 +236,6 @@ abba_wait_for_batch_log <-
 
     # get logs after job is no long in pending/running stage
     logs <- abba_get_batch_log(batch_id,
-                               namespace=namespace,
                                api_address = api_address,
                                api_key=api_key)
 
@@ -263,7 +247,6 @@ abba_wait_for_batch_log <-
 #' Send GET request to get logs of specified Jobs
 #'
 #' @param job_ids A list of job IDs to get logs for
-#' @param namespace Kubernetes namespace
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
@@ -276,7 +259,6 @@ abba_wait_for_batch_log <-
 #' response <- abba_get_job_log('1234j-13j4l5k-ajslfd')}
 abba_get_job_log <-
   function(job_ids,
-           namespace=getOption('abba.k8s_namespace'),
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
            api_key=Sys.getenv("ABBA_API_KEY")) {
 
@@ -284,7 +266,7 @@ abba_get_job_log <-
     req <- httr2::request(paste(api_address, 'job-log', sep='/'))
 
     # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(job_ids=job_ids, namespace=namespace)) %>%
+    req <- httr2::req_body_json(req, list(job_ids=job_ids)) %>%
       httr2::req_method("GET") %>%
       add_api_key_to_header(api_key=api_key)
     # send the request to API
@@ -303,7 +285,6 @@ abba_get_job_log <-
 #' Send GET request to get logs of all jobs in a batch
 #'
 #' @param batch_id unique batch identificator
-#' @param namespace Kubernetes namespace
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
@@ -316,7 +297,6 @@ abba_get_job_log <-
 #' response <- abba_get_job_log('1234j-13j4l5k-ajslfd')}
 abba_get_batch_log <-
   function(batch_id,
-           namespace=getOption('abba.k8s_namespace'),
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
            api_key=Sys.getenv("ABBA_API_KEY")) {
 
@@ -324,7 +304,7 @@ abba_get_batch_log <-
     req <- httr2::request(paste(api_address, 'batch-log', sep='/'))
 
     # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(batch_id=batch_id, namespace=namespace)) %>%
+    req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>%
       httr2::req_method("GET") %>%
       add_api_key_to_header(api_key=api_key)
     # send the request to API
@@ -343,7 +323,6 @@ abba_get_batch_log <-
 #' Send GET request to get batch job statuses
 #'
 #' @param batch_id batch ID to get status for
-#' @param namespace Kubernetes namespace
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
@@ -356,7 +335,6 @@ abba_get_batch_log <-
 #' response <- abba_get_batch_status('1234j-13j4l5k-ajslfd')}
 abba_get_batch_status <-
   function(batch_id,
-           namespace=getOption('abba.k8s_namespace'),
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
            api_key=Sys.getenv("ABBA_API_KEY")) {
 
@@ -364,7 +342,7 @@ abba_get_batch_status <-
     req <- httr2::request(paste(api_address, 'batch-status', sep='/'))
 
     # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(batch_id=batch_id, namespace=namespace)) %>%
+    req <- httr2::req_body_json(req, list(batch_id=batch_id)) %>%
       httr2::req_method("GET") %>%
       add_api_key_to_header(api_key=api_key)
     # send the request to API
@@ -388,7 +366,6 @@ abba_get_batch_status <-
 #' Send GET request to get job status
 #'
 #' @param job_id job IDs to get status for
-#' @param namespace Kubernetes namespace
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
@@ -401,7 +378,6 @@ abba_get_batch_status <-
 #' response <- abba_get_job_status('1234j-13j4l5k-ajslfd')}
 abba_get_job_status <-
   function(job_id,
-           namespace=getOption('abba.k8s_namespace'),
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
            api_key=Sys.getenv("ABBA_API_KEY")) {
 
@@ -409,7 +385,7 @@ abba_get_job_status <-
     req <- httr2::request(paste(api_address, 'job-status', sep='/'))
 
     # add a json body with all parameters
-    req <- httr2::req_body_json(req, list(job_id=job_id, namespace=namespace)) %>%
+    req <- httr2::req_body_json(req, list(job_id=job_id)) %>%
       httr2::req_method("GET") %>%
       add_api_key_to_header(api_key=api_key)
     # send the request to

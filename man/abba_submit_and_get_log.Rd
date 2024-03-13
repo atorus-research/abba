@@ -13,7 +13,6 @@ abba_submit_and_get_log(
   memory_limit = "512M",
   container = "",
   mounts = "",
-  namespace = getOption("abba.k8s_namespace"),
   poll_interval_seconds = 3,
   timeout_seconds = 600,
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
@@ -36,8 +35,6 @@ scheduled to run}
 
 \item{mounts}{Specifically formatted list with information bout volumes that
 container would have access to during the run}
-
-\item{namespace}{Kubernetes namespace to put the job in}
 
 \item{poll_interval_seconds}{Total time to wait before timeout in seconds}
 

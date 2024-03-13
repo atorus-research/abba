@@ -12,7 +12,7 @@ abba_submit_k8s_job_local(
   memory_limit = "512M",
   container = getOption("abba.default.container"),
   mounts = "",
-  namespace = getOption("abba.k8s_namespace"),
+  namespace = getOption("abba.k8s.namespace"),
   username = NULL
 )
 }

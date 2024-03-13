@@ -6,15 +6,12 @@
 \usage{
 abba_get_batch_log(
   batch_id,
-  namespace = getOption("abba.k8s_namespace"),
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
   api_key = Sys.getenv("ABBA_API_KEY")
 )
 }
 \arguments{
 \item{batch_id}{unique batch identificator}
-
-\item{namespace}{Kubernetes namespace}
 
 \item{api_address}{URL to send requests to, hosted in Posit Connect. Defaults
 to environment variable ABBA_API_ADDRESS.}

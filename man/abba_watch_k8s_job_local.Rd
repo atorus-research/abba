@@ -8,7 +8,7 @@ abba_watch_k8s_job_local(
   job_id = "",
   poll_interval_seconds = 3,
   timeout_seconds = 600,
-  namespace = getOption("abba.k8s_namespace")
+  namespace = getOption("abba.k8s.namespace")
 )
 }
 \arguments{

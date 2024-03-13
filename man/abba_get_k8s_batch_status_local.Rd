@@ -6,7 +6,7 @@
 \usage{
 abba_get_k8s_batch_status_local(
   batch_id,
-  namespace = getOption("abba.k8s_namespace")
+  namespace = getOption("abba.k8s.namespace")
 )
 }
 \arguments{

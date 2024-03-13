@@ -6,7 +6,7 @@
 \usage{
 abba_get_k8s_job_status_local(
   job_id,
-  namespace = getOption("abba.k8s_namespace")
+  namespace = getOption("abba.k8s.namespace")
 )
 }
 \arguments{
