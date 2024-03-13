@@ -12,7 +12,7 @@ options(
                                 "atoruscontainers.azurecr.io/openval_base_4.3.2_focal:latest",
                                 "atoruscontainers.azurecr.io/openval-dev-focal:latest"),
   abba.default.container = "atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02",
-  abba.k8s_namespace='rstudio'
+  abba.k8s.namespace='rstudio'
   )
 
 # Returns a list containing "user" and "groups" information
