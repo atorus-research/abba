@@ -1,18 +1,16 @@
 library(plumber)
-devtools::load_all()
+library(abba)
 
 options(
   abba.lower.cpu.limit=0.5,
   abba.cpu.limit = 2,
   abba.lower.memory.limit='128M',
   abba.memory.limit='1G',
-  abba.permitted.containers = c("atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02",
-                                "atoruscontainers.azurecr.io/openval_4.2.1_focal:latest",
-                                "atoruscontainers.azurecr.io/openval_base_4.3.2_focal:2024.03.01",
-                                "atoruscontainers.azurecr.io/openval_base_4.3.2_focal:latest",
-                                "atoruscontainers.azurecr.io/openval-dev-focal:latest"),
-  abba.default.container = "atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02",
-  abba.k8s_namespace='rstudio'
+  abba.permitted.containers = c("registry.io/default_image:version",
+                                "registry.io/image1:version",
+                                "registry.io/image1:version"),
+  abba.default.container = "registry.io/default_image:version",
+  abba.k8s.namespace='rstudio'
 )
 
 # Returns a list containing "user" and "groups" information
