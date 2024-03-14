@@ -18,7 +18,7 @@ get_k8s_job_ids_from_batch <- function(group_batch_id,
   if (length(output)==1){return(list())}
 
   # remove header from output
-  jobids <- utils::tail(output, 2)
+  jobids <- utils::tail(output, -1)
   jobids_list <- sapply(jobids,
                         function(x) stringr::str_extract(x,  stringr::regex("^[\\d\\w\\-]+")),
                         USE.NAMES=FALSE)
