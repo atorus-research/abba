@@ -44,7 +44,7 @@ function(file_path,
          memory_limit="512M",
          container=getOption('abba.default.container'),
          mounts='',
-         namespace=getOption('abba.k8s_namespace'),
+         namespace=getOption('abba.k8s.namespace'),
          req,
          res) {
 
@@ -92,7 +92,7 @@ function(file_path,
 #' @param namespace Kubernetes namespace to put the job in
 #* @get /job-log
 function(job_ids,
-         namespace=getOption('abba.k8s_namespace')) {
+         namespace=getOption('abba.k8s.namespace')) {
 
   result <- abba_get_k8s_job_log_local(job_ids,
                                        namespace=namespace)
@@ -105,7 +105,7 @@ function(job_ids,
 #' @param namespace Kubernetes namespace to put the job in
 #* @get /batch-log
 function(batch_id,
-         namespace=getOption('abba.k8s_namespace')) {
+         namespace=getOption('abba.k8s.namespace')) {
 
   result <- abba_get_k8s_batch_log_local(batch_id,
                                          namespace=namespace)
@@ -118,7 +118,7 @@ function(batch_id,
 #' @param namespace Kubernetes namespace to put the job in
 #* @get /batch-status
 function(batch_id='',
-         namespace=getOption('abba.k8s_namespace')) {
+         namespace=getOption('abba.k8s.namespace')) {
 
   result <- abba_get_k8s_batch_status_local(batch_id,
                                             namespace=namespace)
@@ -130,7 +130,7 @@ function(batch_id='',
 #' @param namespace Kubernetes namespace to put the job in
 #* @get /job-status
 function(job_id='',
-         namespace=getOption('abba.k8s_namespace')) {
+         namespace=getOption('abba.k8s.namespace')) {
   result <- abba_get_k8s_job_status_local(job_id,
                                           namespace=namespace)
   return(result)
