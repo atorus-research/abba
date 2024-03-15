@@ -4,7 +4,8 @@
           abba.lower.memory.limit='128M',
           abba.memory.limit='1G',
           abba.permitted.containers=NULL,
-          abba.default.container=NULL
+          abba.default.container=NULL,
+          abba.k8s.namespace='rstudio'
   )
   invisible()
 }
@@ -17,7 +18,7 @@ mcpu_to_cpu <- function(cpu){
   # define conversion factor
   suffixes <- list(m=1/1000)
   # extract numerical part and suffix
-  numeric_part <- gsub('[^0-9]', '', cpu)
+  numeric_part <- gsub('[^0-9.]', '', cpu)
   suffix <- gsub('[^a-zA-Z]', '', cpu)
 
   # just return numeric part if no unit specified

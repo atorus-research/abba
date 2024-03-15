@@ -12,6 +12,7 @@ abba_submit_k8s_job_and_poll_local(
   memory_limit = "512M",
   container = getOption("abba.default.container"),
   mounts = "",
+  namespace = getOption("abba.k8s.namespace"),
   username = NULL,
   poll_interval_seconds = 3,
   timeout_seconds = 600
@@ -31,6 +32,10 @@ abba_submit_k8s_job_and_poll_local(
 \item{container}{A valid container image name provided as a character string. Defaults to the option abba.default.container.}
 
 \item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
+
+\item{namespace}{Kubernetes namespace to put the job in}
+
+\item{username}{user whose authority will be used to run the program}
 
 \item{poll_interval_seconds}{Time interval for polling job status in seconds}
 

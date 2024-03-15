@@ -107,7 +107,8 @@ abba_submit_and_get_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- abba_get_job_status(job_id$job_id, api_address=api_address,
+      job_details <- abba_get_job_status(job_id$job_id,
+                                         api_address=api_address,
                                          api_key=api_key)
 
       # Get the names of the outer list in job_details
@@ -124,7 +125,9 @@ abba_submit_and_get_log <-
 
     # get logs after job is no long in pending/running stage
     program_name <- tools::file_path_sans_ext(basename(job_details[[1]]$Jobs[[1]]$path))
-    logs <- abba_get_job_log(job_id$job_id, api_address = api_address, api_key=api_key)
+    logs <- abba_get_job_log(job_id$job_id,
+                             api_address = api_address,
+                             api_key=api_key)
     result = list()
     result[[program_name]] = logs[[1]]
     # return response as a list
@@ -160,7 +163,9 @@ abba_wait_for_job_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      job_details <- abba_get_job_status(job_id, api_address=api_address, api_key=api_key)
+      job_details <- abba_get_job_status(job_id,
+                                         api_address=api_address,
+                                         api_key=api_key)
 
       # Get the names of the outer list in job_details
       status_names <- names(job_details)
@@ -175,7 +180,9 @@ abba_wait_for_job_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- abba_get_job_log(job_id, api_address = api_address, api_key=api_key)
+    logs <- abba_get_job_log(job_id,
+                             api_address = api_address,
+                             api_key=api_key)
 
     # return response as a list
     return(logs)
@@ -211,7 +218,8 @@ abba_wait_for_batch_log <-
     while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
       # Get the status
-      batch_details <- abba_get_batch_status(batch_id, api_address=api_address,
+      batch_details <- abba_get_batch_status(batch_id,
+                                             api_address=api_address,
                                              api_key=api_key)
 
       # Get the names of the outer list in job_details
@@ -227,7 +235,8 @@ abba_wait_for_batch_log <-
     }
 
     # get logs after job is no long in pending/running stage
-    logs <- abba_get_batch_log(batch_id, api_address = api_address,
+    logs <- abba_get_batch_log(batch_id,
+                               api_address = api_address,
                                api_key=api_key)
 
     # return response as a list

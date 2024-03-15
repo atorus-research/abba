@@ -3,22 +3,28 @@ test_that("YAML fields are properly updated by configure_yaml", {
                                          batch_group_id="group_A",
                                          user_tag='user_tag',
                                          cpu_limit= 2L,
-                                         memory_limit='512M')
+                                         memory_limit='512M',
+                                         username='test_username',
+                                         namespace='test_namespace')
   actual <- c(yaml_file_configured$metadata$name,
+              yaml_file_configured$metadata$namespace,
               yaml_file_configured$metadata$labels$`batch-group`,
               yaml_file_configured$spec$template$metadata$labels$`batch-group`,
               yaml_file_configured$spec$template$metadata$annotations$USER_TAG_0,
               yaml_file_configured$spec$template$spec$containers[[1]]$args[[2]],
               yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$cpu,
-              yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory)
+              yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory,
+              yaml_file_configured$spec$template$metadata$annotations$user)
 
   expected <- c(yaml_file_configured$metadata$generateName,
+                'test_namespace',
                 "group_A",
                 "group_A",
                 "user_tag",
                 paste0("cd ~ && R --slave --no-save --no-restore -f ", "/tst/path/test.R"),
                 "2",
-                "512M")
+                "512M",
+                'test_username')
 
   expect_equal(actual, expected)
 
@@ -50,9 +56,9 @@ test_that("function errors when memory limit is bigger than maximum specified in
 
 })
 
-test_that("Container name and image can be customized", {
+test_that("Container image can be customized", {
   yaml_file_configured <- configure_k8s_yaml(file_path="/tst/path/test.R",
-                                               container='custom_container_image')
+                                             container='custom_container_image')
 
   actual <- yaml_file_configured$spec$template$spec$containers[[1]]
 

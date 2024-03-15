@@ -4,10 +4,15 @@
 \alias{abba_get_k8s_job_status_local}
 \title{Get status of all pods that belong to a job}
 \usage{
-abba_get_k8s_job_status_local(job_id)
+abba_get_k8s_job_status_local(
+  job_id,
+  namespace = getOption("abba.k8s.namespace")
+)
 }
 \arguments{
 \item{job_id}{unique identifier for a job}
+
+\item{namespace}{Kubernetes namespace}
 }
 \value{
 list of statuses for every pod in a job(typically just one).

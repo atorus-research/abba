@@ -12,6 +12,7 @@ abba_submit_k8s_job_local(
   memory_limit = "512M",
   container = getOption("abba.default.container"),
   mounts = "",
+  namespace = getOption("abba.k8s.namespace"),
   username = NULL
 )
 }
@@ -29,6 +30,10 @@ abba_submit_k8s_job_local(
 \item{container}{A valid container image name provided as a character string. Defaults to the option abba.default.container.}
 
 \item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
+
+\item{namespace}{Kubernetes namespace to put the job in}
+
+\item{username}{user whose authority will be used to run the program}
 }
 \value{
 A list with job_id and batch_id attributes in case of successful submission

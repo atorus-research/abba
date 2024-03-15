@@ -4,10 +4,15 @@
 \alias{abba_get_k8s_batch_log_local}
 \title{Return list of logs for jobs that are marked with a given batch ID}
 \usage{
-abba_get_k8s_batch_log_local(batch_id)
+abba_get_k8s_batch_log_local(
+  batch_id,
+  namespace = getOption("abba.k8s.namespace")
+)
 }
 \arguments{
 \item{batch_id}{string containing batch ID}
+
+\item{namespace}{Kubernetes namespace to search for batch jobs}
 }
 \value{
 Job logs in a from of list consisting of character vectors

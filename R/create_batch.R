@@ -53,7 +53,7 @@ create_file <- function(src = c("plumber.R", "job.Rmd"), path) {
   success <- file.copy(system.file(src, package="abba"),
                        path,
                        overwrite=FALSE)
-  if(success) {
+  if(all(success)) {
     message(sprintf("%s file created at %s", msg[src], path.expand(path)))
   } else{
     warning(sprintf(

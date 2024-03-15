@@ -7,6 +7,8 @@
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #' @param container A character string containing a valid container path
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
+#' @param namespace Kubernetes namespace to put the job in
+#' @param username user whose authority will be used to run the program
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
 #' @noRd
@@ -19,6 +21,7 @@ configure_k8s_yaml <- function(file_path='',
                                memory_limit='512M',
                                container=NULL,
                                mounts=NULL,
+                               namespace=getOption('abba.k8s.namespace'),
                                username=NULL){
 
   yaml_file_obj <- load_k8s_yaml_template()
@@ -69,6 +72,7 @@ configure_k8s_yaml <- function(file_path='',
     x <- gsub("MEMORY_LIMIT", memory_limit, x)
     x <- gsub("RUN_AS_USER", guid$uid, x)
     x <- gsub("RUN_AS_GROUP", guid$gid, x)
+    x <- gsub("K8S_NAMESPACE", namespace, x)
     return(x)
   }
 

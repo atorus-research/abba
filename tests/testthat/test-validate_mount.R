@@ -10,6 +10,10 @@ test_that("function returns FALSE when the input argument is an empty string", {
   expect_equal(validate_k8s_mount(''), FALSE)
 })
 
+test_that("function errors when the input list does not have required named values", {
+  expect_error(validate_k8s_mount(list(volumes=list(list(name='mount0')))))
+})
+
 test_that("function errors when mount names in volumes and volumeMounts differ", {
   mount_info <- list(volumes=list(list(name='mount0')),
                      volumeMounts=list(list(name='mount1')))
