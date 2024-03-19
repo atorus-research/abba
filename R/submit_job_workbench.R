@@ -1,4 +1,4 @@
-submit_workbench_job <- function(p, wait=FALSE, log_path=NA, user_tag='', ...) {
+submit_workbench_job <- function(p, log_path=NA, user_tag='', ...) {
   # Submit the job for the program and wait until its execution
   scriptPath <- path.expand(p)
   scriptFile <- basename(scriptPath)
@@ -20,17 +20,12 @@ submit_workbench_job <- function(p, wait=FALSE, log_path=NA, user_tag='', ...) {
                                           tags = c(jobTag)
   )
 
-  status <- get_workbench_job_status(job_id)
-  # Watch the job while it's executing
-  if (wait){
-    job_id <- wait_for_workbench_job_completion(job_id)
-  }
   # return path of the executed script along with execution status(anything other than 0 is a failure)
   return(job_id)
 
 }
 
-submit_logrx_workbench_job <- function(p, wait=FALSE, log_path=NA, user_tag='', ...) {
+submit_logrx_workbench_job <- function(p, log_path=NA, user_tag='', ...) {
 
   # Submit the job for the program and wait until its execution
   scriptPath <- path.expand(p)
@@ -49,25 +44,22 @@ submit_logrx_workbench_job <- function(p, wait=FALSE, log_path=NA, user_tag='', 
                                           tags = c(jobTag)
   )
 
-  status <-  get_workbench_job_status(job_id)
-  # Watch the job while it's executing
-  if (wait){
-    job_id <- wait_for_workbench_job_completion(job_id)
-    }
-  }
-  # return ID assosicated with submitted program
+  # return ID associated with submitted program
   return(job_id)
+}
 
 # simple function to get the job status
-get_workbench_job_status <- function(job_ids){
+get_workbench_job_status <- function(job_ids,
+                                     ...){
   return(sapply(job_ids, function(x) rstudioapi::launcherGetJob(x)[['status']]))
 }
 
 # function that periodically polls job-id for status and returns its id when job
 # status reaches 'Finished' state
-wait_for_workbench_job_completion <- function(job_ids,
-                                              poll_interval_seconds = 1,
-                                              timeout_seconds = 100){
+watch_workbench_job <- function(job_ids,
+                                poll_interval_seconds = 1,
+                                timeout_seconds = 300,
+                                ...){
   # Initialize variables for tracking job status
   start_time <- Sys.time()
 
@@ -86,7 +78,7 @@ wait_for_workbench_job_completion <- function(job_ids,
 }
 
 # simple function to get job log
-get_workbench_job_log0 <- function(job_id){
+get_workbench_job_log0 <- function(job_id, ...){
   job_info <- rstudioapi::launcherGetJob(job_id)
 
   if (!file.exists(job_info$stdoutFile)){
@@ -97,6 +89,6 @@ get_workbench_job_log0 <- function(job_id){
 }
 
 # vectorized version of get_workbench_job_log0
-get_workbench_job_log <- function(job_ids){
+get_workbench_job_log <- function(job_ids, ...){
   return(lapply(job_ids, get_workbench_job_log0))
 }
