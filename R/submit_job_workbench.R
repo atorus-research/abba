@@ -58,12 +58,17 @@ wait_for_workbench_job_completion <- function(job_ids,
 }
 
 # simple function to get job log
-get_workbench_job_log <- function(job_id){
+get_workbench_job_log0 <- function(job_id){
   job_info <- rstudioapi::launcherGetJob(job_id)
 
   if (!file.exists(job_info$stdoutFile)){
     return(c(sprintf('Log file does not exist for %s', job_info$id)))
   }
 
-  return(utils::tail(readLines(con=job_info$stdoutFile), n=-1))
+  return(readLines(con=job_info$stdoutFile))
+}
+
+# vectorized version of get_workbench_job_log0
+get_workbench_job_log <- function(job_ids){
+  return(lapply(job_ids, get_workbench_job_log0))
 }
