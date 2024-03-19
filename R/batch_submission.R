@@ -15,8 +15,8 @@
 #'     "/mnt/work_drive/proj/comp/prot/task/development/prod/program/sdtm/ae.sas"))
 #'  }
 batch_submit_series <- function(prog_list,
-                                submit_func=submit_workbench_job,
-                                wait_func=watch_workbench_job,
+                                submit_func=abba_rslauncher_submit_job_local,
+                                wait_func=abba_rslauncher_watch_job_local,
                                 ...) {
   job_ids <- list()
 
@@ -47,8 +47,8 @@ batch_submit_series <- function(prog_list,
 #'     "/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_ae.sas"))
 #'  }
 batch_submit_parallel <- function(prog_list,
-                                  submit_func=submit_workbench_job,
-                                  wait_func=watch_workbench_job,
+                                  submit_func=abba_rslauncher_submit_job_local,
+                                  wait_func=abba_rslauncher_watch_job_local,
                                   ...) {
   # Submit jobs for the programs and wait until everything has been executed
   job_ids <- sapply(prog_list, function(x) submit_func(x, ...))
@@ -80,8 +80,8 @@ batch_submit_parallel <- function(prog_list,
 #'     "/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_ae.sas")))
 #'  }
 submit_workbench_batch <- function(prog_list,
-                                   submit_func=submit_workbench_job,
-                                   wait_func=watch_workbench_job,
+                                   submit_func=abba_rslauncher_submit_job_local,
+                                   wait_func=abba_rslauncher_watch_job_local,
                                    ...) {
 
   # execute each item in the prog_list sequentially. Programs inside each list element,
@@ -89,8 +89,8 @@ submit_workbench_batch <- function(prog_list,
   job_ids <- lapply(
     prog_list,
     function(x) batch_submit_parallel(x,
-                                      submit_func=submit_workbench_job,
-                                      wait_func=watch_workbench_job,
+                                      submit_func=submit_func,
+                                      wait_func=wait_func,
                                       ...)
     )
   return(unlist(job_ids))
