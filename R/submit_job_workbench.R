@@ -30,6 +30,34 @@ submit_workbench_job <- function(p, wait=FALSE, log_path=NA, user_tag='', ...) {
 
 }
 
+submit_logrx_workbench_job <- function(p, wait=FALSE, log_path=NA, user_tag='', ...) {
+
+  # Submit the job for the program and wait until its execution
+  scriptPath <- path.expand(p)
+  scriptFile <- basename(scriptPath)
+  scriptArg <- sprintf("-f %s --args %s", system.file('logrx_workbench_submission.R', package="abba"), scriptPath)
+  jobTag <- paste("rstudio-r-script-job", scriptFile, sep = ":")
+  if (is.na(log_path) || log_path == ''){
+    log_path=file.path(dirname(scriptPath), paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
+  } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
+
+  # don't pass any arguments for SubmitJob for now
+  job_id <- rstudioapi::launcherSubmitJob(args =  c("--slave", "--no-save", "--no-restore", scriptArg),
+                                          cluster = 'Local',
+                                          command = "R",
+                                          name = scriptPath,
+                                          tags = c(jobTag)
+  )
+
+  status <-  get_workbench_job_status(job_id)
+  # Watch the job while it's executing
+  if (wait){
+    job_id <- wait_for_workbench_job_completion(job_id)
+    }
+  }
+  # return ID assosicated with submitted program
+  return(job_id)
+
 # simple function to get the job status
 get_workbench_job_status <- function(job_ids){
   return(sapply(job_ids, function(x) rstudioapi::launcherGetJob(x)[['status']]))
