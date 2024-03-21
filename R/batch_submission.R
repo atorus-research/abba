@@ -33,6 +33,7 @@ batch_submit_parallel <- function(prog_list,
 #' would be submitted sequentially.
 #'
 #' @param prog_list A list of R program paths to execute
+#' @param sequential when sequential=TRUE, prog_list is flattened and everything is executed sequentially.
 #' @param submit_func function that will be used to submit jobs
 #' @param wait_func function that checks job status and returns when job finishes executing
 #' @param ... arguments that will be passed to submit_func and wait_func functions
@@ -48,11 +49,18 @@ batch_submit_parallel <- function(prog_list,
 #'     "/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_ae.sas")))
 #'  }
 submit_workbench_batch <- function(prog_list,
+                                   sequential=FALSE,
                                    submit_func=abba_rslauncher_submit_job_local,
                                    wait_func=abba_rslauncher_watch_job_local,
                                    ...) {
   # if prog_list is a data frame - convert it to a list of vectors acording to set rules
   prog_list_converted <- dataframe_to_batch_list(prog_list)
+
+  # if sequential=TRUE is specified - flatten the list and this will execute everything sequentially
+  # REGARDLESS of whether prog_list is a list, a character vector or a data frame
+  if (sequential==TRUE){
+    prog_list_converted <- unlist(prog_list_converted)
+  }
   # execute each item in the prog_list sequentially. Programs inside each list element,
   # which can also be a vector of program paths, will be executed in parallel
   job_ids <- lapply(
