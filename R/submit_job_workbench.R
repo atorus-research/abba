@@ -1,11 +1,16 @@
-abba_rslauncher_submit_job_local <- function(p,
-                                             log_path=NA,
-                                             user_tag='',
-                                             ...) {
+rslauncher_submit_job <- function(p,
+                                  execution_type='standard',
+                                  log_path=NA,
+                                  user_tag='',
+                                  ...) {
+
+  # check execution type
+  if (!(execution_type %in% c('standard', 'logrx'))){
+    stop(sprintf("execution_type argument must be 'standard' or 'logrx', not %s", execution_type))
+  }
   # Submit the job for the program and wait until its execution
   scriptPath <- path.expand(p)
   scriptFile <- basename(scriptPath)
-  scriptArg <- paste("-f", scriptPath)
   jobTag <- paste("rstudio-r-script-job", scriptFile, sep = ":")
 
   # put log file in r script folder if no log path is supplied
@@ -13,7 +18,17 @@ abba_rslauncher_submit_job_local <- function(p,
     log_path=file.path(dirname(scriptPath), paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
   } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
 
-  # don't pass any arguments for SubmitJob for now
+  # define scriptpath depending on the execution type
+  if (execution_type == 'standard'){
+    scriptArg <- paste("-f", scriptPath)
+  }
+  else if (execution_type == 'logrx'){
+    scriptArg <- sprintf("-f %s --args %s %s",
+                         system.file('logrx_workbench_submission.R', package="abba"),
+                         scriptPath,
+                         log_path)
+  }
+  # submit program for execution via rstudioapi
   job_id <- rstudioapi::launcherSubmitJob(args =  c("--slave", "--no-save", "--no-restore", scriptArg),
                                           cluster = 'Local',
                                           command = "R",
@@ -22,6 +37,21 @@ abba_rslauncher_submit_job_local <- function(p,
                                           name = scriptPath,
                                           tags = c(jobTag)
   )
+  # return path of the executed script along with execution status(anything other than 0 is a failure)
+  return(job_id)
+
+}
+
+abba_rslauncher_submit_job_local <- function(p,
+                                             log_path=NA,
+                                             user_tag='',
+                                             ...) {
+
+  job_id <- rslauncher_submit_job(p,
+                                  execution_type='standard',
+                                  log_path=log_path,
+                                  user_tag=user_tag,
+                                  ...)
 
   # return path of the executed script along with execution status(anything other than 0 is a failure)
   return(job_id)
@@ -33,22 +63,11 @@ abba_rslauncher_submit_logrx_job_local <- function(p,
                                                    user_tag='',
                                                    ...) {
 
-  # Submit the job for the program and wait until its execution
-  scriptPath <- path.expand(p)
-  scriptFile <- basename(scriptPath)
-  scriptArg <- sprintf("-f %s --args %s", system.file('logrx_workbench_submission.R', package="abba"), scriptPath)
-  jobTag <- paste("rstudio-r-script-job", scriptFile, sep = ":")
-  if (is.na(log_path) || log_path == ''){
-    log_path=file.path(dirname(scriptPath), paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
-  } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
-
-  # don't pass any arguments for SubmitJob for now
-  job_id <- rstudioapi::launcherSubmitJob(args =  c("--slave", "--no-save", "--no-restore", scriptArg),
-                                          cluster = 'Local',
-                                          command = "R",
-                                          name = scriptPath,
-                                          tags = c(jobTag)
-  )
+  job_id <- rslauncher_submit_job(p,
+                                  execution_type='logrx',
+                                  log_path=log_path,
+                                  user_tag=user_tag,
+                                  ...)
 
   # return ID associated with submitted program
   return(job_id)
