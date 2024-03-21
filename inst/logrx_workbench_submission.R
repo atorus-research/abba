@@ -2,8 +2,9 @@ require(logrx)
 # commandArgs picks up the variables you pass from the command line
 args <- commandArgs(trailingOnly = TRUE)
 
+print(args)
 prog_path <- args[1]
-log.path <- file.path(dirname(prog_path), "log")
-log.name <- paste0(tools::file_path_sans_ext(basename(prog_path)), '.log')
+log_path <- dirname(args[2])
+log_name <- basename(args[2])
 
-axecute(prog_path, log_name = log.name, log_path = log.path)
+axecute(prog_path, log_name = log_name, log_path = log_path)
