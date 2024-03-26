@@ -44,3 +44,48 @@ validate_batch_data_frame <- function(x){
   }
   return(TRUE)
 }
+
+# create run_group variable using inputs and outputs of programs specified by user
+calculate_run_group <- function(x, col_name='run_group_calculated'){
+  x[[col_name]] <- 0
+  # determine which program to run first - such program inputs are not on the outputs of any other program
+  first_progs_index <- get_first_programs(x)
+  x[first_progs_index,][[col_name]] <- 1
+  # iteratively calculate group run order
+  current_group <- 1
+  while (!identical(x[[col_name]],
+                    calculate_next_group(x,
+                                         current_group=current_group,
+                                         col_name=col_name)[[col_name]])){
+    x <- calculate_next_group(x, current_group=current_group, col_name=col_name)
+    current_group <- current_group + 1
+  }
+  return(x)
+}
+
+# split comma-separated inputs
+parse_inputs <- function(x){
+  return(lapply(strsplit(x, ','), stringr::str_trim))
+}
+
+# function to get indexes of programs whose inputs are not produced by any programs in the x dataset
+get_first_programs <- function(x){
+  return(sapply(parse_inputs(ds$inputs), function(x) all(!(x %in% ds$outputs))))
+}
+
+calculate_next_group <- function(x,
+                                 current_group=1,
+                                 col_name='run_group_calculated'){
+
+  cur_group_outputs <- x[x[[col_name]] == current_group,]$outputs
+  # next group definition: any dataset that has one or more outputs of current group
+  # as its inputs
+  next_group <- sapply(parse_inputs(x$inputs), function(y) any(y %in% cur_group_outputs))
+
+  # if there is no next group - return unmodified dataset
+  if (all(!next_group)) {return (x)}
+
+  #
+  x[next_group,][[col_name]] <- current_group + 1
+  return(x)
+}
