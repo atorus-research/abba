@@ -9,6 +9,8 @@
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #' @param namespace Kubernetes namespace to put the job in
 #' @param username user whose authority will be used to run the program
+#' @param auto_mount_home set to TRUE to mount service user home directory
+#' @param home_nfs_address IP address for mounting service user home directory
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
 #' @noRd
@@ -22,7 +24,9 @@ configure_k8s_yaml <- function(file_path='',
                                container=NULL,
                                mounts=NULL,
                                namespace=getOption('abba.k8s.namespace'),
-                               username=NULL){
+                               username=NULL,
+                               auto_mount_home=FALSE,
+                               home_nfs_address=''){
 
   yaml_file_obj <- load_k8s_yaml_template()
 
@@ -32,6 +36,12 @@ configure_k8s_yaml <- function(file_path='',
   # Otherwise, keep what user has specified.
   if (is.null(batch_group_id) || batch_group_id == '') {
     batch_group_id <- program_name
+  }
+
+  # remove home mount if mount_home is FALSE
+  if (auto_mount_home==FALSE){
+    yaml_file_obj$spec$template$spec$volumes <- NULL
+    yaml_file_obj$spec$template$spec$containers[[1]]$volumeMounts <- NULL
   }
 
   # cannot have underscores in job name/generate name
@@ -73,6 +83,7 @@ configure_k8s_yaml <- function(file_path='',
     x <- gsub("RUN_AS_USER", guid$uid, x)
     x <- gsub("RUN_AS_GROUP", guid$gid, x)
     x <- gsub("K8S_NAMESPACE", namespace, x)
+    x <- gsub("DEFAULT_NFS_MOUNT_IP_ADDRESS", home_nfs_address, x)
     return(x)
   }
 

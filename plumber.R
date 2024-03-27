@@ -37,6 +37,8 @@ getUserMetadata <- function(req) {
 #' @param memory_limit Maximum amount of RAM available for Kubernetes container
 #' @param container A string containing a permitted container name. Default is specified by API administrator.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
+#' @param auto_mount_home set to TRUE to mount service user home directory
+#' @param home_nfs_address IP address for mounting service user home directory
 #' @param namespace Kubernetes namespace to put the job in
 #* @post /submit-job
 function(file_path,
@@ -46,6 +48,8 @@ function(file_path,
          memory_limit="512M",
          container=getOption('abba.default.container'),
          mounts='',
+         auto_mount_home=FALSE,
+         home_nfs_address='',
          namespace=getOption('abba.k8s.namespace'),
          req,
          res) {
@@ -83,6 +87,8 @@ function(file_path,
     memory_limit=memory_limit,
     container=container,
     mounts=mounts,
+    auto_mount_home=auto_mount_home,
+    home_nfs_address=home_nfs_address,
     namespace=namespace,
     username=username
   )

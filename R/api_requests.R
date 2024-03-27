@@ -9,6 +9,8 @@
 #' @param container A string containing a permitted container name.
 #' @param mounts Specifically formatted list with information bout volumes that
 #'   container would have access to during the run
+#' @param auto_mount_home set to TRUE to mount service user home directory
+#' @param home_nfs_address IP address for mounting service user home directory
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
@@ -27,6 +29,8 @@ abba_submit_job <-
            memory_limit='512M',
            container='',
            mounts='',
+           auto_mount_home=FALSE,
+           home_nfs_address='',
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
            api_key=Sys.getenv("ABBA_API_KEY")) {
 
@@ -41,7 +45,9 @@ abba_submit_job <-
                                           cpu_limit=cpu_limit,
                                           memory_limit=memory_limit,
                                           mounts=mounts,
-                                          container=container))
+                                          container=container,
+                                          auto_mount_home=auto_mount_home,
+                                          home_nfs_address=home_nfs_address))
     # send the request to API
     resp <- httr2::req_error(req, body = submit_job_error_body) %>% httr2::req_perform()
     result <- httr2::resp_body_json(resp)
@@ -65,6 +71,8 @@ abba_submit_job <-
 #' @param container list that contains container name and image name
 #' @param mounts Specifically formatted list with information bout volumes that
 #'   container would have access to during the run
+#' @param auto_mount_home set to TRUE to mount service user home directory
+#' @param home_nfs_address IP address for mounting service user home directory
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #' @param poll_interval_seconds Total time to wait before timeout in seconds
 #' @param api_address URL to send requests to, hosted in Posit Connect. Defaults
@@ -85,6 +93,8 @@ abba_submit_and_get_log <-
            memory_limit='512M',
            container='',
            mounts='',
+           auto_mount_home=FALSE,
+           home_nfs_address='',
            poll_interval_seconds = 3,
            timeout_seconds = 600,
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
@@ -98,6 +108,8 @@ abba_submit_and_get_log <-
                               memory_limit=memory_limit,
                               mounts=mounts,
                               container=container,
+                              auto_mount_home=auto_mount_home,
+                              home_nfs_address=home_nfs_address,
                               api_address=api_address,
                               api_key=api_key)
 

@@ -16,7 +16,9 @@ test_that("abba_watch_k8s_batch_local functions correctly", {
                                       memory_limit='500M',
                                       container='unique_container',
                                       namespace='unique_namespace',
-                                      username='unique_username')
+                                      username='unique_username',
+                                      auto_mount_home=TRUE,
+                                      home_nfs_address='0.0.0.0')
 
   expect_called(mock_batch_validation, 1)
   expect_called(mock_configure_k8s_yaml, 1)
@@ -33,7 +35,9 @@ test_that("abba_watch_k8s_batch_local functions correctly", {
               container='unique_container',
               mounts='',
               namespace='unique_namespace',
-              username='unique_username')
+              username='unique_username',
+              auto_mount_home=TRUE,
+              home_nfs_address='0.0.0.0')
 
   expect_args(mock_save_yaml, 1, 'configured_yaml_file')
   expect_args(mock_submit_k8s_yaml, 1, 'yaml_file_path')
