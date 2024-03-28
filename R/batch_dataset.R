@@ -69,7 +69,7 @@ parse_inputs <- function(x){
 }
 
 # function to get indexes of programs whose inputs are not produced by any programs in the x dataset
-get_first_programs <- function(x){
+get_first_programs <- function(ds){
   return(sapply(parse_inputs(ds$inputs), function(x) all(!(x %in% ds$outputs))))
 }
 

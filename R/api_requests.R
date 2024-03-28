@@ -15,6 +15,7 @@
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
 #'   environment variable ABBA_API_KEY.
+#' @param ... Other arguments that will be ignored
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -157,6 +158,7 @@ abba_submit_and_get_log <-
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
 #'   environment variable ABBA_API_KEY
+#' @param ... Other arguments that will be ignored
 #'
 #' @return list with 2 attributes: job_id for submitted job`s id, and its logs
 #' @export

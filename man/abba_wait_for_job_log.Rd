@@ -9,7 +9,8 @@ abba_wait_for_job_log(
   poll_interval_seconds = 3,
   timeout_seconds = 600,
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
-  api_key = Sys.getenv("ABBA_API_KEY")
+  api_key = Sys.getenv("ABBA_API_KEY"),
+  ...
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ to environment variable ABBA_API_ADDRESS.}
 
 \item{api_key}{API Key for accessing restricted endpoints. Defaults to
 environment variable ABBA_API_KEY}
+
+\item{...}{Other arguments that will be ignored}
 }
 \value{
 list with 2 attributes: job_id for submitted job`s id, and its logs
