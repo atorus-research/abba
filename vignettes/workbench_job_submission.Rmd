@@ -1,0 +1,68 @@
+---
+title: "Workbench Job Submission"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Workbench Job Submission}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(abba)
+```
+
+In support for Workbench, **abba** has several local submission functions to manage interface with local Workbench cluster. At a high level, these functions break down into three different categories:
+
+-   Submit a job
+-   Get job status
+-   Retrieve the log of the job
+
+Functions specifically for interfacing with Workbench follow the naming convention `abba_rslauncher_*_local`.
+
+## Submit a Job
+
+Job submission is handled by the function `abba_rslauncher_submit_job_local()`. This is the function used to submit a job for a regular execution. To submit program for execution via logrx, `abba_rslauncher_submit_logrx_job_local` can be used.
+
+```{r submit_job, eval=FALSE}
+abba_rslauncher_submit_job_local(
+  "/home/mike.stackhouse/repos/abba/test_programs/test_program.R"
+  )
+# [1] "TG9jYWw6bU9YcFMzeEZacVFaa1lLc2pRak1LZz09"
+abba_rslauncher_submit_logrx_job_local(
+  "/home/mike.stackhouse/repos/abba/test_programs/test_program.R"
+  )
+# [1] "TG9jYWw6VG5leWVvWFFseEN5M0JRVFptVjVIUT09"
+```
+
+Note that this returns a vector with job id and name being path of the program. The Job ID is the identifier used downstream to interact with Workbench.
+
+By default, program log is physically saved in the program folder. The log destination is customizable via `log_path` keyword parameter.
+
+## Get Job Status
+
+Once the job is running in Workbench, **abba** can poll its status. This can be done using the function `abba_rslauncher_get_job_status_local()`
+
+```{r get_status, eval=FALSE}
+abba_rslauncher_get_job_status_local("TG9jYWw6bU9YcFMzeEZacVFaa1lLc2pRak1LZz09")
+# TG9jYWw6bU9YcFMzeEZacVFaa1lLc2pRak1LZz09 
+#                             "Finished" 
+```
+
+The job statuses can be "Running", and "Finished"(clarification needed).
+
+# Get the Log Content
+
+In this context, the "log" refers to the stdout/stderr of the program itself. This returns into a list object with the Job ID and the individual lines written out by the program. The content will contain all of the console output from the program itself.
+
+```{r watch_job, eval=FALSE}
+abba_rslauncher_get_job_log_local("TG9jYWw6bU9YcFMzeEZacVFaa1lLc2pRak1LZz09")
+# [[1]]
+# [1] "[1] 4"                   "Warning message:"        "This is a test warning " "La-di-da"                       
+```

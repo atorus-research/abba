@@ -48,11 +48,11 @@ batch_submit_parallel <- function(prog_list,
 #'   c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_dm.sas",
 #'     "/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_ae.sas")))
 #'  }
-submit_workbench_batch <- function(prog_list,
-                                   sequential=FALSE,
-                                   submit_func=abba_rslauncher_submit_job_local,
-                                   wait_func=abba_rslauncher_watch_job_local,
-                                   ...) {
+abba_submit_batch <- function(prog_list,
+                              sequential=FALSE,
+                              submit_func=abba_rslauncher_submit_job_local,
+                              wait_func=abba_rslauncher_watch_job_local,
+                              ...) {
   # if prog_list is a data frame - convert it to a list of vectors acording to set rules
   prog_list_converted <- dataframe_to_batch_list(prog_list)
 
