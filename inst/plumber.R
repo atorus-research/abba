@@ -10,7 +10,8 @@ options(
                                 "registry.io/image1:version",
                                 "registry.io/image1:version"),
   abba.default.container = "registry.io/default_image:version",
-  abba.k8s.namespace='rstudio'
+  abba.k8s.namespace='rstudio',
+  abba.home.nfs.ip.address='0.0.0.0'
 )
 
 # Returns a list containing "user" and "groups" information
@@ -47,7 +48,7 @@ function(file_path,
          container=getOption('abba.default.container'),
          mounts='',
          auto_mount_home=FALSE,
-         home_nfs_address='',
+         home_nfs_ip_address=getOption('abba.home.nfs.ip.address'),
          namespace=getOption('abba.k8s.namespace'),
          req,
          res) {
@@ -86,7 +87,7 @@ function(file_path,
     container=container,
     mounts=mounts,
     auto_mount_home=auto_mount_home,
-    home_nfs_address=home_nfs_address,
+    home_nfs_ip_address=home_nfs_ip_address,
     namespace=namespace,
     username=username
   )

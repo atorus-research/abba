@@ -7,7 +7,7 @@ test_that("YAML fields are properly updated by configure_yaml", {
                                              username='test_username',
                                              namespace='test_namespace',
                                              auto_mount_home=TRUE,
-                                             home_nfs_address='0.1.2.3'
+                                             home_nfs_ip_address='0.1.2.3'
                                              )
   actual <- c(yaml_file_configured$metadata$name,
               yaml_file_configured$metadata$namespace,

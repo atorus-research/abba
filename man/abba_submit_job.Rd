@@ -13,7 +13,7 @@ abba_submit_job(
   container = "",
   mounts = "",
   auto_mount_home = FALSE,
-  home_nfs_address = "",
+  home_nfs_ip_address = getOption("abba.home.nfs.ip.address"),
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
   api_key = Sys.getenv("ABBA_API_KEY")
 )
@@ -37,7 +37,7 @@ container would have access to during the run}
 
 \item{auto_mount_home}{set to TRUE to mount service user home directory}
 
-\item{home_nfs_address}{IP address for mounting service user home directory}
+\item{home_nfs_ip_address}{IP address for mounting service user home directory}
 
 \item{api_address}{URL to send requests to, hosted in Posit Connect. Defaults
 to environment variable ABBA_API_ADDRESS.}

@@ -220,7 +220,7 @@ abba_watch_k8s_job_local <- function(job_id='',
 #' @param container A valid container image name provided as a character string. Defaults to the option abba.default.container.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #' @param auto_mount_home set to TRUE to mount service user home directory
-#' @param home_nfs_address IP address for mounting service user home directory
+#' @param home_nfs_ip_address IP address for mounting service user home directory
 #' @param namespace Kubernetes namespace to put the job in
 #' @param username user whose authority will be used to run the program
 #'
@@ -239,7 +239,7 @@ abba_submit_k8s_job_local <- function(file_path,
                                       container=getOption('abba.default.container'),
                                       mounts='',
                                       auto_mount_home=FALSE,
-                                      home_nfs_address='10.14.0.6',
+                                      home_nfs_ip_address=getOption('abba.home.nfs.ip.address'),
                                       namespace=getOption('abba.k8s.namespace'),
                                       username=NULL) {
 
@@ -274,7 +274,7 @@ abba_submit_k8s_job_local <- function(file_path,
                                    namespace=namespace,
                                    username=username,
                                    auto_mount_home=auto_mount_home,
-                                   home_nfs_address=home_nfs_address
+                                   home_nfs_ip_address=home_nfs_ip_address
                                    )
 
   # Save yaml to temp folders
@@ -297,7 +297,7 @@ abba_submit_k8s_job_local <- function(file_path,
 #' @param container A valid container image name provided as a character string. Defaults to the option abba.default.container.
 #' @param mounts Specifically formatted list with information bout volumes that container would have access to during the run
 #' @param auto_mount_home set to TRUE to mount service user home directory
-#' @param home_nfs_address IP address for mounting service user home directory
+#' @param home_nfs_ip_address IP address for mounting service user home directory
 #' @param namespace Kubernetes namespace to put the job in
 #' @param username user whose authority will be used to run the program
 #' @param poll_interval_seconds Time interval for polling job status in seconds
@@ -319,7 +319,7 @@ abba_submit_k8s_job_and_poll_local <- function(file_path,
                                                container=getOption('abba.default.container'),
                                                mounts='',
                                                auto_mount_home=FALSE,
-                                               home_nfs_address='',
+                                               home_nfs_ip_address=getOption('abba.home.nfs.ip.address'),
                                                namespace=getOption('abba.k8s.namespace'),
                                                username=NULL,
                                                poll_interval_seconds = 3,
@@ -336,7 +336,7 @@ abba_submit_k8s_job_and_poll_local <- function(file_path,
                                         namespace=namespace,
                                         username=username,
                                         auto_mount_home=auto_mount_home,
-                                        home_nfs_address=home_nfs_address)
+                                        home_nfs_ip_address=home_nfs_ip_address)
 
   result <- abba_watch_k8s_job_local(job_info$job_id,
                                      poll_interval_seconds = poll_interval_seconds,

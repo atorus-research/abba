@@ -14,7 +14,7 @@ abba_submit_and_get_log(
   container = "",
   mounts = "",
   auto_mount_home = FALSE,
-  home_nfs_address = "",
+  home_nfs_ip_address = getOption("abba.home.nfs.ip.address"),
   poll_interval_seconds = 3,
   timeout_seconds = 600,
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
@@ -40,7 +40,7 @@ container would have access to during the run}
 
 \item{auto_mount_home}{set to TRUE to mount service user home directory}
 
-\item{home_nfs_address}{IP address for mounting service user home directory}
+\item{home_nfs_ip_address}{IP address for mounting service user home directory}
 
 \item{poll_interval_seconds}{Total time to wait before timeout in seconds}
 

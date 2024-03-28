@@ -10,7 +10,7 @@
 #' @param namespace Kubernetes namespace to put the job in
 #' @param username user whose authority will be used to run the program
 #' @param auto_mount_home set to TRUE to mount service user home directory
-#' @param home_nfs_address IP address for mounting service user home directory
+#' @param home_nfs_ip_address IP address for mounting service user home directory
 #'
 #' @return A nested named list, yaml_file_obj, with placeholders replaced by actual values
 #' @noRd
@@ -26,7 +26,7 @@ configure_k8s_yaml <- function(file_path='',
                                namespace=getOption('abba.k8s.namespace'),
                                username=NULL,
                                auto_mount_home=FALSE,
-                               home_nfs_address=''){
+                               home_nfs_ip_address=getOption('abba.home.nfs.ip.address')){
 
   yaml_file_obj <- load_k8s_yaml_template()
 
@@ -83,7 +83,7 @@ configure_k8s_yaml <- function(file_path='',
     x <- gsub("RUN_AS_USER", guid$uid, x)
     x <- gsub("RUN_AS_GROUP", guid$gid, x)
     x <- gsub("K8S_NAMESPACE", namespace, x)
-    x <- gsub("DEFAULT_NFS_MOUNT_IP_ADDRESS", home_nfs_address, x)
+    x <- gsub("DEFAULT_NFS_MOUNT_IP_ADDRESS", home_nfs_ip_address, x)
     return(x)
   }
 

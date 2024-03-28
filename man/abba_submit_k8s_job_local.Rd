@@ -13,7 +13,7 @@ abba_submit_k8s_job_local(
   container = getOption("abba.default.container"),
   mounts = "",
   auto_mount_home = FALSE,
-  home_nfs_address = "10.14.0.6",
+  home_nfs_ip_address = getOption("abba.home.nfs.ip.address"),
   namespace = getOption("abba.k8s.namespace"),
   username = NULL
 )
@@ -35,7 +35,7 @@ abba_submit_k8s_job_local(
 
 \item{auto_mount_home}{set to TRUE to mount service user home directory}
 
-\item{home_nfs_address}{IP address for mounting service user home directory}
+\item{home_nfs_ip_address}{IP address for mounting service user home directory}
 
 \item{namespace}{Kubernetes namespace to put the job in}
 
