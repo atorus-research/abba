@@ -36,7 +36,7 @@ spec:
         # I assume this will have to be set to the home directory of the service account
         - name: mount0
           nfs:
-            server: 10.14.0.6
+            server: DEFAULT_NFS_MOUNT_IP_ADDRESS
             path: /home/SERVICE_USER
       containers:
         - name: rs-launcher-container

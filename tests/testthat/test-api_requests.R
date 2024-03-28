@@ -34,6 +34,8 @@ test_that("abba_submit_job properly unpacks the response", {
                                    memory_limit='500M',
                                    container='container',
                                    mounts='mounts',
+                                   auto_mount_home=TRUE,
+                                   home_nfs_ip_address='0.0.0.0',
                                    api_address='0.0.0.0',
                                    api_key='ABBA_API_KEY')
 
@@ -57,7 +59,9 @@ test_that("abba_submit_job properly unpacks the response", {
                    cpu_limit= 1,
                    memory_limit='500M',
                    mounts='mounts',
-                   container='container')
+                   container='container',
+                   auto_mount_home=TRUE,
+                   home_nfs_ip_address='0.0.0.0')
   )
 
   expect_equal(result_actual, list(job_id='unique-job-id', batch_id='unique-batch-id'))
@@ -87,6 +91,7 @@ test_that("abba_submit_and_get_log properly waits for job to finish and returns 
     memory_limit='500M',
     container='container',
     mounts='mounts',
+    auto_mount_home=FALSE,
     poll_interval_seconds=0.1,
     timeout_seconds=5,
     api_address='0.0.0.0',
@@ -104,6 +109,8 @@ test_that("abba_submit_and_get_log properly waits for job to finish and returns 
               memory_limit='500M',
               mounts='mounts',
               container='container',
+              auto_mount_home=FALSE,
+              home_nfs_ip_address=getOption('abba.home.nfs.ip.address'),
               api_address='0.0.0.0',
               api_key='ABBA_API_KEY')
 

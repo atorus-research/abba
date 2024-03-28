@@ -12,6 +12,8 @@ abba_submit_k8s_job_local(
   memory_limit = "512M",
   container = getOption("abba.default.container"),
   mounts = "",
+  auto_mount_home = FALSE,
+  home_nfs_ip_address = getOption("abba.home.nfs.ip.address"),
   namespace = getOption("abba.k8s.namespace"),
   username = NULL
 )
@@ -30,6 +32,10 @@ abba_submit_k8s_job_local(
 \item{container}{A valid container image name provided as a character string. Defaults to the option abba.default.container.}
 
 \item{mounts}{Specifically formatted list with information bout volumes that container would have access to during the run}
+
+\item{auto_mount_home}{set to TRUE to mount service user home directory}
+
+\item{home_nfs_ip_address}{IP address for mounting service user home directory}
 
 \item{namespace}{Kubernetes namespace to put the job in}
 

@@ -5,7 +5,8 @@
           abba.memory.limit='1G',
           abba.permitted.containers=NULL,
           abba.default.container=NULL,
-          abba.k8s.namespace='rstudio'
+          abba.k8s.namespace='rstudio',
+          abba.home.nfs.ip.address='10.14.0.6'
   )
   invisible()
 }
