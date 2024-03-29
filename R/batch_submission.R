@@ -39,10 +39,10 @@ batch_submit_parallel <- function(prog_list,
 #' @param ... arguments that will be passed to submit_func and wait_func functions
 #'
 #' @return list job IDs associated with executed programs
-#' @noRd
+#' @export
 #'
 #' @examples \dontrun{
-#' job_ids <- submit_workbench_batch(list(
+#' job_ids <- abba_submit_batch(list(
 #'   c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/sdtm/dm.sas"),
 #'   c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/sdtm/ae.sas"),
 #'   c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_dm.sas",
@@ -70,7 +70,8 @@ abba_submit_batch <- function(prog_list,
 
     # check if programs from previous run group were executed completely
     if (!all(previous_run_ok)){
-      warning(sprintf("Programs %s have errors in their logs. Batch execution halted.", paste(previous_run_programs[!previous_run_ok], collapse=', ')))
+      warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nBatch execution halted.\n",
+                      paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
       break
     }
     # submit the run

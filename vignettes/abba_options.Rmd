@@ -2,7 +2,7 @@
 title: "abba Options"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Abba Options}
+  %\VignetteIndexEntry{abba Options}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
