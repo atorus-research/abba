@@ -117,3 +117,16 @@ get_rslauncher_job_log0 <- function(job_id, ...){
 abba_rslauncher_get_job_log_local <- function(job_ids, ...){
   return(lapply(job_ids, get_rslauncher_job_log0))
 }
+
+# simple function to check whether job finished running without errors
+# will return TRUE if exitCode is equal to 0, i.e. no errors occured during execution.
+# does not check for warnings, only hard R errors
+abba_rslauncher_get_job_succeeded0 <- function(job_id, ...){
+  job_info <- rstudioapi::launcherGetJob(job_id)
+  return(job_info$exitCode == 0)
+}
+
+# vectorized version of abba_rslauncher_get_job_succeeded0
+abba_rslauncher_get_job_succeeded_local <- function(job_ids, ...){
+  return(lapply(job_ids, abba_rslauncher_get_job_succeeded0))
+}
