@@ -53,7 +53,7 @@ abba_submit_batch <- function(prog_list,
                               submit_func=abba_rslauncher_submit_job_local,
                               wait_func=abba_rslauncher_watch_job_local,
                               ...) {
-  # if prog_list is a data frame - convert it to a list of vectors acording to set rules
+  # if prog_list is a data frame - convert it to a list of vectors according to set rules
   prog_list_converted <- dataframe_to_batch_list(prog_list)
 
   # if sequential=TRUE is specified - flatten the list and this will execute everything sequentially
