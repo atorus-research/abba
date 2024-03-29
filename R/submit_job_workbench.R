@@ -128,5 +128,5 @@ abba_rslauncher_get_job_succeeded0 <- function(job_id, ...){
 
 # vectorized version of abba_rslauncher_get_job_succeeded0
 abba_rslauncher_get_job_succeeded_local <- function(job_ids, ...){
-  return(lapply(job_ids, abba_rslauncher_get_job_succeeded0))
+  return(sapply(job_ids, abba_rslauncher_get_job_succeeded0))
 }

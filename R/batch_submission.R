@@ -53,6 +53,7 @@ abba_submit_batch <- function(prog_list,
                               submit_func=abba_rslauncher_submit_job_local,
                               wait_func=abba_rslauncher_watch_job_local,
                               ...) {
+
   # if prog_list is a data frame - convert it to a list of vectors according to set rules
   prog_list_converted <- dataframe_to_batch_list(prog_list)
 
@@ -63,12 +64,22 @@ abba_submit_batch <- function(prog_list,
   }
   # execute each item in the prog_list sequentially. Programs inside each list element,
   # which can also be a vector of program paths, will be executed in parallel
-  job_ids <- lapply(
-    prog_list_converted,
-    function(x) batch_submit_parallel(x,
-                                      submit_func=submit_func,
-                                      wait_func=wait_func,
-                                      ...)
-    )
+  job_ids <- list()
+  previous_run_ok <- TRUE
+  for (parallel_run in prog_list_converted){
+
+    if (!all(previous_run_ok)){
+      warning(sprintf("Programs %s have errors in their logs. Batch execution halted.", paste(previous_run_programs[!previous_run_ok], collapse=', ')))
+      break
+    }
+    new_run <- batch_submit_parallel(parallel_run,
+                                     submit_func=submit_func,
+                                     wait_func=wait_func,
+                                     ...)
+    job_ids <- c(job_ids, new_run)
+    previous_run_ok <- abba_rslauncher_get_job_succeeded_local(new_run)
+    previous_run_programs <- parallel_run
+  }
+
   return(unlist(job_ids))
 }
