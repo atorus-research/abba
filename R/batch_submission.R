@@ -68,15 +68,20 @@ abba_submit_batch <- function(prog_list,
   previous_run_ok <- TRUE
   for (parallel_run in prog_list_converted){
 
+    # check if programs from previous run group were executed completely
     if (!all(previous_run_ok)){
       warning(sprintf("Programs %s have errors in their logs. Batch execution halted.", paste(previous_run_programs[!previous_run_ok], collapse=', ')))
       break
     }
+    # submit the run
     new_run <- batch_submit_parallel(parallel_run,
                                      submit_func=submit_func,
                                      wait_func=wait_func,
                                      ...)
+    # add executed jobs to the list
     job_ids <- c(job_ids, new_run)
+    # collect information about this run group exit codes to decide if we should
+    # continue with the batch run on the next loop
     previous_run_ok <- abba_rslauncher_get_job_succeeded_local(new_run)
     previous_run_programs <- parallel_run
   }
