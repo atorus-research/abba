@@ -42,6 +42,7 @@ rslauncher_submit_job <- function(p,
 
 }
 
+
 abba_rslauncher_submit_job_local <- function(p,
                                              log_path=NA,
                                              user_tag='',
@@ -58,29 +59,54 @@ abba_rslauncher_submit_job_local <- function(p,
 
 }
 
+
 abba_rslauncher_submit_logrx_job_local <- function(p,
                                                    log_path=NA,
                                                    user_tag='',
                                                    ...) {
 
-  job_id <- rslauncher_submit_job(p,
-                                  execution_type='logrx',
-                                  log_path=log_path,
-                                  user_tag=user_tag,
-                                  ...)
+  rslauncher_submit_job(p,
+                        execution_type='logrx',
+                        log_path=log_path,
+                        user_tag=user_tag,
+                        ...)
 
-  # return ID associated with submitted program
-  return(job_id)
 }
 
+
 # simple function to get the job status
+#' Get Workbench job status for a given vector/list of job IDs
+#'
+#' @param job_ids A list/vector of job IDs
+#' @param ... other positional/keyword arguments that will be ignored
+#'
+#' @return a vector of job ID statuses
+#' @export
+#'
+#' @examples \dontrun{
+#' job_statuses <- abba_rslauncher_get_job_status_local(c('job-id-1', 'job-id-2'))
+#' }
 abba_rslauncher_get_job_status_local <- function(job_ids,
                                                  ...){
   return(sapply(job_ids, function(x) rstudioapi::launcherGetJob(x)[['status']]))
 }
 
-# function that periodically polls job-id for status and returns its id when job
-# status reaches 'Finished' state
+
+#' Periodically poll Workbench jobs for status and return their IDs when all job
+#' statuses arrive at 'Finished' state
+#'
+#' @param job_ids a list/vector of Workbench job IDs
+#' @param poll_interval_seconds how often job statuses should be updated
+#' @param timeout_seconds maximum amount of time in seconds after which job IDs will be
+#' returned regardless of job statuses
+#' @param ... other positional/keyword arguments that will be ignored
+#'
+#' @return a vector of job IDs
+#' @export
+#'
+#' @examples \dontrun{
+#' job_statuses <- abba_rslauncher_watch_job_local(c('job-id-1', 'job-id-2'))
+#' }
 abba_rslauncher_watch_job_local <- function(job_ids,
                                             poll_interval_seconds = 1,
                                             timeout_seconds = 300,
@@ -102,6 +128,7 @@ abba_rslauncher_watch_job_local <- function(job_ids,
   return(job_ids)
 }
 
+
 # simple function to get job log
 get_rslauncher_job_log0 <- function(job_id, ...){
   job_info <- rstudioapi::launcherGetJob(job_id)
@@ -113,6 +140,7 @@ get_rslauncher_job_log0 <- function(job_id, ...){
   return(readLines(con=job_info$stdoutFile))
 }
 
+
 # vectorized version of get_workbench_job_log0
 abba_rslauncher_get_job_log_local <- function(job_ids, ...){
   return(lapply(job_ids, get_rslauncher_job_log0))
@@ -121,12 +149,23 @@ abba_rslauncher_get_job_log_local <- function(job_ids, ...){
 # simple function to check whether job finished running without errors
 # will return TRUE if exitCode is equal to 0, i.e. no errors occured during execution.
 # does not check for warnings, only hard R errors
-abba_rslauncher_get_job_succeeded0 <- function(job_id, ...){
+rslauncher_get_job_succeeded0 <- function(job_id, ...){
   job_info <- rstudioapi::launcherGetJob(job_id)
   return(job_info$exitCode == 0)
 }
 
-# vectorized version of abba_rslauncher_get_job_succeeded0
+
+#' Check whether Workbench jobs have been fully executed.
+#'
+#' @param job_ids a list/vector of Workbench job IDs
+#' @param ... other positional/keyword arguments that will be ignored
+#'
+#' @return a named boolean vector. FALSE value indicates that job did not fully execute
+#' @export
+#'
+#' @examples \dontrun{
+#' job_statuses <- abba_rslauncher_get_job_succeeded_local(c('job-id-1', 'job-id-2'))
+#' }
 abba_rslauncher_get_job_succeeded_local <- function(job_ids, ...){
-  return(sapply(job_ids, abba_rslauncher_get_job_succeeded0))
+  return(sapply(job_ids, rslauncher_get_job_succeeded0))
 }

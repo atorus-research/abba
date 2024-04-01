@@ -36,8 +36,8 @@ validate_batch_data_frame <- function(x){
     stop(sprintf('Batch dataset should be a data frame, not %s',
                  typeof(x)))
   }
-  if (!all(c('program_name', 'run_group') %in% names(x))){
-    stop(sprintf('Batch dataset should have 2 columns: program_name and run_group, but it instead has %s',
+  if (!all(c('program_name') %in% names(x))){
+    stop(sprintf('Batch dataset is required to have program_name column, but it has %s',
                  names(x)))}
   if (nrow(x)==0){
     stop(sprintf('Batch dataset should have at least 1 record'))
@@ -45,7 +45,20 @@ validate_batch_data_frame <- function(x){
   return(TRUE)
 }
 
-# create run_group variable using inputs and outputs of programs specified by user
+#' Calculate run_group variable using inputs and outputs of programs supplied by user
+#'
+#' @param x input data frame. Must contain columns 'inputs', 'outputs' that list
+#' input/output datasets for each program
+#' @param col_name name of newly created variable. Defaults to 'run_group_calculated'
+#'
+#' @return an input data frame with one new column
+#' @export
+#'
+#' @examples
+#' input_ds <- as.data.frame(list(program_name=c('prog1.R', 'prog2.R'),
+#'                                inputs=c('ds0.xpt', 'ds1.xpt'),
+#'                                outputs=c('ds1.xpt', 'ds2.xpt')))
+#' batch_ready <- calculate_run_group
 calculate_run_group <- function(x, col_name='run_group_calculated'){
   x[[col_name]] <- 0
   # determine which program to run first - such program inputs are not on the outputs of any other program
