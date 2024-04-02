@@ -1,4 +1,9 @@
 test_that("YAML fields are properly updated by configure_yaml", {
+
+  mock_system2 <- mock('uid=123(test_username) gid=456(domain users)', cycle=TRUE)
+
+  stub(configure_k8s_yaml, "system2", mock_system2, depth=2)
+
   yaml_file_configured <- configure_k8s_yaml(file_path="/tst/path/test.R",
                                              batch_group_id="group_A",
                                              user_tag='user_tag',
@@ -18,7 +23,9 @@ test_that("YAML fields are properly updated by configure_yaml", {
               yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$cpu,
               yaml_file_configured$spec$template$spec$containers[[1]]$resources$limits$memory,
               yaml_file_configured$spec$template$metadata$annotations$user,
-              yaml_file_configured$spec$template$spec$volumes[[1]]$nfs$server)
+              yaml_file_configured$spec$template$spec$volumes[[1]]$nfs$server,
+              yaml_file_configured$spec$template$spec$securityContext$runAsUser,
+              yaml_file_configured$spec$template$spec$securityContext$runAsGroup)
 
   expected <- c(yaml_file_configured$metadata$generateName,
                 'test_namespace',
@@ -29,7 +36,9 @@ test_that("YAML fields are properly updated by configure_yaml", {
                 "2",
                 "512M",
                 'test_username',
-                '0.1.2.3')
+                '0.1.2.3',
+                '123',
+                '456')
 
   expect_equal(actual, expected)
 

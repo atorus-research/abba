@@ -53,7 +53,7 @@ configure_k8s_yaml <- function(file_path='',
   } else {
     service_user <- username
   }
-  guid <- get_guid()
+  guid <- get_guid(user=service_user)
 
   # Enforce lower and upper limits on cpu resource
   # use mcpu_to_cpu function to make sure compared values have equal units
