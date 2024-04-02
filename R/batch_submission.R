@@ -54,28 +54,30 @@ abba_submit_batch <- function(prog_list,
                               wait_func=abba_rslauncher_watch_job_local,
                               ...) {
 
-  # if prog_list is a data frame - convert it to a list of vectors according to set rules
-  prog_list_converted <- dataframe_to_batch_list(prog_list)
-
   # if sequential=TRUE is specified - flatten the list and this will execute everything sequentially
   # REGARDLESS of whether prog_list is a list, a character vector or a data frame
   if (sequential==TRUE){
     prog_list_converted <- unlist(prog_list_converted)
   }
-  # execute each item in the prog_list sequentially. Programs inside each list element,
-  # which can also be a vector of program paths, will be executed in parallel
+  else {prog_list_converted <- prog_list}
+
+  # execute each item in the prog_list_converted sequentially. Programs inside
+  # each list element, which can also be a vector of program paths,
+  # will be executed in parallel, unless 'sequential=TRUE' is specified
   job_ids <- list()
   previous_run_ok <- TRUE
-  for (parallel_run in prog_list_converted){
+  previous_run_programs <- c()
+  unique_run_groups <- get_run_groups(prog_list)
+
+  for (rg in unique_run_groups){
 
     # check if programs from previous run group were executed completely
-    if (!all(previous_run_ok)){
-      warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nBatch execution halted.\n",
-                      paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
-      break
-    }
+    batch_run_control(prog_list_converted,
+                      current_group=select_parallel_run(prog_list_converted, rg),
+                      previous_run_programs=previous_run_programs,
+                      previous_run_ok=previous_run_ok)
     # submit the run
-    new_run <- batch_submit_parallel(parallel_run,
+    new_run <- batch_submit_parallel(select_parallel_run(prog_list_converted, rg),
                                      submit_func=submit_func,
                                      wait_func=wait_func,
                                      ...)
