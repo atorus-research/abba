@@ -15,7 +15,8 @@ abba_submit_job(
   auto_mount_home = FALSE,
   home_nfs_ip_address = getOption("abba.home.nfs.ip.address"),
   api_address = Sys.getenv("ABBA_API_ADDRESS"),
-  api_key = Sys.getenv("ABBA_API_KEY")
+  api_key = Sys.getenv("ABBA_API_KEY"),
+  ...
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ to environment variable ABBA_API_ADDRESS.}
 
 \item{api_key}{API Key for accessing restricted endpoints. Defaults to
 environment variable ABBA_API_KEY.}
+
+\item{...}{Other arguments that will be ignored}
 }
 \value{
 body of request`s response in a list format

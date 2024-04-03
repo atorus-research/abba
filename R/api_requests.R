@@ -15,6 +15,7 @@
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
 #'   environment variable ABBA_API_KEY.
+#' @param ... Other arguments that will be ignored
 #'
 #' @return body of request`s response in a list format
 #' @export
@@ -32,7 +33,8 @@ abba_submit_job <-
            auto_mount_home=FALSE,
            home_nfs_ip_address=getOption('abba.home.nfs.ip.address'),
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
-           api_key=Sys.getenv("ABBA_API_KEY")) {
+           api_key=Sys.getenv("ABBA_API_KEY"),
+           ...) {
 
     # address for a submit_job_and_watch endpoint
     req <- httr2::request(paste(api_address, 'submit-job', sep='/')) %>%
@@ -156,6 +158,7 @@ abba_submit_and_get_log <-
 #'   to environment variable ABBA_API_ADDRESS.
 #' @param api_key API Key for accessing restricted endpoints. Defaults to
 #'   environment variable ABBA_API_KEY
+#' @param ... Other arguments that will be ignored
 #'
 #' @return list with 2 attributes: job_id for submitted job`s id, and its logs
 #' @export
@@ -167,7 +170,8 @@ abba_wait_for_job_log <-
            poll_interval_seconds = 3,
            timeout_seconds = 600,
            api_address=Sys.getenv("ABBA_API_ADDRESS"),
-           api_key=Sys.getenv("ABBA_API_KEY")) {
+           api_key=Sys.getenv("ABBA_API_KEY"),
+           ...) {
 
     start_time <- Sys.time()
 

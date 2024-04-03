@@ -39,6 +39,10 @@ template:
     - abba_submit_k8s_job_local
     - abba_watch_k8s_batch_local
     - abba_watch_k8s_job_local
+  - title: Workbench Job Interface Functions
+    desc: Functions to send and monitor jobs using the Posit Workbench Launcher
+  - contents:
+    - abba_submit_batch
   - title: Create batch files
     desc: Create an abba API or batch job
   - contents:
@@ -50,6 +54,11 @@ template:
     - k8s_api_setup
     - k8s_batch_job
     - k8s_job_submission
+  - title: Posit Launcher Interface
+    navbar: Posit Launcher Interface
+    contents:
+    - workbench_job_submission
+    - workbench_batch_job
   - title: abba Options
     navbar: abba Options
     contents:

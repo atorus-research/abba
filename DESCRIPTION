@@ -33,7 +33,8 @@ Imports:
     stringr,
     httr2,
     magrittr,
-    tools
+    tools,
+    rstudioapi
 Suggests: 
     testthat (>= 3.0.0),
     mockery,
