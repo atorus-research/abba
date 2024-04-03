@@ -36,6 +36,7 @@ batch_submit_parallel <- function(prog_list,
 #' @param sequential when sequential=TRUE, prog_list is flattened and everything is executed sequentially.
 #' @param submit_func function that will be used to submit jobs
 #' @param wait_func function that checks job status and returns when job finishes executing
+#' @param col_name Name of the column that contains run group numbers when prog_list is a data frame
 #' @param ... arguments that will be passed to submit_func and wait_func functions
 #'
 #' @return list job IDs associated with executed programs

@@ -24,6 +24,8 @@ abba_submit_batch(
 
 \item{wait_func}{function that checks job status and returns when job finishes executing}
 
+\item{col_name}{Name of the column that contains run group numbers when prog_list is a data frame}
+
 \item{...}{arguments that will be passed to submit_func and wait_func functions}
 }
 \value{

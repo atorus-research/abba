@@ -125,6 +125,10 @@ abba_rslauncher_watch_job_local <- function(job_ids,
     # Wait for the specified interval before polling again
     Sys.sleep(poll_interval_seconds)
   }
+  if (difftime(Sys.time(), start_time, units = "secs") > timeout_seconds) {
+    warning(sprintf("Timeout limit exceeded for jobs:\n\t%s. \nJob IDs have been returned while jobs are still running.",
+                    paste(job_ids[!(statuses == "Finished")], collapse='\n\t')))
+  }
   return(job_ids)
 }
 
@@ -146,11 +150,14 @@ abba_rslauncher_get_job_log_local <- function(job_ids, ...){
   return(lapply(job_ids, get_rslauncher_job_log0))
 }
 
+
 # simple function to check whether job finished running without errors
 # will return TRUE if exitCode is equal to 0, i.e. no errors occured during execution.
 # does not check for warnings, only hard R errors
 rslauncher_get_job_succeeded0 <- function(job_id, ...){
   job_info <- rstudioapi::launcherGetJob(job_id)
+
+  if (is.null(job_info$exitCode)){return(NULL)}
   return(job_info$exitCode == 0)
 }
 
@@ -167,5 +174,11 @@ rslauncher_get_job_succeeded0 <- function(job_id, ...){
 #' job_statuses <- abba_rslauncher_get_job_succeeded_local(c('job-id-1', 'job-id-2'))
 #' }
 abba_rslauncher_get_job_succeeded_local <- function(job_ids, ...){
-  return(sapply(job_ids, rslauncher_get_job_succeeded0))
+  results <- sapply(job_ids, rslauncher_get_job_succeeded0)
+  if (any(sapply(results, function(x) is.null(x)))){
+    stop(sprintf(
+      "Jobs %s are still executing. Try increasing timeout parameter to avoid this error.",
+      paste(job_ids[is.null(results)], collapse='\n\t')))
+  }
+  return(results)
 }
