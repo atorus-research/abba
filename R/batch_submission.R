@@ -52,12 +52,13 @@ abba_submit_batch <- function(prog_list,
                               sequential=FALSE,
                               submit_func=abba_rslauncher_submit_job_local,
                               wait_func=abba_rslauncher_watch_job_local,
+                              col_name='run_group',
                               ...) {
 
   # if sequential=TRUE is specified - flatten the list and this will execute everything sequentially
   # REGARDLESS of whether prog_list is a list, a character vector or a data frame
   if (sequential==TRUE){
-    prog_list_converted <- unlist(prog_list_converted)
+    prog_list_converted <- unlist(dataframe_to_batch_list(prog_list))
   }
   else {prog_list_converted <- prog_list}
 
@@ -70,14 +71,26 @@ abba_submit_batch <- function(prog_list,
   unique_run_groups <- get_run_groups(prog_list)
 
   for (rg in unique_run_groups){
-
     # check if programs from previous run group were executed completely
-    batch_run_control(prog_list_converted,
-                      current_group=select_parallel_run(prog_list_converted, rg),
-                      previous_run_programs=previous_run_programs,
-                      previous_run_ok=previous_run_ok)
+    batch_check_results <-
+      batch_run_control(prog_list_converted,
+                        current_group=rg,
+                        previous_run_programs=previous_run_programs,
+                        previous_run_ok=previous_run_ok,
+                        col_name='run_group',
+                        ...)
+
+    prog_list_converted <- batch_check_results$prog_list
+
+    # if batch input is a list, do not run the next group
+    if (batch_check_results$stop == TRUE){break}
+
+    # select programs for running in parallel
+    parallel_run <- select_parallel_run(prog_list_converted, rg, col_name=col_name)
+    message(sprintf("Submitting programs for parallel run:\n\t%s",
+                    paste(parallel_run, collapse='\n\t')))
     # submit the run
-    new_run <- batch_submit_parallel(select_parallel_run(prog_list_converted, rg),
+    new_run <- batch_submit_parallel(parallel_run,
                                      submit_func=submit_func,
                                      wait_func=wait_func,
                                      ...)

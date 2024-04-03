@@ -59,7 +59,7 @@ validate_batch_data_frame <- function(x){
 #'                                inputs=c('ds0.xpt', 'ds1.xpt'),
 #'                                outputs=c('ds1.xpt', 'ds2.xpt')))
 #' batch_ready <- calculate_run_group
-calculate_run_group <- function(x, col_name='run_group_calculated'){
+calculate_run_group <- function(x, col_name='run_group'){
   x[[col_name]] <- 0
   # determine which program to run first - such program inputs are not on the outputs of any other program
   first_progs_index <- get_first_programs(x)
@@ -88,7 +88,7 @@ get_first_programs <- function(ds){
 
 calculate_next_group <- function(x,
                                  current_group=1,
-                                 col_name='run_group_calculated'){
+                                 col_name='run_group'){
 
   cur_group_outputs <- x[x[[col_name]] == current_group,]$outputs
   # next group definition: any dataset that has one or more outputs of current group

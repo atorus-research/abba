@@ -4,7 +4,7 @@
 \alias{calculate_run_group}
 \title{Calculate run_group variable using inputs and outputs of programs supplied by user}
 \usage{
-calculate_run_group(x, col_name = "run_group_calculated")
+calculate_run_group(x, col_name = "run_group")
 }
 \arguments{
 \item{x}{input data frame. Must contain columns 'inputs', 'outputs' that list

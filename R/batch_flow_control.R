@@ -1,7 +1,8 @@
 # detect mode for batch control
 detect_batch_mode_from_input <- function(x){
-  if (is.data.frame(x)){return('data_frame')}
-  else if (is.list(x) || is.character(x)){return('list')}
+  if (is.data.frame(x)){return(c('data_frame'))}
+  else if (is.list(x) || is.character(x)){return(c('list'))}
+  else {stop(sprintf("Expecting a data frame, character vector or a list, not %s", typeof(x)))}
 }
 
 # return unique group numbers
@@ -19,15 +20,14 @@ get_run_groups <- function(x, col_name='run_group'){
 
 # control batch execution. Function is meant to be called in a loop
 batch_run_control <- function(x,
-                              run_group=1,
+                              current_group=1,
                               ...){
   mode <- detect_batch_mode_from_input(x)
-
   # don't check anything if this is the first iteration of the loop
-  if (run_group==1){return(x)}
+  if (current_group==1){return(list(prog_list=x, stop=FALSE))}
 
   if (mode == 'data_frame'){
-    return(control_batch_flow_data_frame(x, ...))
+    return(control_batch_flow_data_frame(x, current_group=current_group, ...))
   }
   else if (mode == 'list'){
     return(control_batch_flow_list(x, ...))
@@ -43,8 +43,11 @@ control_batch_flow_list <- function(x,
   if (!all(previous_run_ok)){
     warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nBatch execution halted.\n",
                     paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
-    break
+    result <- list(prog_list=x, stop=TRUE)
+
   }
+  else {result <- list(prog_list=x, stop=FALSE)}
+  return(result)
 }
 
 # stop batch execution in 'data frame' input mode(when a data frame of programs with inputs/outputs is supplied to batch runner)
@@ -53,6 +56,7 @@ control_batch_flow_data_frame <- function(x,
                                           previous_run_programs=NULL,
                                           previous_run_ok=NULL,
                                           ...){
+
   if (!all(previous_run_ok)){
     x_filtered <- remove_failed_program_dependencies(
       x,
@@ -61,17 +65,18 @@ control_batch_flow_data_frame <- function(x,
 
     warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nPrograms that depend on failed programs will not be executed.\n",
                     paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
-    return(x_filtered)
+    result <- list(prog_list=x_filtered, stop=FALSE)
   }
-  return(x)
+  else {result <- list(prog_list=x, stop=FALSE)}
+  return(result)
 }
 
 # filter list/dataset to select programs for submission
-select_parallel_run <- function(x, run_group){
+select_parallel_run <- function(x, run_group, col_name='run_group'){
   mode <- detect_batch_mode_from_input(x)
   # data frame is expected to have run_group pre-populated/pre-calculated
   if (mode=='data_frame'){
-    return(x[x$run_group==run_group,]$programs)
+    return(x[x[[col_name]]==run_group,]$program_name)
   }
   # in case of list/character vector, run group is just element position
   else if (mode=='list'){
@@ -93,8 +98,6 @@ remove_failed_program_dependencies <- function(x,
   all_groups <- get_run_groups(x_filtered, col_name=col_name)
   current_failed_programs <- failed_programs
 
-  print(c(all_groups[failed_programs_group:length(all_groups)]))
-
   # iteratively find all dependents of failed programs
   for (rg in c(all_groups[failed_programs_group:length(all_groups)])){
 
@@ -103,7 +106,6 @@ remove_failed_program_dependencies <- function(x,
       current_group=rg,
       current_program_names=current_failed_programs,
       col_name=col_name)
-    print(current_failed_programs)
 
     failed_programs <- c(failed_programs, current_failed_programs)
   }

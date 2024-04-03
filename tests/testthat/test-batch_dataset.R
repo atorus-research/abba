@@ -30,6 +30,6 @@ test_that("calculate_run_group correctly calculates run groups", {
                                inputs=c("raw.DM", "sdtm.DM", "sdtm.DM", "sdtm.DM,sdtm.EX", "sdtm.DM,sdtm.EX"),
                                outputs=c("sdtm.DM", "sdtm.EX", "sdtm.AE", "sdtm.SE", "sdtm.SV")))
   expected <- c(1, 2, 2, 3, 3)
-  actual <- calculate_run_group(inputs)$run_group_calculated
+  actual <- calculate_run_group(inputs)$run_group
   expect_equal(expected, actual)
 })

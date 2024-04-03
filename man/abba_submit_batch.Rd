@@ -11,6 +11,7 @@ abba_submit_batch(
   sequential = FALSE,
   submit_func = abba_rslauncher_submit_job_local,
   wait_func = abba_rslauncher_watch_job_local,
+  col_name = "run_group",
   ...
 )
 }
