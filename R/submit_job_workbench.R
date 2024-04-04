@@ -1,7 +1,7 @@
 rslauncher_submit_job <- function(p,
                                   execution_type='standard',
-                                  log_path=NA,
-                                  user_tag='',
+                                  log_path=NULL,
+                                  user_tag=NULL,
                                   ...) {
 
   # check execution type
@@ -11,10 +11,10 @@ rslauncher_submit_job <- function(p,
   # Submit the job for the program and wait until its execution
   scriptPath <- path.expand(p)
   scriptFile <- basename(scriptPath)
-  jobTag <- paste("rstudio-r-script-job", scriptFile, sep = ":")
+  jobTag <- c(paste("rstudio-r-script-job", scriptFile, sep = ":"), user_tag)
 
   # put log file in r script folder if no log path is supplied
-  if (is.na(log_path) || log_path == ''){
+  if (is.null(log_path) || log_path == ''){
     log_path=file.path(dirname(scriptPath), paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
   } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
 
@@ -135,7 +135,12 @@ abba_rslauncher_watch_job_local <- function(job_ids,
 
 # simple function to get job log
 get_rslauncher_job_log0 <- function(job_id, ...){
-  job_info <- rstudioapi::launcherGetJob(job_id)
+
+  # default rstudio api error when non-existing job id is supplied is gibberish,
+  # so it's better to display a simple error message to the user
+  tryCatch({job_info <- rstudioapi::launcherGetJob(job_id)},
+           error=function(e){stop(sprintf("Job with ID '%s' does not exist.", job_id))}
+  )
 
   if (!file.exists(job_info$stdoutFile)){
     return(c(sprintf('Log file does not exist for %s', job_info$id)))
