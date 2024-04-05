@@ -265,10 +265,35 @@ test_that("abba_rslauncher_get_job_succeeded_local returns job statuses accordin
   expect_equal(result_actual, expected_result)
 })
 
+
 test_that("abba_rslauncher_get_job_succeeded_local errors when at least one job is still running", {
   mock_rslauncher_get_job_succeeded0 <- mock(TRUE, FALSE, NULL)
   stub(abba_rslauncher_get_job_succeeded_local, "rslauncher_get_job_succeeded0",
        mock_rslauncher_get_job_succeeded0)
 
   expect_error(abba_rslauncher_get_job_succeeded_local(c('job-id16', 'job-id17', 'job-id18')))
+})
+
+
+test_that("rslauncher_get_job_display_status returns job statuses according to their exit codes", {
+  mock_rslauncher_get_job_succeeded0 <- mock(TRUE, FALSE)
+  stub(rslauncher_get_job_display_status, "rslauncher_get_job_succeeded0",
+       mock_rslauncher_get_job_succeeded0)
+
+  result_actual <- rslauncher_get_job_display_status(c('job-id16', 'job-id17'))
+  expected_result <- c('Completed', 'Completed with errors')
+  names(expected_result) <- c('job-id16', 'job-id17')
+  expect_called(mock_rslauncher_get_job_succeeded0, 2)
+  expect_args(mock_rslauncher_get_job_succeeded0, 1, 'job-id16')
+  expect_args(mock_rslauncher_get_job_succeeded0, 2, 'job-id17')
+  expect_equal(result_actual, expected_result)
+})
+
+
+test_that("rslauncher_get_job_display_status errors when at least one job is still running", {
+  mock_rslauncher_get_job_succeeded0 <- mock(TRUE, FALSE, NULL)
+  stub(rslauncher_get_job_display_status, "rslauncher_get_job_succeeded0",
+       mock_rslauncher_get_job_succeeded0)
+
+  expect_error(rslauncher_get_job_display_status(c('job-id16', 'job-id17', 'job-id18')))
 })
