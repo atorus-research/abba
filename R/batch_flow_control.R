@@ -39,12 +39,18 @@ batch_run_control <- function(x,
 control_batch_flow_list <- function(x,
                                     previous_run_programs=NULL,
                                     previous_run_ok=NULL,
+                                    halt_on_error=TRUE,
                                     ...){
   if (!all(previous_run_ok)){
+    if (halt_on_error){
     warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nBatch execution halted.\n",
                     paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
+    }
+    else {
+      warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\n",
+                      paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
+    }
     result <- list(prog_list=x, stop=TRUE)
-
   }
   else {result <- list(prog_list=x, stop=FALSE)}
   return(result)
@@ -55,6 +61,7 @@ control_batch_flow_data_frame <- function(x,
                                           current_group=NULL,
                                           previous_run_programs=NULL,
                                           previous_run_ok=NULL,
+                                          halt_on_error=TRUE,
                                           ...){
 
   if (!all(previous_run_ok)){
@@ -62,9 +69,15 @@ control_batch_flow_data_frame <- function(x,
       x,
       failed_programs <- previous_run_programs[!previous_run_ok]
     )
+    if (halt_on_error){
+      warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nPrograms that depend on failed programs will not be executed.\n",
+                      paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
+    }
+    else {
+      warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\n",
+                      paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
+    }
 
-    warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nPrograms that depend on failed programs will not be executed.\n",
-                    paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
     result <- list(prog_list=x_filtered, stop=FALSE)
   }
   else {result <- list(prog_list=x, stop=FALSE)}

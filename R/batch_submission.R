@@ -37,6 +37,9 @@ batch_submit_parallel <- function(prog_list,
 #' @param submit_func function that will be used to submit jobs
 #' @param wait_func function that checks job status and returns when job finishes executing
 #' @param col_name Name of the column that contains run group numbers when prog_list is a data frame
+#' @param halt_on_error If TRUE: if prog_list contains program inputs/outputs - programs that depend on failed
+#' program will not be executed; if prog_list contains only program paths - when program fails,
+#' entire batch will stop executing. TRUE by default
 #' @param ... arguments that will be passed to submit_func and wait_func functions
 #'
 #' @return list job IDs associated with executed programs
@@ -54,6 +57,7 @@ abba_submit_batch <- function(prog_list,
                               submit_func=abba_rslauncher_submit_job_local,
                               wait_func=abba_rslauncher_watch_job_local,
                               col_name='run_group',
+                              halt_on_error=TRUE,
                               ...) {
 
   # if sequential=TRUE is specified - flatten the list and this will execute everything sequentially
@@ -69,7 +73,7 @@ abba_submit_batch <- function(prog_list,
   job_ids <- list()
   previous_run_ok <- TRUE
   previous_run_programs <- c()
-  unique_run_groups <- get_run_groups(prog_list)
+  unique_run_groups <- get_run_groups(prog_list_converted)
 
   for (rg in unique_run_groups){
     # check if programs from previous run group were executed completely
@@ -79,15 +83,17 @@ abba_submit_batch <- function(prog_list,
                         previous_run_programs=previous_run_programs,
                         previous_run_ok=previous_run_ok,
                         col_name='run_group',
+                        halt_on_error=halt_on_error,
                         ...)
 
     prog_list_converted <- batch_check_results$prog_list
 
     # if batch input is a list, do not run the next group
-    if (batch_check_results$stop == TRUE){break}
+    if (batch_check_results$stop == TRUE && halt_on_error){break}
 
     # select programs for running in parallel
     parallel_run <- select_parallel_run(prog_list_converted, rg, col_name=col_name)
+    # message that would show batch progress
     message(sprintf("Submitting programs for parallel run:\n\t%s",
                     paste(parallel_run, collapse='\n\t')))
     # submit the run
