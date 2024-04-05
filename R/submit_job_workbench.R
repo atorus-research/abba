@@ -44,7 +44,7 @@ rslauncher_submit_job <- function(p,
 
 
 abba_rslauncher_submit_job_local <- function(p,
-                                             log_path=NA,
+                                             log_path=NULL,
                                              user_tag='',
                                              ...) {
 
@@ -61,7 +61,7 @@ abba_rslauncher_submit_job_local <- function(p,
 
 
 abba_rslauncher_submit_logrx_job_local <- function(p,
-                                                   log_path=NA,
+                                                   log_path=NULL,
                                                    user_tag='',
                                                    ...) {
 
@@ -185,5 +185,36 @@ abba_rslauncher_get_job_succeeded_local <- function(job_ids, ...){
       "Jobs %s are still executing. Try increasing timeout parameter to avoid this error.",
       paste(job_ids[is.null(results)], collapse='\n\t')))
   }
+  return(results)
+}
+
+
+#' Return descriptive job status based on program exitCode
+#'
+#' @param job_ids a list/vector of Workbench job IDs
+#' @param ... other positional/keyword arguments that will be ignored
+#'
+#' @return a named character vector. Possible statuses are 'Completed', 'Completed with errors'
+#' @noRd
+#'
+#' @examples \dontrun{
+#' job_statuses <- abba_rslauncher_get_job_display_status(c('job-id-1', 'job-id-2'))
+#' }
+rslauncher_get_job_display_status <- function(job_ids, ...){
+  intermediate_results <- sapply(job_ids, rslauncher_get_job_succeeded0)
+  if (any(sapply(intermediate_results, function(x) is.null(x)))){
+    stop(sprintf(
+      "Jobs %s are still executing. Try increasing timeout parameter to avoid this error.",
+      paste(job_ids[is.null(intermediate_results)], collapse='\n\t')))
+  }
+
+  # function to convert TRUE/FALSE results into descriptive character statuses
+  make_descriptive <- function(x){
+    if(x==TRUE){'Completed'}
+    else if(x==FALSE){'Completed with errors'}
+  }
+
+  results <- sapply(intermediate_results, make_descriptive)
+
   return(results)
 }

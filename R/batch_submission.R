@@ -111,3 +111,53 @@ abba_submit_batch <- function(prog_list,
 
   return(unlist(job_ids))
 }
+
+
+#' Submit programs for execution in order defined by structure of input list.
+#'
+#' @param prog_list A list of R program paths to execute
+#' @param sequential when sequential=TRUE, prog_list is flattened and everything is executed sequentially.
+#' @param submit_func function that will be used to submit jobs
+#' @param wait_func function that checks job status and returns when job finishes executing
+#' @param status_func function that returns descriptive job statuses
+#' @param col_name Name of the column that contains run group numbers when prog_list is a data frame
+#' @param halt_on_error If TRUE: if prog_list contains program inputs/outputs - programs that depend on failed
+#' program will not be executed; if prog_list contains only program paths - when program fails,
+#' entire batch will stop executing. TRUE by default
+#' @param ... arguments that will be passed to submit_func and wait_func functions
+#'
+#' @return Data frame containing program names, job ids, execution statuses
+#' @export
+#'
+#' @examples \dontrun{
+#' job_ids <- abba_submit_batch_and_get_results(list(
+#'   c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/sdtm/dm.sas"),
+#'   c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/sdtm/ae.sas"),
+#'   c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_dm.sas",
+#'     "/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_ae.sas")),
+#'   sequential=TRUE)
+#'  }
+abba_submit_batch_and_get_results <- function(prog_list,
+                                              sequential=FALSE,
+                                              submit_func=abba_rslauncher_submit_job_local,
+                                              wait_func=abba_rslauncher_watch_job_local,
+                                              status_func=rslauncher_get_job_display_status,
+                                              col_name='run_group',
+                                              halt_on_error=TRUE,
+                                              ...) {
+  # use universal batch runner to submit programs and wait for completion
+  job_ids <- abba_submit_batch(prog_list,
+                               sequential=sequential,
+                               submit_func=submit_func,
+                               wait_func=wait_func,
+                               col_name=col_name,
+                               halt_on_error=halt_on_error,
+                               ...)
+  # collect batch results in a data frame
+  results <- compose_batch_results(
+    job_ids=job_ids,
+    prog_names=unlist(dataframe_to_batch_list(prog_list)),
+    status_func=status_func)
+
+  return(results)
+}
