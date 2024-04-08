@@ -8,7 +8,11 @@ detect_batch_mode_from_input <- function(x){
 # return unique group numbers
 get_run_groups <- function(x, col_name='run_group'){
   # data frame is expected to have run_group pre-populated/pre-calculated
-  if (is.data.frame(x) && !is.null(x[[col_name]])){
+  if (is.data.frame(x)){
+    # check if col_name is in x data frame
+    if (!(col_name %in% names(x))){
+      stop(sprintf("%s variable is not in input data frame. Available columns are: %s", col_name, names(x)))
+    }
     return(unique(x[[col_name]]))
   }
   # if input is a list/vector, then each element is a separate run group, therefore
@@ -41,18 +45,19 @@ control_batch_flow_list <- function(x,
                                     previous_run_ok=NULL,
                                     halt_on_error=TRUE,
                                     ...){
+
+  result <- list(prog_list=x, stop=FALSE)
+
   if (!all(previous_run_ok)){
     if (halt_on_error){
-    warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nBatch execution halted.\n",
-                    paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
+      warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nBatch execution halted.\n",
+                      paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
+      result$stop=TRUE
     }
     else {
       warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\n",
-                      paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
-    }
-    result <- list(prog_list=x, stop=TRUE)
+                      paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))}
   }
-  else {result <- list(prog_list=x, stop=FALSE)}
   return(result)
 }
 
@@ -64,23 +69,25 @@ control_batch_flow_data_frame <- function(x,
                                           halt_on_error=TRUE,
                                           ...){
 
+  result <- list(prog_list=x, stop=FALSE)
+
   if (!all(previous_run_ok)){
     x_filtered <- remove_failed_program_dependencies(
       x,
-      failed_programs <- previous_run_programs[!previous_run_ok]
-    )
+      failed_programs <- previous_run_programs[!previous_run_ok])
+
+    result$prog_list <- x_filtered
+
     if (halt_on_error){
       warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\nPrograms that depend on failed programs will not be executed.\n",
                       paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
+      result$stop=TRUE
     }
     else {
       warning(sprintf("At least one of the following programs have errors in their logs:\n\t%s\n",
                       paste(previous_run_programs[!previous_run_ok], collapse='\n\t')))
     }
-
-    result <- list(prog_list=x_filtered, stop=FALSE)
   }
-  else {result <- list(prog_list=x, stop=FALSE)}
   return(result)
 }
 
@@ -117,26 +124,26 @@ remove_failed_program_dependencies <- function(x,
     current_failed_programs <- calculate_next_dependencies(
       x_filtered,
       current_group=rg,
-      current_program_names=current_failed_programs,
+      failed_programs=current_failed_programs,
       col_name=col_name)
 
     failed_programs <- c(failed_programs, current_failed_programs)
   }
 
   # return dataset without dependents of failed programs
-  return(x[x$program_name != failed_programs,])
+  return(x[!(x$program_name %in% failed_programs),])
 }
 
 #
 calculate_next_dependencies <- function(x,
                                         current_group=NULL,
-                                        current_program_names=NULL,
+                                        failed_programs=NULL,
                                         col_name='run_group',
                                         ...){
   # only select programs from current group
   x_current <- x[x[[col_name]]==current_group,]
   # get outputs of all previously failed programs
-  cur_group_outputs <- x[x[['program_name']] == current_program_names,]$outputs
+  cur_group_outputs <- x[x[['program_name']] == failed_programs,]$outputs
   # next group definition: any dataset that has one or more outputs of current group
   # as its inputs
   dependents <- sapply(parse_inputs(x_current$inputs), function(y) any(y %in% cur_group_outputs))
