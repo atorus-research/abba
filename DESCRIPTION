@@ -34,7 +34,8 @@ Imports:
     httr2,
     magrittr,
     tools,
-    rstudioapi
+    rstudioapi,
+    digest
 Suggests: 
     testthat (>= 3.0.0),
     mockery,

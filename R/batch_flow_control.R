@@ -11,7 +11,7 @@ get_run_groups <- function(x, col_name='run_group'){
   if (is.data.frame(x)){
     # check if col_name is in x data frame
     if (!(col_name %in% names(x))){
-      stop(sprintf("%s variable is not in input data frame. Available columns are: %s", col_name, names(x)))
+      stop(sprintf("%s variable is not in input data frame. Cannot run batch if input data frame does not have run groups.", col_name))
     }
     return(unique(x[[col_name]]))
   }
@@ -156,3 +156,98 @@ calculate_next_dependencies <- function(x,
 
 }
 
+
+# remove programs from input if their inputs/program files have not changed
+remove_unchanged_programs <- function(x, ...){
+  mode <- detect_batch_mode_from_input(x)
+  if (mode == 'data_frame'){
+    return(remove_unchanged_programs_data_frame(x, ...))
+  }
+  else if (mode == 'list'){
+    return(remove_unchanged_programs_list(x, ...))
+  }
+}
+
+
+# recursively descend into input list and remove programs whose hash has not changed from
+# the last time it was collected(usually since the last batch run)
+remove_unchanged_programs_list <- function(x, ...){
+
+  # function for recursively filtering out programs from nested list
+  recursive_cache_match <- function(l){
+
+    descend_ <-  function(x) {
+      if(is.list(x)) {
+        return(recursive_cache_match(x))
+        }
+      else if(is.character(x)) {
+        return(x[!(sapply(x, function(x) cache_match(x, ...)))])
+      }
+      else {return(x)}
+    }
+    lapply(l, descend_)
+  }
+
+  x_filtered <- recursive_cache_match(x)
+
+  # display a message about programs that were filtered out
+  x_removed <- setdiff(unlist(x), unlist(x_filtered))
+  if (length(x_removed) > 0){
+    message(sprintf("Programs would not be re-run due to hash sum check:\n\t%s", paste(x_removed, collapse="\\n\\t")))
+  }
+
+  return(x_filtered)
+}
+
+
+remove_unchanged_programs_data_frame <- function(x, ...){
+
+  # prepare a data frame
+  programs_and_inputs <- x[c('program_name', 'inputs')]
+  programs_and_inputs$inputs <- parse_inputs(programs_and_inputs$inputs, ...)
+  # check if program cache from previous batch run matches the current program
+  programs_cache_match <- apply(x, 1, function(x) lapply(unlist(x), function(x) cache_match(x, ...)))
+  # remove NULL results as they are for non-existing files - we would not include
+  # them when making a decision on whether to re-run this particular program
+  programs_cache_match <- lapply(programs_cache_match, function(x) Filter(Negate(is.na), x))
+  # only programs that have all inputs and program itself unchanged will be excluded from batch
+  programs_cache_match <- sapply(programs_cache_match, function(x) all(unlist(x)))
+  x_filtered <- x[!unlist(programs_cache_match),]
+
+  # display a message about programs that were filtered out
+  x_removed <- x[unlist(programs_cache_match),]$program_name
+  if (length(x_removed) > 0){
+    message(sprintf("Programs would not be re-run due to hash sum check:\n\t%s", paste(x_removed, collapse="\n\t")))
+  }
+
+  return(x_filtered)
+}
+
+
+
+# calculate and save program hashes for later use in batch running
+update_program_hashes <- function(x, ...){
+  mode <- detect_batch_mode_from_input(x)
+  if (mode == 'data_frame'){
+    update_program_hashes_data_frame(x, ...)
+  }
+  else if (mode == 'list'){
+    update_program_hashes_list(x, ...)
+  }
+}
+
+
+# function for calculating hashes for programs when input is a list
+update_program_hashes_list <- function(x, ...){
+  # update program hashes
+  sapply(unlist(x), function(x) abba_save_file_cache(x, ...))
+}
+
+
+# function for calculating hashes for programs and their inputs when input is a data frame
+update_program_hashes_data_frame <- function(x, ...){
+  # update program hashes
+  sapply(x$program_name, function(x) abba_save_file_cache(x, ...))
+  # update hashes of program inputs
+  sapply(unlist(parse_inputs(x$inputs)), function(x) abba_save_file_cache(x, ...))
+}
