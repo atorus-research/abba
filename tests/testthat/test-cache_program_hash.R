@@ -35,3 +35,11 @@ test_that("cache_match behaves correctly", {
   # Clean up
   unlink(program_path)
 })
+
+
+test_that("cache_match returns NA when input program_path is NULL or does not exist", {
+
+  expect_equal(is.na(cache_match(NULL)), TRUE)
+  expect_equal(is.na(cache_match('/non/existing/program/path.definitelyNotAnRprogram')), TRUE)
+
+})
