@@ -21,6 +21,9 @@ rslauncher_submit_job <- function(p,
   if (is.null(log_path) || log_path == ''){
     log_path=file.path(dirname(scriptPath), paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
   } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
+  # create log directory if it does not exist. supplying non-existing directory
+  # to launcherSubmitJob would produce a silent error
+  if (!file.exists(log_path)){dir.create(log_path)}
 
   # define scriptpath depending on the execution type
   if (execution_type == 'standard'){
