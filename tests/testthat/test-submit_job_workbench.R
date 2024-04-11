@@ -7,7 +7,10 @@ test_that("rslauncher_submit_job is producing an error when execution type is no
 
 test_that("rslauncher_submit_job is working as expected in 'standard' mode", {
   mock_launcher_submit_job <- mock('job-id1')
+  mock_select_r_version <- mock('/path/to/r/executable')
+
   stub(rslauncher_submit_job, "rstudioapi::launcherSubmitJob", mock_launcher_submit_job)
+  stub(rslauncher_submit_job, "select_r_version", mock_select_r_version)
 
   result_actual <- rslauncher_submit_job('/path/to/program.R')
 
@@ -16,7 +19,7 @@ test_that("rslauncher_submit_job is working as expected in 'standard' mode", {
   expect_args(mock_launcher_submit_job, 1,
               args =  c("--slave", "--no-save", "--no-restore", "-f /path/to/program.R"),
               cluster = 'Local',
-              command = "R",
+              exe = "/path/to/r/executable",
               stdoutFile = '/path/to/program.log',
               stderrFile = '/path/to/program.log',
               name = '/path/to/program.R',
@@ -30,7 +33,10 @@ test_that("rslauncher_submit_job is working as expected in 'standard' mode", {
 
 test_that("rslauncher_submit_job accepts log_path and user_tag arguments", {
   mock_launcher_submit_job <- mock('job-id1')
+  mock_select_r_version <- mock('/path/to/r/executable')
+
   stub(rslauncher_submit_job, "rstudioapi::launcherSubmitJob", mock_launcher_submit_job)
+  stub(rslauncher_submit_job, "select_r_version", mock_select_r_version)
 
   result_actual <- rslauncher_submit_job('/path/to/program.R',
                                          log_path='/path/to/log',
@@ -41,7 +47,7 @@ test_that("rslauncher_submit_job accepts log_path and user_tag arguments", {
   expect_args(mock_launcher_submit_job, 1,
               args =  c("--slave", "--no-save", "--no-restore", "-f /path/to/program.R"),
               cluster = 'Local',
-              command = "R",
+              exe = "/path/to/r/executable",
               stdoutFile = '/path/to/log/program.log',
               stderrFile = '/path/to/log/program.log',
               name = '/path/to/program.R',
@@ -55,7 +61,10 @@ test_that("rslauncher_submit_job accepts log_path and user_tag arguments", {
 
 test_that("rslauncher_submit_job is working as expected in 'logrx' mode", {
   mock_launcher_submit_job <- mock('job-id2')
+  mock_select_r_version <- mock('/path/to/r/executable')
+
   stub(rslauncher_submit_job, "rstudioapi::launcherSubmitJob", mock_launcher_submit_job)
+  stub(rslauncher_submit_job, "select_r_version", mock_select_r_version)
 
   result_actual <- rslauncher_submit_job('/path/to/program.R', execution_type='logrx')
   expected_result <- c('job-id2')
@@ -68,7 +77,7 @@ test_that("rslauncher_submit_job is working as expected in 'logrx' mode", {
                                 system.file('logrx_workbench_submission.R', package="abba"),
                                 '/path/to/program.R', '/path/to/program.log')),
               cluster = 'Local',
-              command = "R",
+              exe = "/path/to/r/executable",
               stdoutFile = '/path/to/program.log',
               stderrFile = '/path/to/program.log',
               name = '/path/to/program.R',

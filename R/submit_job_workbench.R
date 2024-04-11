@@ -2,7 +2,11 @@ rslauncher_submit_job <- function(p,
                                   execution_type='standard',
                                   log_path=NULL,
                                   user_tag=NULL,
+                                  r_version=NULL,
                                   ...) {
+
+  # default to current session version of R if not provided by user
+  r_version <- select_r_version(r_version)
 
   # check execution type
   if (!(execution_type %in% c('standard', 'logrx'))){
@@ -31,7 +35,7 @@ rslauncher_submit_job <- function(p,
   # submit program for execution via rstudioapi
   job_id <- rstudioapi::launcherSubmitJob(args =  c("--slave", "--no-save", "--no-restore", scriptArg),
                                           cluster = 'Local',
-                                          command = "R",
+                                          exe = r_version,
                                           stdoutFile = log_path,
                                           stderrFile = log_path,
                                           name = scriptPath,

@@ -35,7 +35,8 @@ Imports:
     magrittr,
     tools,
     rstudioapi,
-    digest
+    digest,
+    tidyr
 Suggests: 
     testthat (>= 3.0.0),
     mockery,
