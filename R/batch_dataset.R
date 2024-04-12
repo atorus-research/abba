@@ -133,7 +133,7 @@ parse_inputs <- function(x, ...){
   # create one and fill it with NAs
   if (is.null(x)){
     warning("Input data frame does not contain 'inputs' column. Dependency tracing would not be performed.")
-    return(NA)
+    return(NULL)
   }
 
   # custom strsplit function that would not produce an error when trying to split NULL/NA

@@ -10,6 +10,11 @@
 #' @return A hash sum of the file's contents.
 #' @noRd
 abba_save_file_cache <- function(file_path, cache_folder=NULL, ...) {
+  if (is.null(file_path)||is.na(file_path)||file_path==""||!file.exists(file_path)){
+    # silently return NULL if supplied invalid file path
+    message(sprintf("Could not calculate file hash, file %s does not exist.", file_path))
+    return(NULL)
+  }
   hash_value <- digest::digest(file_path, algo = "md5", file = TRUE)
 
   # by default, put cache in .abba_cache folder inside programs folder

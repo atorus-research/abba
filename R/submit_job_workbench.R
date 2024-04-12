@@ -23,7 +23,7 @@ rslauncher_submit_job <- function(p,
   } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
   # create log directory if it does not exist. supplying non-existing directory
   # to launcherSubmitJob would produce a silent error
-  if (!file.exists(log_path)){dir.create(log_path)}
+  if (!file.exists(dirname(log_path))){dir.create(dirname(log_path))}
 
   # define scriptpath depending on the execution type
   if (execution_type == 'standard'){
@@ -49,7 +49,16 @@ rslauncher_submit_job <- function(p,
 
 }
 
-
+#' Create a job for executing an R program
+#'
+#' @param p path to program
+#' @param log_path optional; path to directory where log will be saved
+#' @param user_tag optional; any user tags user might want to add to the job
+#' @param ... other arguments that will be passed to internal rslauncher_submit_job function
+#'
+#' @return job id
+#' @export
+#'
 abba_rslauncher_submit_job_local <- function(p,
                                              log_path=NULL,
                                              user_tag='',
@@ -67,6 +76,16 @@ abba_rslauncher_submit_job_local <- function(p,
 }
 
 
+#' Execute programs via logrx
+#'
+#' @param p path to program
+#' @param log_path optional; path to directory where log will be saved
+#' @param user_tag optional; any user tags user might want to add to the job
+#' @param ... other arguments that will be passed to internal rslauncher_submit_job function
+#'
+#' @return job id
+#' @export
+#'
 abba_rslauncher_submit_logrx_job_local <- function(p,
                                                    log_path=NULL,
                                                    user_tag='',
