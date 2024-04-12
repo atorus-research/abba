@@ -81,17 +81,19 @@ abba_submit_batch <- function(prog_list,
   previous_run_ok <- TRUE
   previous_run_programs <- c()
 
-
-  # check if programs/their inputs had any changes and remove programs whose code
-  # and inputs(if specified) have not changed since last hash collection(typicaly from previous batch run)
-  if (!rerun_unchanged_programs){
-    prog_list_converted <- remove_unchanged_programs(prog_list_converted,
-                                                     cache_folder=cache_folder)
-  }
   # check if run groups are present for data frame
   unique_run_groups <- get_run_groups(prog_list_converted)
 
   for (rg in unique_run_groups){
+
+    # check if programs/their inputs had any changes and remove programs whose code
+    # and inputs(if specified) have not changed since last hash collection(typicaly from previous batch run)
+    if (!rerun_unchanged_programs){
+      prog_list_converted <- remove_unchanged_programs(prog_list_converted,
+                                                       run_group=rg,
+                                                       col_name=col_name,
+                                                       cache_folder=cache_folder)
+    }
     # check if programs from previous run group were executed completely
     batch_check_results <-
       batch_run_control(prog_list_converted,
@@ -109,9 +111,10 @@ abba_submit_batch <- function(prog_list,
 
     # select programs for running in parallel
     parallel_run <- select_parallel_run(prog_list_converted, rg, col_name=col_name)
-    # message that would show batch progress
-    message(sprintf("Submitting programs for parallel run:\n\t%s",
-                    paste(parallel_run, collapse='\n\t')))
+    # message that would show batch progress. Only show it if there is at least one program to run
+    if (length(parallel_run) > 0){
+      message(sprintf("Submitting programs for parallel run:\n\t%s", paste(parallel_run, collapse='\n\t')))
+    }
     # submit the run
     new_run <- batch_submit_parallel(parallel_run,
                                      submit_func=submit_func,
