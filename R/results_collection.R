@@ -6,7 +6,7 @@ compose_batch_results <- function(job_ids=NULL,
   # all components must be specified
   if (is.null(job_ids) || is.null(prog_names) || is.null(status_func)){
     warning("Job IDs, program names or status func was not provided. Batch results will not be composed.")
-    return(NULL)
+    return(setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("job_ID", "program_name", "status")))
   }
 
   statuses <- status_func(job_ids, ...)
