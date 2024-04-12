@@ -15,7 +15,7 @@ rslauncher_submit_job <- function(p,
   # Submit the job for the program and wait until its execution
   scriptPath <- path.expand(p)
   scriptFile <- basename(scriptPath)
-  jobTag <- c(paste("rstudio-r-script-job", scriptFile, sep = ":"), user_tag)
+  jobTag <- c(paste("rstudio-r-script-job", scriptPath, sep = ":"), user_tag)
 
   # put log file in r script folder if no log path is supplied
   if (is.null(log_path) || log_path == ''){
@@ -186,9 +186,12 @@ abba_rslauncher_get_job_log_local <- function(job_ids, ...){
 # will return TRUE if exitCode is equal to 0, i.e. no errors occured during execution.
 # does not check for warnings, only hard R errors
 rslauncher_get_job_succeeded0 <- function(job_id, ...){
-  job_info <- rstudioapi::launcherGetJob(job_id)
+  # job_info <- rstudioapi::launcherGetJob(job_id)
+  job_info <- tryCatch({rstudioapi::launcherGetJob(job_id)},
+                      error=function(e){list(exitCode=NA)})
 
   if (is.null(job_info$exitCode)){return(NULL)}
+  if (is.na(job_info$exitCode)){return(NA)}
   return(job_info$exitCode == 0)
 }
 
@@ -236,7 +239,8 @@ rslauncher_get_job_display_status <- function(job_ids, ...){
 
   # function to convert TRUE/FALSE results into descriptive character statuses
   make_descriptive <- function(x){
-    if(x==TRUE){'Completed'}
+    if (is.na(x)){'Not submitted'}
+    else if(x==TRUE){'Completed'}
     else if(x==FALSE){'Completed with errors'}
   }
 
