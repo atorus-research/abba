@@ -45,6 +45,36 @@ validate_batch_data_frame <- function(x){
   return(TRUE)
 }
 
+
+#' Validate data frame for calculating run groups
+#' @param x A data frame
+#' @return TRUE if all checks pass
+#' @noRd
+#' @examples
+#' validate_batch_data_frame_for_run_group(
+#' as.data.frame(list(program_name=c("program1.R", "program2.R", "program3.R"),
+#'                    inputs=c('inp1', 'inp2', 'inp3'),
+#'                    outputs=c('out1', 'out2', 'out3'))))
+validate_batch_data_frame_for_run_group <- function(x){
+  if (!is.data.frame(x)){
+    warning(sprintf('Batch dataset should be a data frame, not %s',
+                 typeof(x)))
+    return(FALSE)
+  }
+  if (!all(c('program_name', 'inputs', 'outputs') %in% names(x))){
+    warning(sprintf('Run groups check: Batch dataset is required to have program_name, inputs and outputs columns, but it has %s. Run groups will not be calculated.',
+                 paste(names(x), collapse=',')))
+    return(FALSE)}
+  if (any(is.na(x$inputs)) || any(is.na(x$outputs))){
+    warning('Run groups check: There is at least one NA value in inputs/outputs columns. Run groups will not be calculated.')
+    return(FALSE)}
+  if (nrow(x)==0){
+    warning('Run groups check: Batch dataset should have at least 1 record. Run groups will not be calculated')
+    return(FALSE)
+  }
+  return(TRUE)
+}
+
 #' Calculate run_group variable using inputs and outputs of programs supplied by user
 #'
 #' @param x input data frame. Must contain columns 'inputs', 'outputs' that list
@@ -60,25 +90,59 @@ validate_batch_data_frame <- function(x){
 #'                                outputs=c('ds1.xpt', 'ds2.xpt')))
 #' batch_ready <- calculate_run_group
 calculate_run_group <- function(x, col_name='run_group'){
+  input_validated <- validate_batch_data_frame_for_run_group(x)
+
+  # if input data frame does not contain all required information - assign run_group
+  # so that all programs would run sequentially
+  if (!input_validated){
+    warning("Batch will be executed in sequential mode because run_groups could not be calculated.")
+    x[[col_name]] <- c(1:nrow(x))
+    return(x)
+  }
+
   x[[col_name]] <- 0
   # determine which program to run first - such program inputs are not on the outputs of any other program
   first_progs_index <- get_first_programs(x)
   x[first_progs_index,][[col_name]] <- 1
   # iteratively calculate group run order
   current_group <- 1
+
+  #setup cutoff to avoid infinite loop
+  x_cutoff=length(x)
+  cutoff_count <- 1
   while (!identical(x[[col_name]],
                     calculate_next_group(x,
                                          current_group=current_group,
                                          col_name=col_name)[[col_name]])){
     x <- calculate_next_group(x, current_group=current_group, col_name=col_name)
     current_group <- current_group + 1
+    cutoff_count <- cutoff_count + 1
+
+    if (cutoff_count > x_cutoff){
+      warning("Could not calculate run groups fully. Please check input dataframe for circular dependencies")
+      break}
+
   }
   return(x)
 }
 
 # split comma-separated inputs
-parse_inputs <- function(x){
-  return(lapply(strsplit(x, ','), stringr::str_trim))
+parse_inputs <- function(x, ...){
+
+  # if input data frame does not contain 'inputs' column, produce a warning,
+  # create one and fill it with NAs
+  if (is.null(x)){
+    warning("Input data frame does not contain 'inputs' column. Dependency tracing would not be performed.")
+    return(NULL)
+  }
+
+  # custom strsplit function that would not produce an error when trying to split NULL/NA
+  strsplit_ <- function(x, ...){
+    if (is.null(x) || is.na(x)){return(x)}
+    return(unlist(strsplit(x, ...)))
+  }
+  split_x <- lapply(x, function(x) {strsplit_(x, ',')})
+  return(lapply(split_x, stringr::str_trim))
 }
 
 # function to get indexes of programs whose inputs are not produced by any programs in the x dataset
@@ -93,8 +157,7 @@ calculate_next_group <- function(x,
   cur_group_outputs <- x[x[[col_name]] == current_group,]$outputs
   # next group definition: any dataset that has one or more outputs of current group
   # as its inputs
-  next_group <- sapply(parse_inputs(x$inputs), function(y) any(y %in% cur_group_outputs))
-
+  next_group <- sapply(parse_inputs(x$inputs), function(y) any(y %in% cur_group_outputs) && is.character(y))
   # if there is no next group - return unmodified dataset
   if (all(!next_group)) {return (x)}
 
