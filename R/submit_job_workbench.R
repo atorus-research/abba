@@ -3,6 +3,7 @@ rslauncher_submit_job <- function(p,
                                   log_path=NULL,
                                   user_tag=NULL,
                                   r_version=NULL,
+                                  environment_vars=NULL,
                                   ...) {
 
   # default to current session version of R if not provided by user
@@ -42,7 +43,8 @@ rslauncher_submit_job <- function(p,
                                           stdoutFile = log_path,
                                           stderrFile = log_path,
                                           name = scriptPath,
-                                          tags = c(jobTag)
+                                          tags = c(jobTag),
+                                          environment=unlist(environment_vars)
   )
   # return path of the executed script along with execution status(anything other than 0 is a failure)
   return(job_id)
