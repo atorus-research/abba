@@ -4,6 +4,7 @@ rslauncher_submit_job <- function(p,
                                   user_tag=NULL,
                                   r_version=NULL,
                                   environment_vars=NULL,
+                                  source_file=NULL,
                                   ...) {
 
   # default to current session version of R if not provided by user
@@ -13,6 +14,10 @@ rslauncher_submit_job <- function(p,
   if (!(execution_type %in% c('standard', 'logrx'))){
     stop(sprintf("execution_type argument must be 'standard' or 'logrx', not %s", execution_type))
   }
+  # fail if non-existing source_file was specified
+  else if (!is.null(source_file) && !file.exists(source_file)){
+    stop(sprintf("Source file was specified(%s) but does not exist.", source_file))
+    }
   # Submit the job for the program and wait until its execution
   scriptPath <- path.expand(p)
   scriptFile <- basename(scriptPath)
@@ -28,13 +33,22 @@ rslauncher_submit_job <- function(p,
 
   # define scriptpath depending on the execution type
   if (execution_type == 'standard'){
-    scriptArg <- paste("-f", scriptPath)
+    if (is.null(source_file)) {
+      scriptArg <- paste("-f", scriptPath)
+      }
+    else {
+      scriptArg <- sprintf("-f %s --args %s %s",
+                           system.file('regular_workbench_submission.R', package="abba"),
+                           scriptPath,
+                           ifelse(is.null(source_file), "", source_file))
+    }
   }
   else if (execution_type == 'logrx'){
-    scriptArg <- sprintf("-f %s --args %s %s",
+    scriptArg <- sprintf("-f %s --args %s %s %s",
                          system.file('logrx_workbench_submission.R', package="abba"),
                          scriptPath,
-                         log_path)
+                         log_path,
+                         ifelse(is.null(source_file), "", source_file))
   }
   # submit program for execution via rstudioapi
   job_id <- rstudioapi::launcherSubmitJob(args =  c("--slave", "--no-save", "--no-restore", scriptArg),
