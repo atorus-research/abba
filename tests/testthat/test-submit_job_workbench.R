@@ -8,9 +8,11 @@ test_that("rslauncher_submit_job is producing an error when execution type is no
 test_that("rslauncher_submit_job is working as expected in 'standard' mode", {
   mock_launcher_submit_job <- mock('job-id1')
   mock_select_r_version <- mock('/path/to/r/executable')
+  mock_dir_create <- mock()
 
   stub(rslauncher_submit_job, "rstudioapi::launcherSubmitJob", mock_launcher_submit_job)
   stub(rslauncher_submit_job, "select_r_version", mock_select_r_version)
+  stub(rslauncher_submit_job, "dir.create", mock_dir_create)
 
   result_actual <- rslauncher_submit_job('/path/to/program.R')
 
@@ -23,7 +25,8 @@ test_that("rslauncher_submit_job is working as expected in 'standard' mode", {
               stdoutFile = '/path/to/program.log',
               stderrFile = '/path/to/program.log',
               name = '/path/to/program.R',
-              tags = c("rstudio-r-script-job:program.R"))
+              tags = c("rstudio-r-script-job:/path/to/program.R"),
+              environment=NULL)
 
   expected_result <- c('job-id1')
   # names(expected_result) <- c('/path/to/program.R')
@@ -34,9 +37,11 @@ test_that("rslauncher_submit_job is working as expected in 'standard' mode", {
 test_that("rslauncher_submit_job accepts log_path and user_tag arguments", {
   mock_launcher_submit_job <- mock('job-id1')
   mock_select_r_version <- mock('/path/to/r/executable')
+  mock_dir_create <- mock()
 
   stub(rslauncher_submit_job, "rstudioapi::launcherSubmitJob", mock_launcher_submit_job)
   stub(rslauncher_submit_job, "select_r_version", mock_select_r_version)
+  stub(rslauncher_submit_job, "dir.create", mock_dir_create)
 
   result_actual <- rslauncher_submit_job('/path/to/program.R',
                                          log_path='/path/to/log',
@@ -51,7 +56,8 @@ test_that("rslauncher_submit_job accepts log_path and user_tag arguments", {
               stdoutFile = '/path/to/log/program.log',
               stderrFile = '/path/to/log/program.log',
               name = '/path/to/program.R',
-              tags = c("rstudio-r-script-job:program.R", "custom-user-tag"))
+              tags = c("rstudio-r-script-job:/path/to/program.R", "custom-user-tag"),
+              environment=NULL)
 
   expected_result <- c('job-id1')
   # names(expected_result) <- c('/path/to/program.R')
@@ -62,9 +68,11 @@ test_that("rslauncher_submit_job accepts log_path and user_tag arguments", {
 test_that("rslauncher_submit_job is working as expected in 'logrx' mode", {
   mock_launcher_submit_job <- mock('job-id2')
   mock_select_r_version <- mock('/path/to/r/executable')
+  mock_dir_create <- mock()
 
   stub(rslauncher_submit_job, "rstudioapi::launcherSubmitJob", mock_launcher_submit_job)
   stub(rslauncher_submit_job, "select_r_version", mock_select_r_version)
+  stub(rslauncher_submit_job, "dir.create", mock_dir_create)
 
   result_actual <- rslauncher_submit_job('/path/to/program.R', execution_type='logrx')
   expected_result <- c('job-id2')
@@ -73,7 +81,7 @@ test_that("rslauncher_submit_job is working as expected in 'logrx' mode", {
 
   expect_args(mock_launcher_submit_job, 1,
               args =  c("--slave", "--no-save", "--no-restore",
-                        sprintf("-f %s --args %s %s",
+                        sprintf("-f %s --args %s %s ",
                                 system.file('logrx_workbench_submission.R', package="abba"),
                                 '/path/to/program.R', '/path/to/program.log')),
               cluster = 'Local',
@@ -81,7 +89,8 @@ test_that("rslauncher_submit_job is working as expected in 'logrx' mode", {
               stdoutFile = '/path/to/program.log',
               stderrFile = '/path/to/program.log',
               name = '/path/to/program.R',
-              tags = c("rstudio-r-script-job:program.R"))
+              tags = c("rstudio-r-script-job:/path/to/program.R"),
+              environment=NULL)
 
   expect_equal(result_actual, expected_result)
 })
