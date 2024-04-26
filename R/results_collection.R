@@ -27,7 +27,7 @@ compose_batch_results <- function(job_ids=NULL,
     job_path <- get_program_path_by_id(job_ids[[i]])
     results[results$program_name == job_path,]$job_ID <- job_ids[[i]]
   }
-  results$status <- rslauncher_get_job_display_status(results$job_ID)
+  results$status <- status_func(results$job_ID)
   return(results)
 
 }
