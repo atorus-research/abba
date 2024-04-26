@@ -5,6 +5,7 @@ rslauncher_submit_job <- function(p,
                                   r_version=NULL,
                                   environment_vars=NULL,
                                   source_file=NULL,
+                                  working_dir=NULL,
                                   ...) {
 
   # default to current session version of R if not provided by user
@@ -31,6 +32,9 @@ rslauncher_submit_job <- function(p,
   # to launcherSubmitJob would produce a silent error
   if (!file.exists(dirname(log_path))){dir.create(dirname(log_path))}
 
+  # assign working directory to parent dir of submitted program
+  if (is.null(working_dir)){working_dir <- dirname(p)}
+
   # define scriptpath depending on the execution type
   if (execution_type == 'standard'){
     if (is.null(source_file)) {
@@ -54,6 +58,7 @@ rslauncher_submit_job <- function(p,
   job_id <- rstudioapi::launcherSubmitJob(args =  c("--slave", "--no-save", "--no-restore", scriptArg),
                                           cluster = 'Local',
                                           exe = r_version,
+                                          workingDirectory = working_dir,
                                           stdoutFile = log_path,
                                           stderrFile = log_path,
                                           name = scriptPath,
