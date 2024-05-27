@@ -1,0 +1,211 @@
+slurm_submit_job <- function(program_path,
+                             log_path=NULL,
+                             r_version=NULL,
+                             user_tag=NULL,
+                             cpu_limit=NULL,
+                             username=NULL,
+                             job_timeout=3600,
+                             ...) {
+
+  # default to current session version of R if not provided by user
+  rscript_path <- select_rscript_version(r_version)
+
+  # Submit the job for the program and wait until its execution
+  scriptPath <- path.expand(program_path)
+  scriptFile <- basename(scriptPath)
+  jobTag <- c(paste("rstudio-r-script-job", scriptPath, sep = ":"), user_tag)
+
+  # put log file in r script folder if no log path is supplied
+  if (is.null(log_path) || log_path == ''){
+    log_path=file.path(dirname(scriptPath), paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
+  } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
+
+  # create log directory if it does not exist
+  if (!file.exists(dirname(log_path))){dir.create(dirname(log_path))}
+
+  # assign working directory to parent dir of submitted program
+  if (is.null(working_dir)){working_dir <- dirname(program_path)}
+
+  # Configure job to run our program
+  job_config <- configure_slurm_job(program_path=program_path,
+                                    log_path=log_path,
+                                    rscript_path=rscript_path,
+                                    user_tag=user_tag,
+                                    cpu_limit=cpu_limit,
+                                    username=username,
+                                    job_timeout=job_timeout
+  )
+
+  # Save yaml to temp folders
+  job_config_path <- save_slurm_template(job_config)
+
+  # Send the job for execution and read job id
+  job_id <- submit_slurm_job_config(job_config_path)
+
+  # return path of the executed script along with execution status(anything other than 0 is a failure)
+  return(job_id)
+
+}
+
+configure_slurm_job <- function(program_path='',
+                                log_path='',
+                                rscript_path='',
+                                user_tag='',
+                                cpu_limit=1L,
+                                username=NULL,
+                                job_timeout=3600
+                                ){
+
+  slurm_config_obj <- load_slurm_template()
+
+  program_name <- unlist(strsplit(basename(program_path), '.', fixed = TRUE))[1]
+
+  # cannot have underscores in job name/generate name
+  job_name <- gsub('_', '-', program_name)
+  generate_name <- paste0(job_name, '-', uuid::UUIDgenerate())
+
+  # Pull supplied username if provided, otherwise default to local user
+  if (is.null(username)){
+    service_user <- Sys.info()[["user"]]
+  } else {
+    service_user <- username
+  }
+  guid <- get_guid(user=service_user)
+
+  # determine log folder for placing .log file
+  log_path <- slurm_config_determine_log_folder(log_path = log_path, program_path = program_path)
+
+  # a function that would try to replace all possible keywords inside the target string
+  replace_func <- function(x){
+    x <- gsub("SLURM_JOB_UID", guid$uid, x)
+    x <- gsub("SLURM_JOB_TIMEOUT", job_timeout, x)
+    x <- gsub("CPU_LIMIT", cpu_limit, x)
+    x <- gsub("SLURM_JOB_JOB_NAME", generate_name, x)
+    x <- gsub("PROGRAM_LOG_PATH", log_path, x)
+    x <- gsub("RSCRIPT_PATH", rscript_path, x)
+    x <- gsub("R_PROGRAM_PATH", program_path, x)
+    x <- gsub("R_PROGRAM_FOLDER_PATH", dirname(program_path), x)
+    return(x)
+  }
+
+  # recursively walk the yaml and replace all placeholders with actual values
+  recursive_replace <- function(l){
+    sapply(l, function(x) if(is.list(x)) recursive_replace(x)
+           else if(is.character(x)) replace_func(x)
+           else x, USE.NAMES = FALSE)
+  }
+
+  slurm_config_obj <- recursive_replace(slurm_config_obj)
+
+  return(slurm_config_obj)
+
+}
+
+# function for submitting slurm config. Takes in a file path to config as the only argument
+submit_slurm_job_config <- function(slurm_config_path){
+  # send the job for execution
+  output <- suppressWarnings(system2(command="sbatch",
+                                     args=c(slurm_config_path),
+                                     stdout=TRUE, stderr=TRUE))
+  # read job id from config and return it for further tracking and reporting
+  return(slurm_config_get_job_id(output))
+}
+
+# Function for parsing slurm config to extract job id
+slurm_config_get_job_id <- function(output){
+  job_id <- stringr::str_extract(output, stringr::regex("(?<=job )\\d+$"))
+  return(job_id)
+}
+
+# Function to determine where to place program logs depending on supplied log path/program path
+slurm_config_determine_log_folder <- function(log_path=NULL,
+                                              program_path=NULL){
+  if (is.null(program_path) || program_path == ''){
+    stop(sprintf("Program_path parameter should be a real path, not %s", typeof(program_path)))
+  }
+  # put log file in r script folder if no log path is supplied
+  if (is.null(log_path) || log_path == ''){
+    log_path <- file.path(dirname(program_path), paste0(tools::file_path_sans_ext(basename(program_path)), '.log'))
+  } else {log_path <- file.path(log_path, paste0(tools::file_path_sans_ext(basename(program_path)), '.log'))}
+
+  return (log_path)
+}
+
+# function to get job log path
+get_slurm_job_log_path <- function(job_id, ...){
+  # Update the dummy code when slurm becomes available on workbench-val
+  return('job_log_path')
+}
+
+# function to get slurm job log
+get_slurm_job_log0 <- function(job_id, ...){
+
+  # try and get log path for a given job
+  tryCatch({log_path <- get_slurm_job_log_path(job_id, ...)},
+           error=function(e){stop(sprintf("Job with ID '%s' does not exist.", job_id))}
+  )
+
+  if (!file.exists(log_path)){
+    return(c(sprintf('Log file does not exist for %s', log_path)))
+  }
+
+  return(readLines(con=log_path))
+}
+
+# vectorized version of get_slurm_job_log0
+abba_slurm_get_job_log_local <- function(job_ids, ...){
+  return(lapply(job_ids, get_slurm_job_log0))
+}
+
+
+#' Check whether Slurm jobs have been fully executed.
+#'
+#' @param job_ids a list/vector of Slurm job IDs
+#' @param ... other positional/keyword arguments that will be ignored
+#'
+#' @return a named boolean vector. FALSE value indicates that job did not fully execute
+#' @export
+#'
+#' @examples \dontrun{
+#' job_statuses <- abba_rslauncher_get_job_succeeded_local(c('job-id-1', 'job-id-2'))
+#' }
+abba_slurm_get_job_succeeded_local <- function(job_ids, ...){
+  results <- sapply(job_ids, rslauncher_get_job_succeeded0)
+  if (any(sapply(results, function(x) is.null(x)))){
+    stop(sprintf(
+      "Jobs %s are still executing. Try increasing timeout parameter to avoid this error.",
+      paste(job_ids[is.null(results)], collapse='\n\t')))
+  }
+  return(results)
+}
+
+
+# simple function to get slurm job status
+slurm_get_job_status0 <- function(job_id, ...){
+  output <- suppressWarnings(system2(command="sacct",
+                                     args=c(" -j", job_id, "--format=JobID,ExitCode,State"),
+                                     stdout=TRUE, stderr=TRUE))
+  # get first line after headers
+  job_info <- output[[3]]
+
+  # split words in job_info string by spaces. Expected result is 3 words(job id, exit code, and state)
+  status <- strsplit(job_info, "\\s+")[[1]]
+  return(status[[length(status)]])
+}
+
+
+#' Return descriptive job status for slurm jobs
+#'
+#' @param job_ids a list/vector of Slurm job IDs
+#' @param ... other positional/keyword arguments that will be ignored
+#'
+#' @return a named character vector. Possible statuses are 'PENDING', 'RUNNING', 'SUSPENDED', 'COMPLETING', and 'COMPLETED'
+#' @noRd
+#'
+#' @examples \dontrun{
+#' job_statuses <- slurm_get_job_status(c('job-id-1', 'job-id-2'))
+#' }
+slurm_get_job_status <- function(job_ids, ...){
+  intermediate_results <- sapply(job_ids, slurm_get_job_status0)
+  return(intermediate_results)
+}
