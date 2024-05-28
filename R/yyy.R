@@ -6,7 +6,8 @@
           abba.permitted.containers=NULL,
           abba.default.container=NULL,
           abba.k8s.namespace='rstudio',
-          abba.home.nfs.ip.address='10.14.0.6'
+          abba.home.nfs.ip.address='10.14.0.6',
+          abba.default_cache_folder=NULL
   )
   invisible()
 }
