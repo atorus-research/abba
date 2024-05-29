@@ -24,4 +24,5 @@ setwd(dirname(prog_path))
 axecute(prog_path, log_name = log_name, log_path = log_path)
 
 # return to original directory
-setwd(cwd)
+# check if cwd still exists because global environment might get cleaned by the program itself
+if (exists("cwd")) {setwd(cwd)}
