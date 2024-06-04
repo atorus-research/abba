@@ -14,7 +14,7 @@ abba_submit_batch(
   col_name = "run_group",
   halt_on_error = TRUE,
   rerun_unchanged_programs = TRUE,
-  cache_folder = NULL,
+  cache_folder = getOption("abba.default_cache_folder"),
   ...
 )
 }
@@ -38,7 +38,7 @@ and inputs have not been modified since last batch run. TRUE by default}
 
 \item{cache_folder}{specify a path to the folder where hash-sums of programs
 and their inputs will be stored. By default, those hashes are saved in the subfolder .abba_cache
-of the same folder as target(program/programs input)}
+of the same folder as target(program/programs input). The default value can be set by specifying abba.default_cache_folder option.}
 
 \item{...}{arguments that will be passed to submit_func and wait_func functions}
 }
