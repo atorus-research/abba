@@ -105,8 +105,12 @@ configure_slurm_job <- function(program_path='',
 submit_slurm_job_config <- function(slurm_config_path){
   # send the job for execution
   output <- suppressWarnings(system2(command="sbatch",
-                                     args=c(slurm_config_path),
+                                     args=c(job_config_path),
                                      stdout=TRUE, stderr=TRUE))
+  err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
+  if (!is.null(attr(output, "status")) && attr(output, "status") != 0){
+    stop(sprintf("Error submitting the job. %s.\nError message: %s", output, err_msg))
+  }
   # read job id from config and return it for further tracking and reporting
   return(slurm_config_get_job_id(output))
 }
@@ -133,7 +137,16 @@ slurm_config_determine_log_folder <- function(log_path=NULL,
 
 # function to get job log path
 get_slurm_job_log_path <- function(job_id, ...){
-  # Update the dummy code when slurm becomes available on workbench-val
+  # get job info
+  output <- suppressWarnings(system2(command="scontrol",
+                                     args=c("show job", job_id),
+                                     stdout=TRUE, stderr=TRUE))
+
+  err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
+  if (attr(output, "status") != 0){
+    stop(sprintf("Error getting job log path. %s.\nError message: %s", output, err_msg))
+  }
+
   return('job_log_path')
 }
 
@@ -141,12 +154,10 @@ get_slurm_job_log_path <- function(job_id, ...){
 get_slurm_job_log0 <- function(job_id, ...){
 
   # try and get log path for a given job
-  tryCatch({log_path <- get_slurm_job_log_path(job_id, ...)},
-           error=function(e){stop(sprintf("Job with ID '%s' does not exist.", job_id))}
-  )
+  log_path <- get_slurm_job_log_path(job_id, ...)
 
   if (!file.exists(log_path)){
-    return(c(sprintf('Log file does not exist for %s', log_path)))
+    stop(sprintf('Log file does not exist for %s', log_path))
   }
 
   return(readLines(con=log_path))
@@ -185,6 +196,11 @@ slurm_get_job_status0 <- function(job_id, ...){
   output <- suppressWarnings(system2(command="sacct",
                                      args=c(" -j", job_id, "--format=JobID,ExitCode,State"),
                                      stdout=TRUE, stderr=TRUE))
+
+  err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
+  if (attr(output, "status") != 0){
+    stop(sprintf("Error getting job status. %s.\nError message: %s", output, err_msg))
+  }
   # get first line after headers
   job_info <- output[[3]]
 
