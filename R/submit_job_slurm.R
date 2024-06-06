@@ -2,7 +2,8 @@ slurm_submit_job <- function(program_path,
                              log_path=NULL,
                              r_version=NULL,
                              user_tag=NULL,
-                             cpu_limit=NULL,
+                             cpu_cores=getOption("abba.slurm.cpu.cores"),
+                             memory=getOption("abba.slurm.memory"),
                              username=NULL,
                              job_timeout=3600,
                              ...) {
@@ -31,7 +32,8 @@ slurm_submit_job <- function(program_path,
                                     log_path=log_path,
                                     rscript_path=rscript_path,
                                     user_tag=user_tag,
-                                    cpu_limit=cpu_limit,
+                                    cpu_cores=cpu_cores,
+                                    memory=memory,
                                     username=username,
                                     job_timeout=job_timeout
   )
@@ -51,7 +53,8 @@ configure_slurm_job <- function(program_path='',
                                 log_path='',
                                 rscript_path='',
                                 user_tag='',
-                                cpu_limit=1L,
+                                cpu_cores=getOption("abba.slurm.cpu.cores"),
+                                memory=getOption("abba.slurm.memory"),
                                 username=NULL,
                                 job_timeout=3600
                                 ){
@@ -79,7 +82,8 @@ configure_slurm_job <- function(program_path='',
   replace_func <- function(x){
     x <- gsub("SLURM_JOB_UID", guid$uid, x)
     x <- gsub("SLURM_JOB_TIMEOUT", job_timeout, x)
-    x <- gsub("CPU_LIMIT", cpu_limit, x)
+    x <- gsub("CPU_CORES", cpu_cores, x)
+    x <- gsub("RAM_MB", memory, x)
     x <- gsub("SLURM_JOB_JOB_NAME", generate_name, x)
     x <- gsub("PROGRAM_LOG_PATH", log_path, x)
     x <- gsub("RSCRIPT_PATH", rscript_path, x)
@@ -107,10 +111,11 @@ submit_slurm_job_config <- function(slurm_config_path){
   output <- suppressWarnings(system2(command="sbatch",
                                      args=c(job_config_path),
                                      stdout=TRUE, stderr=TRUE))
-  err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
-  if (!is.null(attr(output, "status")) && attr(output, "status") != 0){
-    stop(sprintf("Error submitting the job. %s.\nError message: %s", output, err_msg))
-  }
+  # err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
+  # if (!is.null(attr(output, "status")) && attr(output, "status") != 0){
+  #   stop(sprintf("Error submitting the job. %s.\nError message: %s", output, err_msg))
+  # }
+  slurm_command_error_check(output, "Error submitting the job.")
   # read job id from config and return it for further tracking and reporting
   return(slurm_config_get_job_id(output))
 }
@@ -142,12 +147,15 @@ get_slurm_job_log_path <- function(job_id, ...){
                                      args=c("show job", job_id),
                                      stdout=TRUE, stderr=TRUE))
 
-  err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
-  if (attr(output, "status") != 0){
-    stop(sprintf("Error getting job log path. %s.\nError message: %s", output, err_msg))
-  }
+  # err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
+  # if (attr(output, "status") != 0){
+  #   stop(sprintf("Error getting job log path. %s.\nError message: %s", output, err_msg))
+  # }
+  slurm_command_error_check(output, "Error getting job log path.")
 
-  return('job_log_path')
+  parsed_output <- slurm_parse_scontrol_output(output)
+
+  return(parsed_output$StdOut)
 }
 
 # function to get slurm job log
@@ -157,7 +165,7 @@ get_slurm_job_log0 <- function(job_id, ...){
   log_path <- get_slurm_job_log_path(job_id, ...)
 
   if (!file.exists(log_path)){
-    stop(sprintf('Log file does not exist for %s', log_path))
+    stop(sprintf('Cannot find log for job %s. File %s does not exist.', job_id, log_path))
   }
 
   return(readLines(con=log_path))
@@ -191,16 +199,17 @@ abba_slurm_get_job_succeeded_local <- function(job_ids, ...){
 }
 
 
-# simple function to get slurm job status
 slurm_get_job_status0 <- function(job_id, ...){
-  output <- suppressWarnings(system2(command="sacct",
-                                     args=c(" -j", job_id, "--format=JobID,ExitCode,State"),
+  output <- suppressWarnings(system2(command="squeue",
+                                     args=c(" --jobs", job_id, '--format="%.18i %.20P %.60j %.25u %.15T %.10M %.9l %R"', "--states=all"),
                                      stdout=TRUE, stderr=TRUE))
 
-  err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
-  if (attr(output, "status") != 0){
-    stop(sprintf("Error getting job status. %s.\nError message: %s", output, err_msg))
-  }
+  # err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
+  # if (attr(output, "status") != 0){
+  #   stop(sprintf("Error getting job status. %s.\nError message: %s", output, err_msg))
+  # }
+  slurm_command_error_check(output, "Error getting job status.")
+
   # get first line after headers
   job_info <- output[[3]]
 

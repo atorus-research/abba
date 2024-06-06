@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH --uid=SLURM_JOB_UID
 #SBATCH --time=SLURM_JOB_TIMEOUT
-#SBATCH --cpus-per-task=CPU_LIMIT
+#SBATCH --cpus-per-task=CPU_CORES
+#SBATCH --mem=RAM_MB
 #SBATCH --job-name=SLURM_JOB_JOB_NAME
 #SBATCH --output=PROGRAM_LOG_PATH
 #SBATCH --chdir=R_PROGRAM_FOLDER_PATH
