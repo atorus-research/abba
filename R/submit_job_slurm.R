@@ -199,23 +199,16 @@ abba_slurm_get_job_succeeded_local <- function(job_ids, ...){
 }
 
 
+#' Return job status for slurm job given job ID
 slurm_get_job_status0 <- function(job_id, ...){
   output <- suppressWarnings(system2(command="squeue",
-                                     args=c(" --jobs", job_id, '--format="%.18i %.20P %.60j %.25u %.15T %.10M %.9l %R"', "--states=all"),
+                                     args=c('--jobs', job_id, '--format="%.18i %.20P %.60j %.25u %.15T %.12M %.9l"', "--states=all"),
                                      stdout=TRUE, stderr=TRUE))
 
-  # err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
-  # if (attr(output, "status") != 0){
-  #   stop(sprintf("Error getting job status. %s.\nError message: %s", output, err_msg))
-  # }
-  slurm_command_error_check(output, "Error getting job status.")
+  slurm_command_error_check(output, sprintf("Error getting job status for job ID %s.", job_id))
+  parsed_output <- slurm_parse_squeue_output(output) %>% dplyr::filter(JOBID %in% job_id)
 
-  # get first line after headers
-  job_info <- output[[3]]
-
-  # split words in job_info string by spaces. Expected result is 3 words(job id, exit code, and state)
-  status <- strsplit(job_info, "\\s+")[[1]]
-  return(status[[length(status)]])
+  return(parsed_output$STATE)
 }
 
 
@@ -224,13 +217,13 @@ slurm_get_job_status0 <- function(job_id, ...){
 #' @param job_ids a list/vector of Slurm job IDs
 #' @param ... other positional/keyword arguments that will be ignored
 #'
-#' @return a named character vector. Possible statuses are 'PENDING', 'RUNNING', 'SUSPENDED', 'COMPLETING', and 'COMPLETED'
+#' @return a named character vector with job statuses as values and job IDs as names.
 #' @noRd
 #'
 #' @examples \dontrun{
 #' job_statuses <- slurm_get_job_status(c('job-id-1', 'job-id-2'))
 #' }
 slurm_get_job_status <- function(job_ids, ...){
-  intermediate_results <- sapply(job_ids, slurm_get_job_status0)
-  return(intermediate_results)
+  result <- sapply(job_ids, slurm_get_job_status0)
+  return(result)
 }

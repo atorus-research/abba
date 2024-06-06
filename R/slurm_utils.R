@@ -48,7 +48,7 @@ slurm_get_job_status_sacct0 <- function(job_id, ...){
 
 
 # parse the StdOut path from scontrol command output
-slurm_parse_scontrol_output <- function(x){
+slurm_parse_scontrol_output <- function(output){
   # only easily parsed information is currently retained
   parsed_output <- stringr::str_split(stringr::str_trim(output), " ", simplify=TRUE) %>%
     .[stringr::str_count(., "=") == 1]
@@ -63,10 +63,18 @@ slurm_parse_scontrol_output <- function(x){
 }
 
 
+# parse the StdOut path from scontrol command output
+slurm_parse_squeue_output <- function(output){
+  # squeue output is structured like a csv file with whitespace delimiter
+  read.table(text=output, header=TRUE, sep="")
+
+}
+
+
 # check if command executed via system2 produced any errors
 slurm_command_error_check <- function(cmd_output, msg){
-  err_msg <- if(is.null(attr(cmd_output, "errmsg"))) "No error message provided" else attr(cmd_output, "errmsg")
+  err_msg <- if(is.null(attr(cmd_output, "errmsg"))) "" else paste("Error details:", attr(cmd_output, "errmsg"))
   if (!is.null(attr(cmd_output, "status")) && attr(cmd_output, "status") != 0){
-    stop(sprintf(paste0(msg, " %s.\nError message: %s"), cmd_output, err_msg))
+    stop(sprintf(paste0(msg, " %s.\n%s"), cmd_output, err_msg))
   }
 }
