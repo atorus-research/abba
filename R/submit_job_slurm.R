@@ -1,3 +1,19 @@
+#' Submit R program as a SLURM job
+#'
+#' @param program_path
+#' @param log_path
+#' @param r_version
+#' @param user_tag
+#' @param cpu_cores
+#' @param memory
+#' @param username
+#' @param job_timeout
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 slurm_submit_job <- function(program_path,
                              log_path=NULL,
                              r_version=NULL,
@@ -5,6 +21,7 @@ slurm_submit_job <- function(program_path,
                              cpu_cores=getOption("abba.slurm.cpu.cores"),
                              memory=getOption("abba.slurm.memory"),
                              username=NULL,
+                             working_dir=NULL,
                              job_timeout=3600,
                              ...) {
 
@@ -17,9 +34,7 @@ slurm_submit_job <- function(program_path,
   jobTag <- c(paste("rstudio-r-script-job", scriptPath, sep = ":"), user_tag)
 
   # put log file in r script folder if no log path is supplied
-  if (is.null(log_path) || log_path == ''){
-    log_path=file.path(dirname(scriptPath), paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
-  } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
+  log_path <- slurm_config_determine_log_folder(log_path = log_path, program_path = program_path)
 
   # create log directory if it does not exist
   if (!file.exists(dirname(log_path))){dir.create(dirname(log_path))}
@@ -75,9 +90,6 @@ configure_slurm_job <- function(program_path='',
   }
   guid <- get_guid(user=service_user)
 
-  # determine log folder for placing .log file
-  log_path <- slurm_config_determine_log_folder(log_path = log_path, program_path = program_path)
-
   # a function that would try to replace all possible keywords inside the target string
   replace_func <- function(x){
     x <- gsub("SLURM_JOB_UID", guid$uid, x)
@@ -109,12 +121,8 @@ configure_slurm_job <- function(program_path='',
 submit_slurm_job_config <- function(slurm_config_path){
   # send the job for execution
   output <- suppressWarnings(system2(command="sbatch",
-                                     args=c(job_config_path),
+                                     args=c(slurm_config_path),
                                      stdout=TRUE, stderr=TRUE))
-  # err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
-  # if (!is.null(attr(output, "status")) && attr(output, "status") != 0){
-  #   stop(sprintf("Error submitting the job. %s.\nError message: %s", output, err_msg))
-  # }
   slurm_command_error_check(output, "Error submitting the job.")
   # read job id from config and return it for further tracking and reporting
   return(slurm_config_get_job_id(output))
@@ -146,11 +154,6 @@ get_slurm_job_log_path <- function(job_id, ...){
   output <- suppressWarnings(system2(command="scontrol",
                                      args=c("show job", job_id),
                                      stdout=TRUE, stderr=TRUE))
-
-  # err_msg <- if(is.null(attr(output, "errmsg"))) "No error message provided" else attr(output, "errmsg")
-  # if (attr(output, "status") != 0){
-  #   stop(sprintf("Error getting job log path. %s.\nError message: %s", output, err_msg))
-  # }
   slurm_command_error_check(output, "Error getting job log path.")
 
   parsed_output <- slurm_parse_scontrol_output(output)
@@ -172,24 +175,37 @@ get_slurm_job_log0 <- function(job_id, ...){
 }
 
 # vectorized version of get_slurm_job_log0
-abba_slurm_get_job_log_local <- function(job_ids, ...){
+abba_slurm_get_job_log <- function(job_ids, ...){
   return(lapply(job_ids, get_slurm_job_log0))
+}
+
+
+# return TRUE if job exit code is 0, and FALSE otherwise
+abba_slurm_get_job_succeeded0 <- function(job_id, ...){
+  output <- suppressWarnings(system2(command="squeue",
+                                     args=c('--jobs', job_id, '--Format="UserName,Name:.60,JobID:.10,exit_code:.14"', "--states=all"),
+                                     stdout=TRUE, stderr=TRUE))
+
+  slurm_command_error_check(output, sprintf("Error getting job exit code for job ID %s.", job_id))
+  parsed_output <- slurm_parse_squeue_output(output) %>% dplyr::filter(JOBID %in% job_id)
+  job_succeeded <- if(parsed_output$EXIT_CODE == 0) TRUE else FALSE
+  return(job_succeeded)
 }
 
 
 #' Check whether Slurm jobs have been fully executed.
 #'
 #' @param job_ids a list/vector of Slurm job IDs
-#' @param ... other positional/keyword arguments that will be ignored
+#' @param ... other positional/keyword arguments
 #'
 #' @return a named boolean vector. FALSE value indicates that job did not fully execute
 #' @export
 #'
 #' @examples \dontrun{
-#' job_statuses <- abba_rslauncher_get_job_succeeded_local(c('job-id-1', 'job-id-2'))
+#' job_statuses <- abba_slurm_get_job_succeeded(c('job-id-1', 'job-id-2'))
 #' }
-abba_slurm_get_job_succeeded_local <- function(job_ids, ...){
-  results <- sapply(job_ids, rslauncher_get_job_succeeded0)
+abba_slurm_get_job_succeeded <- function(job_ids, ...){
+  results <- sapply(job_ids, abba_slurm_get_job_succeeded0)
   if (any(sapply(results, function(x) is.null(x)))){
     stop(sprintf(
       "Jobs %s are still executing. Try increasing timeout parameter to avoid this error.",
