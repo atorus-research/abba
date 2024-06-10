@@ -1,29 +1,31 @@
 #' Submit R program as a SLURM job
 #'
-#' @param program_path
-#' @param log_path
-#' @param r_version
-#' @param user_tag
-#' @param cpu_cores
-#' @param memory
-#' @param username
-#' @param job_timeout
+#' @param program_path Full path to the R program file. Must be accessible from the SLURM node
+#' @param log_path desirable parent folder for program's log file. Defaults to parent folder of R program.
+#' @param r_version Version of R that will be used to run the program. Can be specified as a full path to Rscript executable, or as a label of R version that is displayed in the Workbench GUI.
+#' @param user_tag custom string that will be added to the job name.
+#' @param cpu_cores Amount of CPU cores that will be requested for the job.
+#' @param memory Amount of RAM in megabytes that will be requested for the job.
+#' @param username user whose permission level is used to execute the script. Defaults to user submitting the job.
+#' @param job_timeout time limit for a job. Must be specified in a format of "days-hours:minutes:seconds" If exceeded, job will be cancelled.
 #' @param ...
 #'
-#' @return
+#' @return job ID
 #' @export
 #'
-#' @examples
-slurm_submit_job <- function(program_path,
-                             log_path=NULL,
-                             r_version=NULL,
-                             user_tag=NULL,
-                             cpu_cores=getOption("abba.slurm.cpu.cores"),
-                             memory=getOption("abba.slurm.memory"),
-                             username=NULL,
-                             working_dir=NULL,
-                             job_timeout=3600,
-                             ...) {
+#' @examples \dontrun{
+#' job_id <- abba_slurm_submit_job("/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_dm.sas")
+#'  }
+abba_slurm_submit_job <- function(program_path,
+                                  log_path=NULL,
+                                  r_version=NULL,
+                                  user_tag=NULL,
+                                  cpu_cores=getOption("abba.slurm.cpu.cores"),
+                                  memory=getOption("abba.slurm.memory"),
+                                  username=NULL,
+                                  working_dir=NULL,
+                                  job_timeout=3600,
+                                  ...) {
 
   # default to current session version of R if not provided by user
   rscript_path <- select_rscript_version(r_version)
@@ -64,6 +66,21 @@ slurm_submit_job <- function(program_path,
 
 }
 
+
+#' Configure slurm submission script using it in sbatch command
+#'
+#' @param program_path full path to R program
+#' @param log_path desirable parent folder for program's log file.
+#' @param r_version Version of R that will be used to run the program. Can be specified as a full path to Rscript executable, or as a label of R version that is displayed in the Workbench GUI.
+#' @param user_tag custom string that will be added to the job name.
+#' @param cpu_cores Amount of CPU cores that will be requested for the job.
+#' @param memory Amount of RAM in megabytes that will be requested for the job.
+#' @param username user whose permission level is used to execute the script. Defaults to user submitting the job.
+#' @param job_timeout time limit for a job. Must be specified in a format of "days-hours:minutes:seconds" If exceeded, job will be cancelled.
+#'
+#' @return a character vector representing submission script for sbatch command
+#' @noRd
+#'
 configure_slurm_job <- function(program_path='',
                                 log_path='',
                                 rscript_path='',
@@ -117,7 +134,8 @@ configure_slurm_job <- function(program_path='',
 
 }
 
-# function for submitting slurm config. Takes in a file path to config as the only argument
+
+# function for submitting slurm config. Takes in a file path to config as the argument
 submit_slurm_job_config <- function(slurm_config_path){
   # send the job for execution
   output <- suppressWarnings(system2(command="sbatch",
@@ -128,25 +146,6 @@ submit_slurm_job_config <- function(slurm_config_path){
   return(slurm_config_get_job_id(output))
 }
 
-# Function for parsing slurm config to extract job id
-slurm_config_get_job_id <- function(output){
-  job_id <- stringr::str_extract(output, stringr::regex("(?<=job )\\d+$"))
-  return(job_id)
-}
-
-# Function to determine where to place program logs depending on supplied log path/program path
-slurm_config_determine_log_folder <- function(log_path=NULL,
-                                              program_path=NULL){
-  if (is.null(program_path) || program_path == ''){
-    stop(sprintf("Program_path parameter should be a real path, not %s", typeof(program_path)))
-  }
-  # put log file in r script folder if no log path is supplied
-  if (is.null(log_path) || log_path == ''){
-    log_path <- file.path(dirname(program_path), paste0(tools::file_path_sans_ext(basename(program_path)), '.log'))
-  } else {log_path <- file.path(log_path, paste0(tools::file_path_sans_ext(basename(program_path)), '.log'))}
-
-  return (log_path)
-}
 
 # function to get job log path
 get_slurm_job_log_path <- function(job_id, ...){
@@ -161,6 +160,7 @@ get_slurm_job_log_path <- function(job_id, ...){
   return(parsed_output$StdOut)
 }
 
+
 # function to get slurm job log
 get_slurm_job_log0 <- function(job_id, ...){
 
@@ -173,6 +173,7 @@ get_slurm_job_log0 <- function(job_id, ...){
 
   return(readLines(con=log_path))
 }
+
 
 # vectorized version of get_slurm_job_log0
 abba_slurm_get_job_log <- function(job_ids, ...){

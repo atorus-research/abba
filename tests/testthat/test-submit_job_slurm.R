@@ -15,21 +15,22 @@ test_that("Placeholders are properly updated by configure_slurm_template functio
   stub(configure_slurm_job, "uuid::UUIDgenerate", "uuid-generated")
 
   actual <- configure_slurm_job(program_path="/tst/path/test.R",
-                                log_path='',
+                                log_path='/tst/path/test.log',
                                 rscript_path='/opt/R/421/bin/Rscript',
                                 user_tag='user_tag',
-                                cpu_limit=1L,
+                                cpu_cores=1L,
+                                memory=998,
                                 job_timeout=100)
 
   expected <- c("#!/bin/bash",
-                "#SBATCH --UID=123",
+                "#SBATCH --uid=123",
                 "#SBATCH --time=100",
                 "#SBATCH --cpus-per-task=1",
+                "#SBATCH --mem=998",
                 "#SBATCH --job-name=test-uuid-generated",
-                "#SBATCH --error=/tst/path/test.log",
                 "#SBATCH --output=/tst/path/test.log",
+                "#SBATCH --chdir=/tst/path",
                 "",
-                "cd /tst/path",
                 "/opt/R/421/bin/Rscript /tst/path/test.R")
 
   expect_equal(actual, expected)
@@ -78,16 +79,15 @@ test_that("submit_slurm_job_config submits script for execution", {
 
 test_that("slurm_get_job_status gets job status", {
 
-  mock_system2 <- mock(c("JobID ExitCode State",
-                         "----- ----- -----",
+  mock_system2 <- mock(c("JOBID ExitCode STATE",
                          "2955  0   COMPLETED"), cycle=TRUE)
 
   stub(slurm_get_job_status, "system2", mock_system2, depth=2)
 
-  actual_result <- slurm_get_job_status("job_id")
-
+  actual_result <- slurm_get_job_status("2955")
+  print(actual_result)
   expected_result <- c("COMPLETED")
-  names(expected_result) <- c("job_id")
+  names(expected_result) <- c("2955")
 
   expect_equal(actual_result, expected_result)
 })

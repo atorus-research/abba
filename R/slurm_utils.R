@@ -78,3 +78,25 @@ slurm_command_error_check <- function(cmd_output, msg){
     stop(sprintf(paste0(msg, " %s.\n%s"), cmd_output, err_msg))
   }
 }
+
+
+# Function to determine where to place program logs depending on supplied log path/program path
+slurm_config_determine_log_folder <- function(log_path=NULL,
+                                              program_path=NULL){
+  if (is.null(program_path) || program_path == ''){
+    stop(sprintf("Program_path parameter should be a real path, not %s", typeof(program_path)))
+  }
+  # put log file in r script folder if no log path is supplied
+  if (is.null(log_path) || log_path == ''){
+    log_path <- file.path(dirname(program_path), paste0(tools::file_path_sans_ext(basename(program_path)), '.log'))
+  } else {log_path <- file.path(log_path, paste0(tools::file_path_sans_ext(basename(program_path)), '.log'))}
+
+  return (log_path)
+}
+
+
+# Function for parsing slurm config to extract job id
+slurm_config_get_job_id <- function(output){
+  job_id <- stringr::str_extract(output, stringr::regex("(?<=job )\\d+$"))
+  return(job_id)
+}
