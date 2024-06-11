@@ -36,7 +36,7 @@ abba_slurm_submit_job <- function(program_path,
   jobTag <- c(paste("rstudio-r-script-job", scriptPath, sep = ":"), user_tag)
 
   # put log file in r script folder if no log path is supplied
-  log_path <- slurm_config_determine_log_folder(log_path = log_path, program_path = program_path)
+  log_path <- slurm_config_determine_log_path(log_path = log_path, program_path = program_path)
 
   # create log directory if it does not exist
   if (!file.exists(dirname(log_path))){dir.create(dirname(log_path))}
@@ -64,100 +64,6 @@ abba_slurm_submit_job <- function(program_path,
   # return path of the executed script along with execution status(anything other than 0 is a failure)
   return(job_id)
 
-}
-
-
-#' Configure slurm submission script using it in sbatch command
-#'
-#' @param program_path full path to R program
-#' @param log_path desirable parent folder for program's log file.
-#' @param r_version Version of R that will be used to run the program. Can be specified as a full path to Rscript executable, or as a label of R version that is displayed in the Workbench GUI.
-#' @param user_tag custom string that will be added to the job name.
-#' @param cpu_cores Amount of CPU cores that will be requested for the job.
-#' @param memory Amount of RAM in megabytes that will be requested for the job.
-#' @param username user whose permission level is used to execute the script. Defaults to user submitting the job.
-#' @param job_timeout time limit for a job. Must be specified in a format of "days-hours:minutes:seconds" If exceeded, job will be cancelled.
-#'
-#' @return a character vector representing submission script for sbatch command
-#' @noRd
-#'
-configure_slurm_job <- function(program_path='',
-                                log_path='',
-                                rscript_path='',
-                                user_tag='',
-                                cpu_cores=getOption("abba.slurm.cpu.cores"),
-                                memory=getOption("abba.slurm.memory"),
-                                username=NULL,
-                                job_timeout=3600
-                                ){
-
-  slurm_config_obj <- load_slurm_template()
-
-  program_name <- unlist(strsplit(basename(program_path), '.', fixed = TRUE))[1]
-
-  # cannot have underscores in job name/generate name
-  job_name <- gsub('_', '-', program_name)
-  generate_name <- paste0(job_name, '-', uuid::UUIDgenerate())
-
-  # Pull supplied username if provided, otherwise default to local user
-  if (is.null(username)){
-    service_user <- Sys.info()[["user"]]
-  } else {
-    service_user <- username
-  }
-  guid <- get_guid(user=service_user)
-
-  # a function that would try to replace all possible keywords inside the target string
-  replace_func <- function(x){
-    x <- gsub("SLURM_JOB_UID", guid$uid, x)
-    x <- gsub("SLURM_JOB_TIMEOUT", job_timeout, x)
-    x <- gsub("CPU_CORES", cpu_cores, x)
-    x <- gsub("RAM_MB", memory, x)
-    x <- gsub("SLURM_JOB_JOB_NAME", generate_name, x)
-    x <- gsub("PROGRAM_LOG_PATH", log_path, x)
-    x <- gsub("RSCRIPT_PATH", rscript_path, x)
-    x <- gsub("R_PROGRAM_PATH", program_path, x)
-    x <- gsub("R_PROGRAM_FOLDER_PATH", dirname(program_path), x)
-    return(x)
-  }
-
-  # recursively walk the yaml and replace all placeholders with actual values
-  recursive_replace <- function(l){
-    sapply(l, function(x) if(is.list(x)) recursive_replace(x)
-           else if(is.character(x)) replace_func(x)
-           else x, USE.NAMES = FALSE)
-  }
-
-  slurm_config_obj <- recursive_replace(slurm_config_obj)
-
-  return(slurm_config_obj)
-
-}
-
-
-# function for submitting slurm config. Takes in a file path to config as the argument
-submit_slurm_job_config <- function(slurm_config_path){
-  # send the job for execution
-  output <- suppressWarnings(system2(command="sbatch",
-                                     args=c(slurm_config_path),
-                                     stdout=TRUE, stderr=TRUE))
-  slurm_command_error_check(output, "Error submitting the job.")
-  # read job id from config and return it for further tracking and reporting
-  return(slurm_config_get_job_id(output))
-}
-
-
-# function to get job log path
-get_slurm_job_log_path <- function(job_id, ...){
-  # get job info
-  output <- suppressWarnings(system2(command="scontrol",
-                                     args=c("show job", job_id),
-                                     stdout=TRUE, stderr=TRUE))
-  slurm_command_error_check(output, "Error getting job log path.")
-
-  parsed_output <- slurm_parse_scontrol_output(output)
-
-  return(parsed_output$StdOut)
 }
 
 
@@ -240,7 +146,7 @@ slurm_get_job_status0 <- function(job_id, ...){
 #' @examples \dontrun{
 #' job_statuses <- slurm_get_job_status(c('job-id-1', 'job-id-2'))
 #' }
-slurm_get_job_status <- function(job_ids, ...){
+abba_slurm_get_job_status <- function(job_ids, ...){
   result <- sapply(job_ids, slurm_get_job_status0)
   return(result)
 }

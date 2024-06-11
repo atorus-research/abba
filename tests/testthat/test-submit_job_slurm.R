@@ -18,6 +18,7 @@ test_that("Placeholders are properly updated by configure_slurm_template functio
                                 log_path='/tst/path/test.log',
                                 rscript_path='/opt/R/421/bin/Rscript',
                                 user_tag='user_tag',
+                                username='test_username',
                                 cpu_cores=1L,
                                 memory=998,
                                 job_timeout=100)
@@ -77,17 +78,30 @@ test_that("submit_slurm_job_config submits script for execution", {
 })
 
 
-test_that("slurm_get_job_status gets job status", {
+test_that("abba_slurm_get_job_status gets job status", {
 
   mock_system2 <- mock(c("JOBID ExitCode STATE",
                          "2955  0   COMPLETED"), cycle=TRUE)
 
-  stub(slurm_get_job_status, "system2", mock_system2, depth=2)
+  stub(abba_slurm_get_job_status, "system2", mock_system2, depth=2)
 
-  actual_result <- slurm_get_job_status("2955")
-  print(actual_result)
+  actual_result <- abba_slurm_get_job_status("2955")
   expected_result <- c("COMPLETED")
   names(expected_result) <- c("2955")
+
+  expect_equal(actual_result, expected_result)
+})
+
+
+test_that("abba_slurm_get_job_succeeded returns TRUE if job had 0 exit code status and FALSE otherwise", {
+
+  mock_system2 <- mock(c("JOBID EXIT_CODE STATE", "2955  0   COMPLETED", "2971  1   COMPLETED"), cycle = TRUE)
+
+  stub(abba_slurm_get_job_succeeded, "system2", mock_system2, depth=2)
+
+  actual_result <- abba_slurm_get_job_succeeded(c("2955", "2971"))
+  expected_result <- c(TRUE, FALSE)
+  names(expected_result) <- c("2955", "2971")
 
   expect_equal(actual_result, expected_result)
 })
