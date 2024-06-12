@@ -1,5 +1,51 @@
 library(mockery)
 
+
+test_that("abba_slurm_submit_job functions correctly", {
+  mock_select_rscript_version <- mock('/path/to/bin/Rscript')
+  mock_configure_slurm_job <- mock('configured_sbatch_file')
+  mock_save_slurm_template <- mock('submission_script_file_path')
+  mock_submit_slurm_job_config <- mock('job-id')
+  mock_slurm_config_determine_log_path <- mock('/path/to/log/program.R')
+  mock_dir_create <- mock()
+
+  stub(abba_slurm_submit_job, "select_rscript_version", mock_select_rscript_version)
+  stub(abba_slurm_submit_job, "configure_slurm_job", mock_configure_slurm_job)
+  stub(abba_slurm_submit_job, "save_slurm_template", mock_save_slurm_template)
+  stub(abba_slurm_submit_job, "submit_slurm_job_config", mock_submit_slurm_job_config)
+  stub(abba_slurm_submit_job, "slurm_config_determine_log_path", mock_slurm_config_determine_log_path)
+  stub(abba_slurm_submit_job, "dir.create", mock_dir_create)
+
+  result <- abba_slurm_submit_job('/path/to/program.R',
+                                  log_path='/path/to/log',
+                                  r_version='4.2.2',
+                                  user_tag='user_tag',
+                                  cpu_cores=1,
+                                  memory='500M',
+                                  username='unique_username',
+                                  job_timeout=100)
+
+  expect_called(mock_select_rscript_version, 1)
+  expect_called(mock_configure_slurm_job, 1)
+  expect_called(mock_save_slurm_template, 1)
+  expect_called(mock_submit_slurm_job_config, 1)
+
+  expect_args(mock_select_rscript_version, 1, '4.2.2')
+  expect_args(mock_configure_slurm_job, 1,
+              program_path='/path/to/program.R',
+              log_path='/path/to/log/program.R',
+              rscript_path='/path/to/bin/Rscript',
+              user_tag='user_tag',
+              cpu_cores=1,
+              memory='500M',
+              username='unique_username',
+              job_timeout=100)
+
+  expect_args(mock_save_slurm_template, 1, 'configured_sbatch_file')
+  expect_args(mock_submit_slurm_job_config, 1, 'submission_script_file_path')
+})
+
+
 test_that("Package .submit file for configuring slurm job loads correctly", {
   x <- load_slurm_template()
 
@@ -28,7 +74,7 @@ test_that("Placeholders are properly updated by configure_slurm_template functio
                 "#SBATCH --time=100",
                 "#SBATCH --cpus-per-task=1",
                 "#SBATCH --mem=998",
-                "#SBATCH --job-name=test-uuid-generated",
+                "#SBATCH --job-name=test-user_tag-uuid-generated",
                 "#SBATCH --output=/tst/path/test.log",
                 "#SBATCH --chdir=/tst/path",
                 "",
