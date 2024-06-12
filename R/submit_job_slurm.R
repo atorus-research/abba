@@ -154,18 +154,18 @@ abba_slurm_get_job_status <- function(job_ids, ...){
 
 #' Watch SLURM job, periodically polling its execution status.
 #'
-#' @param unit_id job ID that was specified when submitting job
+#' @param job_id job ID that was specified when submitting jobs
 #' @param poll_interval_seconds Time interval for polling job status in seconds
 #' @param timeout_seconds Total time to wait before timeout in seconds
 #'
 #' @return a list of job ID(s) and status(es)
-#' @noRd
+#' @export
 #'
 #' @examples \dontrun{
 #' result <- abba_watch_slurm_job("5195", 10, 3000)
 #' }
 #'
-abba_watch_slurm_job <- function(unit_id='',
+abba_watch_slurm_job <- function(job_id='',
                                  poll_interval_seconds = 3,
                                  timeout_seconds = 300){
   # Initialize variables for tracking job status
@@ -175,7 +175,7 @@ abba_watch_slurm_job <- function(unit_id='',
   # Poll for job status in the specified batch group
   while (difftime(Sys.time(), start_time, units = "secs") <= timeout_seconds) {
 
-    job_details <- get_status(unit_id)
+    job_details <- get_status(job_id)
 
     job_still_running_statuses <- c("CONFIGURING", "RUNNING", "COMPLETING", "PENDING")
     # Check if all jobs finished running
