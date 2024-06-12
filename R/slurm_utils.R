@@ -27,7 +27,7 @@ configure_slurm_job <- function(program_path='',
   program_name <- unlist(strsplit(basename(program_path), '.', fixed = TRUE))[1]
 
   # cannot have underscores in job name/generate name
-  job_name <- gsub('_', '-', program_name)
+  job_name <- paste(gsub('_', '-', program_name), user_tag, sep='-')
   generate_name <- paste0(job_name, '-', uuid::UUIDgenerate())
 
   # Pull supplied username if provided, otherwise default to local user
