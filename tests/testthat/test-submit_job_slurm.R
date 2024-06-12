@@ -106,3 +106,23 @@ test_that("abba_slurm_get_job_succeeded returns TRUE if job had 0 exit code stat
   expect_equal(actual_result, expected_result)
 })
 
+
+
+test_that("abba_slurm_watch_job waits for job to finish", {
+  mock_get_job_status <- mock(c('CONFIGURING','COMPLETING'),
+                              c('RUNNING','COMPLETED'),
+                              c('CANCELLED','COMPLETED'), loop=TRUE)
+  stub(abba_slurm_watch_job,
+       "abba_slurm_get_job_status",
+       mock_get_job_status)
+
+  expected_result <- c('CANCELLED','COMPLETED')
+
+  result_actual <- abba_slurm_watch_job(c('job-id6', 'job-id7'),
+                                        poll_interval_seconds = 0.1,
+                                        timeout_seconds = 10)
+
+  expect_called(mock_get_job_status, 3)
+  expect_args(mock_get_job_status, 3, c('job-id6', 'job-id7'))
+  expect_equal(result_actual, expected_result)
+})
