@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples \dontrun{
-#' job_id <- abba_slurm_submit_job("/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_dm.sas")
+#' job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas")
 #'  }
 abba_slurm_submit_job <- function(program_path,
                                   log_path=NULL,
@@ -90,12 +90,15 @@ abba_slurm_get_job_log <- function(job_ids, ...){
 # return TRUE if job exit code is 0, and FALSE otherwise
 abba_slurm_get_job_succeeded0 <- function(job_id, ...){
   output <- suppressWarnings(system2(command="squeue",
-                                     args=c('--jobs', job_id, '--Format="UserName,Name:.60,JobID:.10,exit_code:.14"', "--states=all"),
+                                     args=c('--jobs', job_id, '--Format="UserName,Name:.60,JobID:.10,exit_code:.14,State:.20"', "--states=all"),
                                      stdout=TRUE, stderr=TRUE))
 
   slurm_command_error_check(output, sprintf("Error getting job exit code for job ID %s.", job_id))
-  parsed_output <- slurm_parse_squeue_output(output) %>% dplyr::filter(JOBID %in% job_id)
-  job_succeeded <- if(parsed_output$EXIT_CODE == 0) TRUE else FALSE
+  parsed_output <- slurm_parse_squeue_output(output) %>%
+    dplyr::filter(JOBID == job_id)
+  if(parsed_output$STATE == 'COMPLETED') {job_succeeded <- TRUE}
+  else if(parsed_output$STATE %in% c('CONFIGURING', 'COMPLETING', 'PENDING', 'RUNNING', 'SIGNALING', 'RESIZING')) {job_succeeded <- NULL}
+  else {job_succeeded <- FALSE}
   return(job_succeeded)
 }
 

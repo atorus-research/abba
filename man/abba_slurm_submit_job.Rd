@@ -44,6 +44,6 @@ Submit R program as a SLURM job
 }
 \examples{
 \dontrun{
-job_id <- abba_slurm_submit_job("/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_dm.sas")
+job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas")
  }
 }

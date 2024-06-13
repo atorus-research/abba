@@ -141,7 +141,7 @@ test_that("abba_slurm_get_job_status gets job status", {
 
 test_that("abba_slurm_get_job_succeeded returns TRUE if job had 0 exit code status and FALSE otherwise", {
 
-  mock_system2 <- mock(c("JOBID EXIT_CODE STATE", "2955  0   COMPLETED", "2971  1   COMPLETED"), cycle = TRUE)
+  mock_system2 <- mock(c("JOBID EXIT_CODE STATE", "2955  0   COMPLETED", "2971  1   FAILED"), cycle = TRUE)
 
   stub(abba_slurm_get_job_succeeded, "system2", mock_system2, depth=2)
 

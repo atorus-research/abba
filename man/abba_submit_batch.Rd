@@ -11,6 +11,7 @@ abba_submit_batch(
   sequential = FALSE,
   submit_func = abba_rslauncher_submit_job_local,
   wait_func = abba_rslauncher_watch_job_local,
+  succeed_func = abba_rslauncher_get_job_succeeded_local,
   col_name = "run_group",
   halt_on_error = TRUE,
   rerun_unchanged_programs = TRUE,
@@ -26,6 +27,8 @@ abba_submit_batch(
 \item{submit_func}{function that will be used to submit jobs}
 
 \item{wait_func}{function that checks job status and returns when job finishes executing}
+
+\item{succeed_func}{function that returns TRUE if job finished running without errors and FALSE otherwise}
 
 \item{col_name}{Name of the column that contains run group numbers when prog_list is a data frame}
 
