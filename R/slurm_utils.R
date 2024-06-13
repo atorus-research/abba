@@ -153,14 +153,14 @@ slurm_parse_scontrol_output <- function(output){
   output_values <- lapply(split_output, function(x){x[[2]]})
 
   # create a named list with names being job attribute/parameter names
-  setNames(object=output_values, output_names)
+  stats::setNames(object=output_values, output_names)
 }
 
 
 # parse the StdOut path from scontrol command output
 slurm_parse_squeue_output <- function(output){
   # squeue output is structured like a csv file with whitespace delimiter
-  read.table(text=output, header=TRUE, sep="")
+  utils::read.table(text=output, header=TRUE, sep="")
 
 }
 
