@@ -34,6 +34,7 @@ test_that("abba_submit_batch flattens the list if sequential=TRUE", {
   mock_batch_submit_parallel <- mock('prog-id1', 'prog-id2')
   mock_submit <- mock()
   mock_wait <- mock()
+  mock_succeed <- mock(TRUE, cycle=TRUE)
   mock_abba_rslauncher_get_job_succeeded_local <- mock(TRUE, cycle=TRUE)
   mock_update_hashes <- mock()
 
@@ -43,8 +44,6 @@ test_that("abba_submit_batch flattens the list if sequential=TRUE", {
   stub(abba_submit_batch, 'batch_run_control', mock_batch_run_control)
   stub(abba_submit_batch, 'select_parallel_run', mock_select_parallel_run)
   stub(abba_submit_batch, 'batch_submit_parallel', mock_batch_submit_parallel)
-  stub(abba_submit_batch, 'abba_rslauncher_get_job_succeeded_local',
-       mock_abba_rslauncher_get_job_succeeded_local)
   stub(abba_submit_batch, 'update_program_hashes', mock_update_hashes)
 
   # run the function
@@ -52,6 +51,7 @@ test_that("abba_submit_batch flattens the list if sequential=TRUE", {
                                      sequential=TRUE,
                                      submit_func=mock_submit,
                                      wait_func=mock_wait,
+                                     succeed_func=mock_succeed,
                                      arg1='arg1')
 
   # execute checks
@@ -87,6 +87,7 @@ test_that("abba_submit_batch breaks execution cycle if programs have errors in s
   mock_batch_submit_parallel <- mock('prog-id1', 'prog-id2')
   mock_submit <- mock()
   mock_wait <- mock()
+  mock_succeed <- mock(TRUE, cycle=TRUE)
   mock_abba_rslauncher_get_job_succeeded_local <- mock(FALSE, cycle=TRUE)
   mock_update_hashes <- mock()
 
@@ -96,8 +97,6 @@ test_that("abba_submit_batch breaks execution cycle if programs have errors in s
   stub(abba_submit_batch, 'batch_run_control', mock_batch_run_control)
   stub(abba_submit_batch, 'select_parallel_run', mock_select_parallel_run)
   stub(abba_submit_batch, 'batch_submit_parallel', mock_batch_submit_parallel)
-  stub(abba_submit_batch, 'abba_rslauncher_get_job_succeeded_local',
-       mock_abba_rslauncher_get_job_succeeded_local)
   stub(abba_submit_batch, 'update_program_hashes', mock_update_hashes)
 
   # run the function
@@ -106,6 +105,7 @@ test_that("abba_submit_batch breaks execution cycle if programs have errors in s
                                      halt_on_error = TRUE,
                                      submit_func=mock_submit,
                                      wait_func=mock_wait,
+                                     succeed_func=mock_succeed,
                                      arg1='arg1')
 
   # execute checks
@@ -136,7 +136,7 @@ test_that("abba_submit_batch works as expected in standard mode", {
   mock_batch_submit_parallel <- mock(c('prog-id1', 'prog-id2'), 'prog-id3')
   mock_submit <- mock()
   mock_wait <- mock()
-  mock_abba_rslauncher_get_job_succeeded_local <- mock(TRUE, cycle=TRUE)
+  mock_succeed <- mock(TRUE, cycle=TRUE)
   mock_update_hashes <- mock()
 
   # stub functions in target function
@@ -145,14 +145,13 @@ test_that("abba_submit_batch works as expected in standard mode", {
   stub(abba_submit_batch, 'batch_run_control', mock_batch_run_control)
   stub(abba_submit_batch, 'select_parallel_run', mock_select_parallel_run)
   stub(abba_submit_batch, 'batch_submit_parallel', mock_batch_submit_parallel)
-  stub(abba_submit_batch, 'abba_rslauncher_get_job_succeeded_local',
-       mock_abba_rslauncher_get_job_succeeded_local)
   stub(abba_submit_batch, 'update_program_hashes', mock_update_hashes)
 
   # run the function
   result_actual <- abba_submit_batch(list(c('prog1.R', 'prog2.R'), 'prog3.R'),
                                      submit_func=mock_submit,
                                      wait_func=mock_wait,
+                                     succeed_func=mock_succeed,
                                      arg1='arg1')
 
   # execute checks
@@ -184,6 +183,7 @@ test_that("abba_submit_batch_and_get_results works as expected", {
   mock_status <- mock()
   mock_submit <- mock()
   mock_wait <- mock()
+  mock_succeed <- mock(TRUE, cycle=TRUE)
 
   # stub functions in target function
   stub(abba_submit_batch_and_get_results, 'abba_submit_batch', mock_abba_submit_batch)
@@ -194,6 +194,7 @@ test_that("abba_submit_batch_and_get_results works as expected", {
     list(c('prog1.R')),
     submit_func=mock_submit,
     wait_func=mock_wait,
+    succeed_func=mock_succeed,
     status_func=mock_status,
     arg1='arg1')
 
@@ -206,6 +207,7 @@ test_that("abba_submit_batch_and_get_results works as expected", {
               sequential=FALSE,
               submit_func=mock_submit,
               wait_func=mock_wait,
+              succeed_func=mock_succeed,
               col_name='run_group',
               halt_on_error=TRUE,
               rerun_unchanged_programs=TRUE,

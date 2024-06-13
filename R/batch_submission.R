@@ -36,6 +36,7 @@ batch_submit_parallel <- function(prog_list,
 #' @param sequential when sequential=TRUE, prog_list is flattened and everything is executed sequentially.
 #' @param submit_func function that will be used to submit jobs
 #' @param wait_func function that checks job status and returns when job finishes executing
+#' @param succeed_func function that returns TRUE if job finished running without errors and FALSE otherwise
 #' @param col_name Name of the column that contains run group numbers when prog_list is a data frame
 #' @param halt_on_error If TRUE: if prog_list contains program inputs/outputs - programs that depend on failed
 #' program will not be executed; if prog_list contains only program paths - when program fails,
@@ -61,6 +62,7 @@ abba_submit_batch <- function(prog_list,
                               sequential=FALSE,
                               submit_func=abba_rslauncher_submit_job_local,
                               wait_func=abba_rslauncher_watch_job_local,
+                              succeed_func=abba_rslauncher_get_job_succeeded_local,
                               col_name='run_group',
                               halt_on_error=TRUE,
                               rerun_unchanged_programs=TRUE,
@@ -127,7 +129,7 @@ abba_submit_batch <- function(prog_list,
     job_ids <- c(job_ids, new_run)
     # collect information about this run group exit codes to decide if we should
     # continue with the batch run on the next loop
-    previous_run_ok <- abba_rslauncher_get_job_succeeded_local(new_run)
+    previous_run_ok <- succeed_func(new_run)
     previous_run_programs <- parallel_run
   }
   #update program and inputs hash after batch has been run
@@ -143,6 +145,7 @@ abba_submit_batch <- function(prog_list,
 #' @param sequential when sequential=TRUE, prog_list is flattened and everything is executed sequentially.
 #' @param submit_func function that will be used to submit jobs
 #' @param wait_func function that checks job status and returns when job finishes executing
+#' @param succeed_func function that returns TRUE if job finished running without errors and FALSE otherwise
 #' @param status_func function that returns descriptive job statuses
 #' @param col_name Name of the column that contains run group numbers when prog_list is a data frame
 #' @param halt_on_error If TRUE: if prog_list contains program inputs/outputs - programs that depend on failed
@@ -151,8 +154,8 @@ abba_submit_batch <- function(prog_list,
 #' @param rerun_unchanged_programs If FALSE: will not re-run programs whose code
 #' and inputs have not been modified since last batch run. TRUE by default
 #' @param cache_folder specify a path to the folder where hash-sums of programs
-#' and their inputs will be stored. By default, those hashes are saved in the subfolder .abba_cache
-#' of the same folder as target(program/programs input)
+#' and their inputs will be stored. if NULL, those hashes are saved in the subfolder .abba_cache
+#' of the same folder as target(program/programs input). Default is set by abba.default_cache_folder option
 #' @param ... arguments that will be passed to submit_func and wait_func functions
 #'
 #' @return Data frame containing program names, job ids, execution statuses
@@ -170,17 +173,19 @@ abba_submit_batch_and_get_results <- function(prog_list,
                                               sequential=FALSE,
                                               submit_func=abba_rslauncher_submit_job_local,
                                               wait_func=abba_rslauncher_watch_job_local,
+                                              succeed_func=abba_rslauncher_get_job_succeeded_local,
                                               status_func=rslauncher_get_job_display_status,
                                               col_name='run_group',
                                               halt_on_error=TRUE,
                                               rerun_unchanged_programs=TRUE,
-                                              cache_folder=NULL,
+                                              cache_folder=getOption("abba.default_cache_folder"),
                                               ...) {
   # use universal batch runner to submit programs and wait for completion
   job_ids <- abba_submit_batch(prog_list,
                                sequential=sequential,
                                submit_func=submit_func,
                                wait_func=wait_func,
+                               succeed_func=succeed_func,
                                col_name=col_name,
                                halt_on_error=halt_on_error,
                                rerun_unchanged_programs=rerun_unchanged_programs,
