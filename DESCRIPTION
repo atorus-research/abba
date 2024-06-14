@@ -1,6 +1,6 @@
 Package: abba
 Title: Atorus Batch Backend API
-Version: 0.0.0.9004
+Version: 0.0.0.9005
 Authors@R: 
     c(
     person(given = "Eli",
