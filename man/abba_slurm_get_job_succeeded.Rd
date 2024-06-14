@@ -2,20 +2,21 @@
 % Please edit documentation in R/submit_job_slurm.R
 \name{abba_slurm_get_job_succeeded}
 \alias{abba_slurm_get_job_succeeded}
-\title{Check whether Slurm jobs have been fully executed.}
+\title{Check whether SLURM jobs have been fully executed.}
 \usage{
 abba_slurm_get_job_succeeded(job_ids, ...)
 }
 \arguments{
-\item{job_ids}{a list/vector of Slurm job IDs}
+\item{job_ids}{a list/vector of  valid SLURM job IDs}
 
-\item{...}{other positional/keyword arguments}
+\item{...}{other parameters that will be ignored}
 }
 \value{
-a named boolean vector. FALSE value indicates that job did not fully execute
+a named boolean vector. TRUE if job finished running and has 'COMPLETED' status, FALSE otherwise.
+If job has not finished running, a NULL will be returned.
 }
 \description{
-Check whether Slurm jobs have been fully executed.
+Check whether SLURM jobs have been fully executed.
 }
 \examples{
 \dontrun{

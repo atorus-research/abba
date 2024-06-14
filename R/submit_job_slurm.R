@@ -67,7 +67,14 @@ abba_slurm_submit_job <- function(program_path,
 }
 
 
-# function to get slurm job log
+#' Function to get SLURM job log
+#'
+#' @param job_id string representing a valid SLURM job ID
+#' @param ... other arguments that will be ignored
+#'
+#' @return character vector containing job log
+#' @noRd
+#'
 get_slurm_job_log0 <- function(job_id, ...){
 
   # try and get log path for a given job
@@ -81,13 +88,32 @@ get_slurm_job_log0 <- function(job_id, ...){
 }
 
 
-# vectorized version of get_slurm_job_log0
+#' Return job log for each submitted job ID
+#'
+#' @param job_ids valid SLURM job IDs
+#' @param ... other parameters that will be ignored
+#'
+#' @return list of character vectors. each character vector would represent program log.
+#' @export
+#'
+#' @examples \dontrun{
+#' job_log <- abba_slurm_get_job_log("156")}
+#'
 abba_slurm_get_job_log <- function(job_ids, ...){
   return(lapply(job_ids, get_slurm_job_log0))
 }
 
 
 # return TRUE if job exit code is 0, and FALSE otherwise
+#' Get SLURM job exit code represented by a boolean variable
+#'
+#' @param job_id a valid SLURM job ID
+#' @param ... other parameters that will be ignored
+#'
+#' @return TRUE if job finished running and has 'COMPLETED' status, FALSE otherwise.
+#' If job has not finished running, a NULL will be returned.
+#' @noRd
+#'
 abba_slurm_get_job_succeeded0 <- function(job_id, ...){
   output <- suppressWarnings(system2(command="squeue",
                                      args=c('--jobs', job_id, '--Format="UserName,Name:.60,JobID:.10,exit_code:.14,State:.20"', "--states=all"),
@@ -103,12 +129,13 @@ abba_slurm_get_job_succeeded0 <- function(job_id, ...){
 }
 
 
-#' Check whether Slurm jobs have been fully executed.
+#' Check whether SLURM jobs have been fully executed.
 #'
-#' @param job_ids a list/vector of Slurm job IDs
-#' @param ... other positional/keyword arguments
+#' @param job_ids a list/vector of  valid SLURM job IDs
+#' @param ... other parameters that will be ignored
 #'
-#' @return a named boolean vector. FALSE value indicates that job did not fully execute
+#' @return a named boolean vector. TRUE if job finished running and has 'COMPLETED' status, FALSE otherwise.
+#' If job has not finished running, a NULL will be returned.
 #' @export
 #'
 #' @examples \dontrun{
@@ -125,7 +152,13 @@ abba_slurm_get_job_succeeded <- function(job_ids, ...){
 }
 
 
-#' Return job status for slurm job given job ID
+#' Return descriptive job status for SLURM job
+#'
+#' @param job_id a valid Slurm job ID
+#' @param ... other positional/keyword arguments that will be ignored
+#'
+#' @return a named character vector with job status as value and job ID as name.
+#' @noRd
 slurm_get_job_status0 <- function(job_id, ...){
   output <- suppressWarnings(system2(command="squeue",
                                      args=c('--jobs', job_id, '--format="%.18i %.20P %.60j %.25u %.15T %.12M %.9l"', "--states=all"),
@@ -144,7 +177,7 @@ slurm_get_job_status0 <- function(job_id, ...){
 #' @param ... other positional/keyword arguments that will be ignored
 #'
 #' @return a named character vector with job statuses as values and job IDs as names.
-#' @noRd
+#' @export
 #'
 #' @examples \dontrun{
 #' job_statuses <- slurm_get_job_status(c('job-id-1', 'job-id-2'))
@@ -160,6 +193,7 @@ abba_slurm_get_job_status <- function(job_ids, ...){
 #' @param job_id job ID that was specified when submitting jobs
 #' @param poll_interval_seconds Time interval for polling job status in seconds
 #' @param timeout_seconds Total time to wait before timeout in seconds
+#' @param ... other positional/keyword arguments that will be ignored
 #'
 #' @return a list of job ID(s) and status(es)
 #' @export
@@ -170,7 +204,8 @@ abba_slurm_get_job_status <- function(job_ids, ...){
 #'
 abba_slurm_watch_job <- function(job_id='',
                                  poll_interval_seconds = 3,
-                                 timeout_seconds = 300){
+                                 timeout_seconds = 300,
+                                 ...){
   # Initialize variables for tracking job status
   start_time <- Sys.time()
 

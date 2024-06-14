@@ -7,7 +7,8 @@
 abba_slurm_watch_job(
   job_id = "",
   poll_interval_seconds = 3,
-  timeout_seconds = 300
+  timeout_seconds = 300,
+  ...
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ abba_slurm_watch_job(
 \item{poll_interval_seconds}{Time interval for polling job status in seconds}
 
 \item{timeout_seconds}{Total time to wait before timeout in seconds}
+
+\item{...}{other positional/keyword arguments that will be ignored}
 }
 \value{
 a list of job ID(s) and status(es)
