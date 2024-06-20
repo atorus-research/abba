@@ -16,12 +16,9 @@ get_k8s_job_log0 <- function(job_id,
                  args=c("logs", "-n" , namespace, paste0("jobs/", job_id)),
                  stdout=TRUE, stderr=TRUE))
 
-  # return custom error message about invalid job ID if job was not found
-  if(!is.null(attributes(log))){
-    if("status" %in% names(attributes(log)) & attr(log, "status")==1){
-      return(paste0("Job ", job_id, " not found."))
-      }
-    }
+  # check if log was retrieved without errors and raise an R error if command's exit code is not 0
+  system_command_error_check(log, "Error getting job log")
+
   return(list(job_id=job_id, log=as.character(log)))
 }
 
@@ -43,12 +40,9 @@ get_k8s_pod_log0 <- function(pod_id,
                                   args=c("logs", "-n" , namespace, pod_id),
                                   stdout=TRUE, stderr=TRUE))
 
-  # return custom error message about invalid job ID if job was not found
-  if(!is.null(attributes(log))){
-    if("status" %in% names(attributes(log)) & attr(log, "status")==1){
-      return(paste0("Pod ", pod_id, " not found."))
-    }
-  }
+  # check if log was retrieved without errors and raise an R error if command's exit code is not 0
+  system_command_error_check(log, "Error getting job log")
+
   return(list(pod_id=pod_id, log=as.character(log)))
 }
 
