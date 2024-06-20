@@ -1,11 +1,16 @@
 # simple function to create a data frame with results
+# WORKS ONLY FOR BATCHES SUBMITTED TO WORKBENCH FOR NOW
 compose_batch_results <- function(job_ids=NULL,
                                   prog_names=NULL,
                                   status_func=rslauncher_get_job_display_status,
                                   ...){
   # all components must be specified
-  if (is.null(job_ids) || is.null(prog_names) || is.null(status_func)){
-    warning("Job IDs, program names or status func was not provided. Batch results will not be composed.")
+  if (is.null(job_ids) & is.null(prog_names)){
+    warning("Job IDs and program names were not provided. Batch results will not be composed.")
+    return(stats::setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("job_ID", "program_name", "status")))
+  }
+  if (is.null(status_func)){
+    warning("status function was not provided. Batch results will not be composed.")
     return(stats::setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("job_ID", "program_name", "status")))
   }
 
