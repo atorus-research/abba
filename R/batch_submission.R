@@ -42,7 +42,11 @@ batch_submit_parallel <- function(prog_list,
 #' program will not be executed; if prog_list contains only program paths - when program fails,
 #' entire batch will stop executing. TRUE by default
 #' @param rerun_unchanged_programs If FALSE: will not re-run programs whose code
-#' and inputs have not been modified since last batch run. TRUE by default
+#' and inputs have not been modified since last batch run with update_cache=TRUE.
+#' @param update_cache if TRUE, file hash for programs and their inputs will be calculated
+#' and saved in .abba_cache folder. It will be done after batch run(.abba_cache folder will be created
+#' if it does not exist). If FALSE, .abba_cache folder will not be created/updated.
+#' FALSE by default.
 #' @param cache_folder specify a path to the folder where hash-sums of programs
 #' and their inputs will be stored. By default, those hashes are saved in the subfolder .abba_cache
 #' of the same folder as target(program/programs input). The default value can be set by specifying abba.default_cache_folder option.
@@ -66,6 +70,7 @@ abba_submit_batch <- function(prog_list,
                               col_name='run_group',
                               halt_on_error=TRUE,
                               rerun_unchanged_programs=TRUE,
+                              update_cache=FALSE,
                               cache_folder=getOption("abba.default_cache_folder"),
                               ...) {
 
@@ -132,8 +137,11 @@ abba_submit_batch <- function(prog_list,
     previous_run_ok <- succeed_func(new_run)
     previous_run_programs <- parallel_run
   }
-  #update program and inputs hash after batch has been run
-  update_program_hashes(prog_list, cache_folder=cache_folder)
+  # update program and inputs hash after batch has been run
+  # only update hashes if re-run check has been explicitly enabled
+  if (update_cache){
+    update_program_hashes(prog_list, cache_folder=cache_folder)
+    }
 
   return(unlist(job_ids))
 }
@@ -152,7 +160,11 @@ abba_submit_batch <- function(prog_list,
 #' program will not be executed; if prog_list contains only program paths - when program fails,
 #' entire batch will stop executing. TRUE by default
 #' @param rerun_unchanged_programs If FALSE: will not re-run programs whose code
-#' and inputs have not been modified since last batch run. TRUE by default
+#' and inputs have not been modified since last batch run with update_cache=TRUE.
+#' @param update_cache if TRUE, file hash for programs and their inputs will be calculated
+#' and saved in .abba_cache folder. It will be done after batch run(.abba_cache folder will be created
+#' if it does not exist). If FALSE, .abba_cache folder will not be created/updated.
+#' FALSE by default.
 #' @param cache_folder specify a path to the folder where hash-sums of programs
 #' and their inputs will be stored. if NULL, those hashes are saved in the subfolder .abba_cache
 #' of the same folder as target(program/programs input). Default is set by abba.default_cache_folder option
@@ -178,6 +190,7 @@ abba_submit_batch_and_get_results <- function(prog_list,
                                               col_name='run_group',
                                               halt_on_error=TRUE,
                                               rerun_unchanged_programs=TRUE,
+                                              update_cache=FALSE,
                                               cache_folder=getOption("abba.default_cache_folder"),
                                               ...) {
   # use universal batch runner to submit programs and wait for completion
@@ -189,6 +202,7 @@ abba_submit_batch_and_get_results <- function(prog_list,
                                col_name=col_name,
                                halt_on_error=halt_on_error,
                                rerun_unchanged_programs=rerun_unchanged_programs,
+                               update_cache=update_cache,
                                cache_folder=cache_folder,
                                ...)
   # collect batch results in a data frame

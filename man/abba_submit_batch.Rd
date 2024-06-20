@@ -15,6 +15,7 @@ abba_submit_batch(
   col_name = "run_group",
   halt_on_error = TRUE,
   rerun_unchanged_programs = TRUE,
+  update_cache = FALSE,
   cache_folder = getOption("abba.default_cache_folder"),
   ...
 )
@@ -37,7 +38,12 @@ program will not be executed; if prog_list contains only program paths - when pr
 entire batch will stop executing. TRUE by default}
 
 \item{rerun_unchanged_programs}{If FALSE: will not re-run programs whose code
-and inputs have not been modified since last batch run. TRUE by default}
+and inputs have not been modified since last batch run with update_cache=TRUE.}
+
+\item{update_cache}{if TRUE, file hash for programs and their inputs will be calculated
+and saved in .abba_cache folder. It will be done after batch run(.abba_cache folder will be created
+if it does not exist). If FALSE, .abba_cache folder will not be created/updated.
+FALSE by default.}
 
 \item{cache_folder}{specify a path to the folder where hash-sums of programs
 and their inputs will be stored. By default, those hashes are saved in the subfolder .abba_cache

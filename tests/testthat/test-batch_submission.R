@@ -211,6 +211,7 @@ test_that("abba_submit_batch_and_get_results works as expected", {
               col_name='run_group',
               halt_on_error=TRUE,
               rerun_unchanged_programs=TRUE,
+              update_cache=FALSE,
               cache_folder=NULL,
               arg1='arg1')
   expect_args(mock_compose_batch_results, 1,
