@@ -72,7 +72,7 @@ submit_slurm_job_config <- function(slurm_config_path){
   output <- suppressWarnings(system2(command="sbatch",
                                      args=c(slurm_config_path),
                                      stdout=TRUE, stderr=TRUE))
-  slurm_command_error_check(output, "Error submitting the job.")
+  system_command_error_check(output, "Error submitting the job.")
   # read job id from config and return it for further tracking and reporting
   return(slurm_config_get_job_id(output))
 }
@@ -84,7 +84,7 @@ get_slurm_job_log_path <- function(job_id, ...){
   output <- suppressWarnings(system2(command="scontrol",
                                      args=c("show job", job_id),
                                      stdout=TRUE, stderr=TRUE))
-  slurm_command_error_check(output, "Error getting job log path.")
+  system_command_error_check(output, "Error getting job log path.")
 
   parsed_output <- slurm_parse_scontrol_output(output)
 
@@ -162,15 +162,6 @@ slurm_parse_squeue_output <- function(output){
   # squeue output is structured like a csv file with whitespace delimiter
   utils::read.table(text=output, header=TRUE, sep="")
 
-}
-
-
-# check if command executed via system2 produced any errors
-slurm_command_error_check <- function(cmd_output, msg){
-  err_msg <- if(is.null(attr(cmd_output, "errmsg"))) "" else paste("Error details:", attr(cmd_output, "errmsg"))
-  if (!is.null(attr(cmd_output, "status")) && attr(cmd_output, "status") != 0){
-    stop(sprintf(paste0(msg, " %s.\n%s"), cmd_output, err_msg))
-  }
 }
 
 
