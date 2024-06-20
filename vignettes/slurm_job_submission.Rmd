@@ -68,7 +68,7 @@ abba_slurm_get_job_log("38")
 
 Here is an example of using SLURM submission functions in abba_submit_batch. Additional arguments like log_path will be passed on to submit_func
 
-```{r watch_job, eval=FALSE}
+```{r submit batch, eval=FALSE}
 abba_submit_batch(list("/home/mike.stackhouse/repos/abba/test_programs/test_program.R", "/home/mike.stackhouse/repos/abba/test_programs/test_program.R"),
                   submit_func=abba_slurm_submit_job,
                   wait_func=abba_slurm_watch_job,
