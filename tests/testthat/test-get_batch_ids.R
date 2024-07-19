@@ -1,4 +1,7 @@
 test_that("get_batch_ids returns an empty list if no jobs exist with a given batch id", {
+  mock_system <- mock(c("NAME READY STATUS RESTARTS AGE"))
+
+  stub(get_k8s_job_ids_from_batch, "system2", mock_system)
   expect_equal(get_k8s_job_ids_from_batch('non-existing-batch-id-945387'), list())
 })
 

@@ -7,7 +7,6 @@
 submit_k8s_yaml <- function(yaml_full_path){
 
   # send the job for execution
-  system(paste("kubectl apply -f", yaml_full_path))
   suppressWarnings(system2(command="kubectl",
                            args=c("apply", "-f" , yaml_full_path),
                            stdout=TRUE, stderr=TRUE))

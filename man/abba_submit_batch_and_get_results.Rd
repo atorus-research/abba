@@ -9,11 +9,12 @@ abba_submit_batch_and_get_results(
   sequential = FALSE,
   submit_func = abba_rslauncher_submit_job_local,
   wait_func = abba_rslauncher_watch_job_local,
+  succeed_func = abba_rslauncher_get_job_succeeded_local,
   status_func = rslauncher_get_job_display_status,
   col_name = "run_group",
   halt_on_error = TRUE,
   rerun_unchanged_programs = TRUE,
-  cache_folder = NULL,
+  cache_folder = getOption("abba.default_cache_folder"),
   ...
 )
 }
@@ -25,6 +26,8 @@ abba_submit_batch_and_get_results(
 \item{submit_func}{function that will be used to submit jobs}
 
 \item{wait_func}{function that checks job status and returns when job finishes executing}
+
+\item{succeed_func}{function that returns TRUE if job finished running without errors and FALSE otherwise}
 
 \item{status_func}{function that returns descriptive job statuses}
 
@@ -38,8 +41,8 @@ entire batch will stop executing. TRUE by default}
 and inputs have not been modified since last batch run. TRUE by default}
 
 \item{cache_folder}{specify a path to the folder where hash-sums of programs
-and their inputs will be stored. By default, those hashes are saved in the subfolder .abba_cache
-of the same folder as target(program/programs input)}
+and their inputs will be stored. if NULL, those hashes are saved in the subfolder .abba_cache
+of the same folder as target(program/programs input). Default is set by abba.default_cache_folder option}
 
 \item{...}{arguments that will be passed to submit_func and wait_func functions}
 }

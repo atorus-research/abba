@@ -1,3 +1,5 @@
+library(mockery)
+
 test_that("detect_batch_mode_from_input correctly detects type of input", {
   expect_equal(detect_batch_mode_from_input(list()), 'list')
   expect_equal(detect_batch_mode_from_input(c('1')), 'list')

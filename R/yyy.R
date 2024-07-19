@@ -7,7 +7,9 @@
           abba.default.container=NULL,
           abba.k8s.namespace='rstudio',
           abba.home.nfs.ip.address='10.14.0.6',
-          abba.default_cache_folder=NULL
+          abba.default_cache_folder=NULL,
+          abba.slurm.cpu.cores=1L,
+          abba.slurm.memory=1024L
   )
   invisible()
 }
