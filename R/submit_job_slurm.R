@@ -119,7 +119,7 @@ abba_slurm_get_job_succeeded0 <- function(job_id, ...){
                                      args=c('--jobs', job_id, '--Format="UserName,Name:.60,JobID:.10,exit_code:.14,State:.20"', "--states=all"),
                                      stdout=TRUE, stderr=TRUE))
 
-  slurm_command_error_check(output, sprintf("Error getting job exit code for job ID %s.", job_id))
+  system_command_error_check(output, sprintf("Error getting job exit code for job ID %s.", job_id))
   parsed_output <- slurm_parse_squeue_output(output) %>%
     dplyr::filter(JOBID == job_id)
   if(parsed_output$STATE == 'COMPLETED') {job_succeeded <- TRUE}
@@ -164,7 +164,7 @@ slurm_get_job_status0 <- function(job_id, ...){
                                      args=c('--jobs', job_id, '--format="%.18i %.20P %.60j %.25u %.15T %.12M %.9l"', "--states=all"),
                                      stdout=TRUE, stderr=TRUE))
 
-  slurm_command_error_check(output, sprintf("Error getting job status for job ID %s.", job_id))
+  system_command_error_check(output, sprintf("Error getting job status for job ID %s.", job_id))
   parsed_output <- slurm_parse_squeue_output(output) %>% dplyr::filter(JOBID %in% job_id)
 
   return(parsed_output$STATE)
