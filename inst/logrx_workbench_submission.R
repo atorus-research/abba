@@ -1,3 +1,7 @@
+if (!("logrx" %in% rownames(installed.packages()))) {
+  stop("logrx package is not installed. Install logrx package to submit programs via logrx.")
+}
+
 require(logrx)
 # commandArgs picks up the variables you pass from the command line
 args <- commandArgs(trailingOnly = TRUE)
