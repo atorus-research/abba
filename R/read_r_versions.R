@@ -44,6 +44,11 @@ select_r_version <- function(r_version){
   else if (r_version %in% av$Path){
     return(r_version)
   }
+  # it is possible that an R version is not registered in Workbench but can still
+  # be used to submit R programs
+  else if (file.exists(r_version)){
+    return(r_version)
+  }
   else{stop(paste(
     sprintf("R version '%s' not found. Cannot submit job.", r_version),
     "List of available R versions:\n",
@@ -65,6 +70,11 @@ select_rscript_version <- function(r_version){
   }
   # if exe path is supplied, return it back if it is listed in workbench r version
   else if (r_version %in% av$RScriptPath){
+    return(r_version)
+  }
+  # it is possible that an R version is not registered in Workbench but can still
+  # be used to submit R programs
+  else if (file.exists(r_version)){
     return(r_version)
   }
   else{stop(paste(
