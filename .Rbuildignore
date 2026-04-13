@@ -10,3 +10,4 @@
 ^test_programs$
 ^\.claude$
 ^CLAUDE\.md$
+^\.github$
