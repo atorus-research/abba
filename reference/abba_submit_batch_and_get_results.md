@@ -1,0 +1,105 @@
+# Submit programs for execution in order defined by structure of input list.
+
+Submit programs for execution in order defined by structure of input
+list.
+
+## Usage
+
+``` r
+abba_submit_batch_and_get_results(
+  prog_list,
+  sequential = FALSE,
+  submit_func = abba_rslauncher_submit_job_local,
+  wait_func = abba_rslauncher_watch_job_local,
+  succeed_func = abba_rslauncher_get_job_succeeded_local,
+  status_func = rslauncher_get_job_display_status,
+  col_name = "run_group",
+  halt_on_error = TRUE,
+  rerun_unchanged_programs = TRUE,
+  update_cache = FALSE,
+  cache_folder = getOption("abba.default_cache_folder"),
+  ...
+)
+```
+
+## Arguments
+
+- prog_list:
+
+  A list of R program paths to execute
+
+- sequential:
+
+  when sequential=TRUE, prog_list is flattened and everything is
+  executed sequentially.
+
+- submit_func:
+
+  function that will be used to submit jobs
+
+- wait_func:
+
+  function that checks job status and returns when job finishes
+  executing
+
+- succeed_func:
+
+  function that returns TRUE if job finished running without errors and
+  FALSE otherwise
+
+- status_func:
+
+  function that returns descriptive job statuses
+
+- col_name:
+
+  Name of the column that contains run group numbers when prog_list is a
+  data frame
+
+- halt_on_error:
+
+  If TRUE: if prog_list contains program inputs/outputs - programs that
+  depend on failed program will not be executed; if prog_list contains
+  only program paths - when program fails, entire batch will stop
+  executing. TRUE by default
+
+- rerun_unchanged_programs:
+
+  If FALSE: will not re-run programs whose code and inputs have not been
+  modified since last batch run with update_cache=TRUE.
+
+- update_cache:
+
+  if TRUE, file hash for programs and their inputs will be calculated
+  and saved in .abba_cache folder. It will be done after batch
+  run(.abba_cache folder will be created if it does not exist). If
+  FALSE, .abba_cache folder will not be created/updated. FALSE by
+  default.
+
+- cache_folder:
+
+  specify a path to the folder where hash-sums of programs and their
+  inputs will be stored. if NULL, those hashes are saved in the
+  subfolder .abba_cache of the same folder as target(program/programs
+  input). Default is set by abba.default_cache_folder option
+
+- ...:
+
+  arguments that will be passed to submit_func and wait_func functions
+
+## Value
+
+Data frame containing program names, job ids, execution statuses
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+job_ids <- abba_submit_batch_and_get_results(list(
+  c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/sdtm/dm.sas"),
+  c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/sdtm/ae.sas"),
+  c("/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_dm.sas",
+    "/mnt/work_drive/proj/comp/prot/task/development/prod/program/tfl/t1_ae.sas")),
+  sequential=TRUE)
+ } # }
+```
