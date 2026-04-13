@@ -4,6 +4,10 @@
 #'
 #' @return A string containing Job ID
 #' @export
+#'
+#' @examples \dontrun{
+#' job_id <- submit_k8s_yaml("/tmp/my_job.yaml")
+#' }
 submit_k8s_yaml <- function(yaml_full_path){
 
   # send the job for execution
@@ -80,6 +84,9 @@ abba_get_k8s_unit_status_local <- function(unit_id, unit_type='job', namespace=g
 #' @return list of statuses for every pod in a job(typically just one).
 #' @export
 #'
+#' @examples \dontrun{
+#' status <- abba_get_k8s_job_status_local("job-sdtm-abc123")
+#' }
 abba_get_k8s_job_status_local <- function(job_id, namespace=getOption('abba.k8s.namespace')){
 
   job_details <- abba_get_k8s_unit_status_local(unit_id=job_id, unit_type='job', namespace=namespace)
@@ -96,6 +103,9 @@ abba_get_k8s_job_status_local <- function(job_id, namespace=getOption('abba.k8s.
 #' @return list of statuses for every job in a batch
 #' @export
 #'
+#' @examples \dontrun{
+#' status <- abba_get_k8s_batch_status_local("batch-sdtm-abc123")
+#' }
 abba_get_k8s_batch_status_local <- function(batch_id, namespace=getOption('abba.k8s.namespace')){
 
   job_details <- abba_get_k8s_unit_status_local(unit_id=batch_id, unit_type='batch', namespace=namespace)

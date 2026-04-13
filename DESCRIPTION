@@ -1,7 +1,7 @@
 Package: abba
-Title: Atorus Batch Backend API
-Version: 0.0.0.9007
-Authors@R: 
+Title: Batch Execution of R Programs on Kubernetes, SLURM, and Posit Workbench
+Version: 0.1.0
+Authors@R:
     c(
     person(given = "Eli",
            family = "Miller",
@@ -20,14 +20,21 @@ Authors@R:
     person(given = "Yevhenii",
            family = "Boiko",
            role = c("aut"),
-           email = "Yevhenii.Boiko@atorusresearch.com")
+           email = "Yevhenii.Boiko@atorusresearch.com"),
+    person("Atorus Research, Inc.", role = "cph")
            )
-Description: Management of remote batch execution of programs into a cluster through a simple programming interface, and additional provide proper segregation of security identities via API abstraction.
-License: file LICENSE
+Description: Submit and monitor batch execution of R programs across
+    distributed computing backends including Kubernetes, SLURM, and Posit
+    Workbench. Provides end-user job submission functions, cluster interface
+    functions using 'kubectl' and SLURM commands, and a 'plumber' API
+    template for secure identity segregation. Supports parallel and
+    sequential batch execution, file-based caching to skip unchanged
+    programs, and 'logrx' integration for execution logging.
+License: Apache License (>= 2) | file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Imports: 
+Imports:
     yaml,
     uuid,
     stringr,
@@ -36,12 +43,15 @@ Imports:
     tools,
     rstudioapi,
     digest,
-    tidyr,
-    logrx
-Suggests: 
+    tidyr
+Suggests:
     testthat (>= 3.0.0),
     mockery,
     knitr,
-    rmarkdown
+    rmarkdown,
+    logrx
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+SystemRequirements: kubectl (optional, for Kubernetes backend),
+    SLURM (optional, sbatch/scontrol/sacct/squeue for SLURM backend),
+    Posit Workbench (optional, for Workbench backend)

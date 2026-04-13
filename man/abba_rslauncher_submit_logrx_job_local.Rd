@@ -21,3 +21,8 @@ job id
 \description{
 Execute programs via logrx
 }
+\examples{
+\dontrun{
+job_id <- abba_rslauncher_submit_logrx_job_local("/path/to/program.R")
+}
+}

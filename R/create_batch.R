@@ -2,7 +2,7 @@
 #'
 #' This function create a batch API or job file template at the specified
 #' location. The Batch API file template is a plumber API with the necessary
-#' REST API server side to interface with the {abba} package. This simplifies
+#' REST API server side to interface with the \pkg{abba} package. This simplifies
 #' the process of setting up the receiver API for which jobs are submitted. The
 #' job template file is a markdown file with the necessary function calls to run
 #' a batch job.
@@ -12,7 +12,7 @@
 #'
 #' @param path A file path where the target file will be created
 #'
-#' @return NULL
+#' @return No return value, called for side effects (file creation).
 #' @rdname create_batch
 #' @export
 #'

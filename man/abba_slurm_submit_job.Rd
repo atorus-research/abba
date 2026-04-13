@@ -32,9 +32,11 @@ abba_slurm_submit_job(
 
 \item{username}{user whose permission level is used to execute the script. Defaults to user submitting the job.}
 
+\item{working_dir}{working directory for the SLURM job. Defaults to parent directory of \code{program_path}.}
+
 \item{job_timeout}{time limit for a job. Must be specified in a format of "days-hours:minutes:seconds" If exceeded, job will be cancelled.}
 
-\item{...}{}
+\item{...}{additional arguments (currently unused)}
 }
 \value{
 job ID

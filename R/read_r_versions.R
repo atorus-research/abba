@@ -1,10 +1,16 @@
 read_r_versions <- function(){
 
+  r_versions_path <- "/etc/rstudio/r-versions"
+  if (!file.exists(r_versions_path)) {
+    stop("Cannot read R versions: ", r_versions_path, " not found. ",
+         "This function requires Posit Workbench.")
+  }
+
   # read data from r-versions json
-  prep <- utils::read.delim("/etc/rstudio/r-versions", sep=":", header=FALSE,
+  prep <- utils::read.delim(r_versions_path, sep=":", header=FALSE,
                             comment.char="#", strip.white=TRUE)
   # calculate values for ID column(need for transforming data)
-  id_lines <- Filter(function(x) !startsWith(x, '#'), readLines("/etc/rstudio/r-versions"))
+  id_lines <- Filter(function(x) !startsWith(x, '#'), readLines(r_versions_path))
   ids <- cumsum(id_lines == "")[id_lines!=""]
 
   # add ids to differentiate between information blobs belonging to different r installations

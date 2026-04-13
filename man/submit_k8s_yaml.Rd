@@ -15,3 +15,8 @@ A string containing Job ID
 \description{
 Submit a job profile for execution on a Kubernetes cluster
 }
+\examples{
+\dontrun{
+job_id <- submit_k8s_yaml("/tmp/my_job.yaml")
+}
+}

@@ -84,7 +84,7 @@ In this example, the `volumes` element references the physical server that needs
 
 ## Deployment Prep
 
-Before you deploy to connect, you'll need to make sure that you have a Posit Connect API key. Note that you'll need at least a role of [Publisher](https://support.posit.co/hc/en-us/articles/226871287-User-roles-in-Posit-Connect) to do this (and to actually deploy to Connect itself). You can do this by following the instructions for Posit [here](https://docs.posit.co/connect/user/api-keys/). 
+Before you deploy to connect, you'll need to make sure that you have a Posit Connect API key. Note that you'll need at least a role of Publisher to do this (and to actually deploy to Connect itself). You can do this by following the instructions in the Posit Connect documentation.
 
 With that in place, make sure you test our your job locally before deploying to connect. To do this, you'll need the **abba** API URL hosted in your environment, which you can get from your Posit support team (or by looking through content visible to you on Posit Connect). 
 

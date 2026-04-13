@@ -81,6 +81,9 @@ rslauncher_submit_job <- function(p,
 #' @return job id
 #' @export
 #'
+#' @examples \dontrun{
+#' job_id <- abba_rslauncher_submit_job_local("/path/to/program.R")
+#' }
 abba_rslauncher_submit_job_local <- function(p,
                                              log_path=NULL,
                                              user_tag='',
@@ -108,6 +111,9 @@ abba_rslauncher_submit_job_local <- function(p,
 #' @return job id
 #' @export
 #'
+#' @examples \dontrun{
+#' job_id <- abba_rslauncher_submit_logrx_job_local("/path/to/program.R")
+#' }
 abba_rslauncher_submit_logrx_job_local <- function(p,
                                                    log_path=NULL,
                                                    user_tag='',

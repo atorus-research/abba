@@ -66,7 +66,7 @@ For more information about options, refer to `vignettes('abba_options')`
 
 # Deploy the API
 
-Once the API is configured, deploy it to Posit Connect. This can be done following a standard Plumber API deployment process, either using the [publish button within the RStudio IDE](https://docs.posit.co/how-to-guides/rsc/publish-plumberapi/#step-2-publish-your-plumber-api-to-rstudio-connect), or using [git backed content](https://docs.posit.co/connect/user/git-backed/) if you'd like to follow a more controlled deployment process. 
+Once the API is configured, deploy it to Posit Connect. This can be done following a standard Plumber API deployment process, either using the publish button within the RStudio IDE, or using [git backed content](https://docs.posit.co/connect/user/git-backed/) if you'd like to follow a more controlled deployment process.
 
 # Connect Setup
 

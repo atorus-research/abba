@@ -83,7 +83,9 @@ configure_k8s_yaml <- function(file_path='',
     x <- gsub("RUN_AS_USER", guid$uid, x)
     x <- gsub("RUN_AS_GROUP", guid$gid, x)
     x <- gsub("K8S_NAMESPACE", namespace, x)
-    x <- gsub("DEFAULT_NFS_MOUNT_IP_ADDRESS", home_nfs_ip_address, x)
+    if (!is.null(home_nfs_ip_address)) {
+      x <- gsub("DEFAULT_NFS_MOUNT_IP_ADDRESS", home_nfs_ip_address, x)
+    }
     return(x)
   }
 

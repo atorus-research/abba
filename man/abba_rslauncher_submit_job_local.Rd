@@ -21,3 +21,8 @@ job id
 \description{
 Create a job for executing an R program
 }
+\examples{
+\dontrun{
+job_id <- abba_rslauncher_submit_job_local("/path/to/program.R")
+}
+}

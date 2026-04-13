@@ -94,7 +94,7 @@ test_that("save_slurm_template saves file when no file_path is specified", {
 test_that("save_yaml saves file in a temporary directory when no file_path is specified", {
   config <- load_slurm_template()
   config_path <- save_slurm_template(config)
-  expect_true(grepl("/tmp/", config_path, fixed=TRUE))
+  expect_true(grepl(tempdir(), config_path, fixed=TRUE))
 })
 
 

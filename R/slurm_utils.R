@@ -144,8 +144,8 @@ slurm_get_job_status_sacct0 <- function(job_id, ...){
 # parse the StdOut path from scontrol command output
 slurm_parse_scontrol_output <- function(output){
   # only easily parsed information is currently retained
-  parsed_output <- stringr::str_split(stringr::str_trim(output), " ", simplify=TRUE) %>%
-    .[stringr::str_count(., "=") == 1]
+  split_result <- stringr::str_split(stringr::str_trim(output), " ", simplify=TRUE)
+  parsed_output <- split_result[stringr::str_count(split_result, "=") == 1]
 
   split_output <- stringr::str_split(parsed_output, "=")
 

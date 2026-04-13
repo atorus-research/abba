@@ -55,6 +55,9 @@ get_k8s_pod_log0 <- function(pod_id,
 #' @export
 #' @return A list of job logs. Each list entry will contain complete log for a job
 #'
+#' @examples \dontrun{
+#' logs <- abba_get_k8s_job_log_local(c("job-sdtm-abc123", "job-adam-def456"))
+#' }
 abba_get_k8s_job_log_local <- function(job_ids,
                                        namespace=getOption('abba.k8s.namespace')){
   logs <- lapply(job_ids, function(x) get_k8s_job_log0(x, namespace=namespace))
@@ -70,6 +73,9 @@ abba_get_k8s_job_log_local <- function(job_ids,
 #' @export
 #' @return Job logs in a from of list consisting of character vectors
 #'
+#' @examples \dontrun{
+#' logs <- abba_get_k8s_batch_log_local("batch-sdtm-abc123")
+#' }
 abba_get_k8s_batch_log_local <- function(batch_id,
                                          namespace=getOption('abba.k8s.namespace')){
 

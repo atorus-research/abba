@@ -20,3 +20,8 @@ Job logs in a from of list consisting of character vectors
 \description{
 Return list of logs for jobs that are marked with a given batch ID
 }
+\examples{
+\dontrun{
+logs <- abba_get_k8s_batch_log_local("batch-sdtm-abc123")
+}
+}

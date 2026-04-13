@@ -7,8 +7,9 @@
 #' @param cpu_cores Amount of CPU cores that will be requested for the job.
 #' @param memory Amount of RAM in megabytes that will be requested for the job.
 #' @param username user whose permission level is used to execute the script. Defaults to user submitting the job.
+#' @param working_dir working directory for the SLURM job. Defaults to parent directory of `program_path`.
 #' @param job_timeout time limit for a job. Must be specified in a format of "days-hours:minutes:seconds" If exceeded, job will be cancelled.
-#' @param ...
+#' @param ... additional arguments (currently unused)
 #'
 #' @return job ID
 #' @export
@@ -120,8 +121,8 @@ abba_slurm_get_job_succeeded0 <- function(job_id, ...){
                                      stdout=TRUE, stderr=TRUE))
 
   system_command_error_check(output, sprintf("Error getting job exit code for job ID %s.", job_id))
-  parsed_output <- slurm_parse_squeue_output(output) %>%
-    dplyr::filter(JOBID == job_id)
+  parsed_output <- slurm_parse_squeue_output(output)
+  parsed_output <- parsed_output[parsed_output$JOBID == job_id, , drop = FALSE]
   if(parsed_output$STATE == 'COMPLETED') {job_succeeded <- TRUE}
   else if(parsed_output$STATE %in% c('CONFIGURING', 'COMPLETING', 'PENDING', 'RUNNING', 'SIGNALING', 'RESIZING')) {job_succeeded <- NULL}
   else {job_succeeded <- FALSE}
@@ -165,7 +166,8 @@ slurm_get_job_status0 <- function(job_id, ...){
                                      stdout=TRUE, stderr=TRUE))
 
   system_command_error_check(output, sprintf("Error getting job status for job ID %s.", job_id))
-  parsed_output <- slurm_parse_squeue_output(output) %>% dplyr::filter(JOBID %in% job_id)
+  parsed_output <- slurm_parse_squeue_output(output)
+  parsed_output <- parsed_output[parsed_output$JOBID %in% job_id, , drop = FALSE]
 
   return(parsed_output$STATE)
 }

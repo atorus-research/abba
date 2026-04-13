@@ -20,3 +20,8 @@ list of statuses for every job in a batch
 \description{
 Get status of all jobs in a batch
 }
+\examples{
+\dontrun{
+status <- abba_get_k8s_batch_status_local("batch-sdtm-abc123")
+}
+}
