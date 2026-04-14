@@ -5,3 +5,8 @@
 inst/doc
 docs
 whoami
+rsconnect/
+plumber.R
+notes.md
+*.Rcheck/
+*.tar.gz

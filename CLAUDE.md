@@ -109,6 +109,6 @@ The package interfaces with external tools via `system2()`:
 ## Notes
 
 - All test external calls are mocked via `mockery` - no real kubectl/SLURM needed to run tests
-- `rsconnect/` directory contains deployment metadata for connect-dev.atorusresearch.com (not needed for package distribution)
+- `rsconnect/` directory (gitignored) contains local Posit Connect deployment metadata
 - Root-level `plumber.R` is a production deployment file (excluded via .Rbuildignore); `inst/plumber.R` is the distributable template
 - `test_programs/` contains a simple test script used during development
