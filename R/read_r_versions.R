@@ -1,9 +1,10 @@
 read_r_versions <- function(){
 
-  r_versions_path <- "/etc/rstudio/r-versions"
+  r_versions_path <- getOption('abba.r.versions.path', '/etc/rstudio/r-versions')
   if (!file.exists(r_versions_path)) {
     stop("Cannot read R versions: ", r_versions_path, " not found. ",
-         "This function requires Posit Workbench.")
+         "This function requires Posit Workbench. ",
+         "Set options(abba.r.versions.path = ...) to configure the path.")
   }
 
   # read data from r-versions json

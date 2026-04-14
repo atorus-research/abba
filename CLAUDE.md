@@ -75,7 +75,8 @@ inst/               - Templates: plumber.R, job.yaml, job.Rmd, slurm_job.submit,
 | `abba.permitted.containers` | NULL | Allowed container images |
 | `abba.default.container` | NULL | Default container image |
 | `abba.k8s.namespace` | 'rstudio' | Kubernetes namespace |
-| `abba.home.nfs.ip.address` | '10.14.0.6' | NFS mount IP for home dirs |
+| `abba.home.nfs.ip.address` | NULL | NFS mount IP for home dirs |
+| `abba.r.versions.path` | '/etc/rstudio/r-versions' | Path to Workbench R versions file |
 | `abba.default_cache_folder` | NULL | Hash cache storage location |
 | `abba.slurm.cpu.cores` | 1L | Default SLURM CPU cores |
 | `abba.slurm.memory` | 1024L | Default SLURM memory (MB) |

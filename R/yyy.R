@@ -9,6 +9,7 @@
     abba.default.container = NULL,
     abba.k8s.namespace = 'rstudio',
     abba.home.nfs.ip.address = NULL,
+    abba.r.versions.path = '/etc/rstudio/r-versions',
     abba.default_cache_folder = NULL,
     abba.slurm.cpu.cores = 1L,
     abba.slurm.memory = 1024L
