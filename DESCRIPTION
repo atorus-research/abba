@@ -31,6 +31,9 @@ Description: Submit and monitor batch execution of R programs across
     sequential batch execution, file-based caching to skip unchanged
     programs, and 'logrx' integration for execution logging.
 License: Apache License (>= 2) | file LICENSE
+URL: https://atorus-research.github.io/abba/,
+    https://github.com/atorus-research/abba
+BugReports: https://github.com/atorus-research/abba/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
