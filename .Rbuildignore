@@ -11,3 +11,4 @@
 ^\.claude$
 ^CLAUDE\.md$
 ^\.github$
+^cran-comments\.md$
