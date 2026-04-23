@@ -5,12 +5,14 @@
 \alias{create_batch_job}
 \title{Create a Batch API or Job file template}
 \usage{
-create_batch_api(path = ".")
+create_batch_api(path)
 
-create_batch_job(path = ".")
+create_batch_job(path)
 }
 \arguments{
-\item{path}{A file path where the target file will be created}
+\item{path}{A file path where the target file will be created. Must be
+supplied explicitly; no default is provided so that files are never
+written to an unexpected location.}
 }
 \value{
 No return value, called for side effects (file creation).
@@ -28,13 +30,14 @@ Note that to deploy an R api to Posit Connect, the file must be named
 plumber.R.
 }
 \examples{
+# Write the template to a temporary directory
+create_batch_api(tempdir())
+create_batch_job(tempdir())
 
 \dontrun{
-create_batch_api()
 create_batch_api("~/api_directory")
 create_batch_api("~/api_directory/plumber.R")
 
-create_batch_job()
 create_batch_job("~/job_directory")
 create_batch_job("~/job_directory/my_job.Rmd")
 }

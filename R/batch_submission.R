@@ -43,13 +43,14 @@ batch_submit_parallel <- function(prog_list,
 #' entire batch will stop executing. TRUE by default
 #' @param rerun_unchanged_programs If FALSE: will not re-run programs whose code
 #' and inputs have not been modified since last batch run with update_cache=TRUE.
-#' @param update_cache if TRUE, file hash for programs and their inputs will be calculated
-#' and saved in .abba_cache folder. It will be done after batch run(.abba_cache folder will be created
-#' if it does not exist). If FALSE, .abba_cache folder will not be created/updated.
-#' FALSE by default.
-#' @param cache_folder specify a path to the folder where hash-sums of programs
-#' and their inputs will be stored. By default, those hashes are saved in the subfolder .abba_cache
-#' of the same folder as target(program/programs input). The default value can be set by specifying abba.default_cache_folder option.
+#' @param update_cache if TRUE, file hash for programs and their inputs will be
+#' calculated and written to `cache_folder` after the batch run. If FALSE, the
+#' cache will not be created or updated. FALSE by default.
+#' @param cache_folder Path to the folder where hash-sums of programs and
+#' their inputs will be stored. Required when `update_cache=TRUE` or
+#' `rerun_unchanged_programs=FALSE`. The default value can be set via the
+#' `abba.default_cache_folder` option; abba never falls back to writing caches
+#' under the user's filespace.
 #' @param ... arguments that will be passed to submit_func and wait_func functions
 #'
 #' @return list job IDs associated with executed programs
@@ -73,6 +74,10 @@ abba_submit_batch <- function(prog_list,
                               update_cache=FALSE,
                               cache_folder=getOption("abba.default_cache_folder"),
                               ...) {
+
+  if ((update_cache || !rerun_unchanged_programs) && is.null(cache_folder)) {
+    stop("cache_folder must be supplied when update_cache=TRUE or rerun_unchanged_programs=FALSE. Set it via the cache_folder argument or the abba.default_cache_folder option.")
+  }
 
   # if sequential=TRUE is specified - flatten the list and this will execute everything sequentially
   # REGARDLESS of whether prog_list is a list, a character vector or a data frame
@@ -161,13 +166,14 @@ abba_submit_batch <- function(prog_list,
 #' entire batch will stop executing. TRUE by default
 #' @param rerun_unchanged_programs If FALSE: will not re-run programs whose code
 #' and inputs have not been modified since last batch run with update_cache=TRUE.
-#' @param update_cache if TRUE, file hash for programs and their inputs will be calculated
-#' and saved in .abba_cache folder. It will be done after batch run(.abba_cache folder will be created
-#' if it does not exist). If FALSE, .abba_cache folder will not be created/updated.
-#' FALSE by default.
-#' @param cache_folder specify a path to the folder where hash-sums of programs
-#' and their inputs will be stored. if NULL, those hashes are saved in the subfolder .abba_cache
-#' of the same folder as target(program/programs input). Default is set by abba.default_cache_folder option
+#' @param update_cache if TRUE, file hash for programs and their inputs will be
+#' calculated and written to `cache_folder` after the batch run. If FALSE, the
+#' cache will not be created or updated. FALSE by default.
+#' @param cache_folder Path to the folder where hash-sums of programs and
+#' their inputs will be stored. Required when `update_cache=TRUE` or
+#' `rerun_unchanged_programs=FALSE`. The default value can be set via the
+#' `abba.default_cache_folder` option; abba never falls back to writing caches
+#' under the user's filespace.
 #' @param ... arguments that will be passed to submit_func and wait_func functions
 #'
 #' @return Data frame containing program names, job ids, execution statuses

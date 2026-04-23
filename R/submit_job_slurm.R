@@ -1,7 +1,9 @@
 #' Submit R program as a SLURM job
 #'
 #' @param program_path Full path to the R program file. Must be accessible from the SLURM node
-#' @param log_path desirable parent folder for program's log file. Defaults to parent folder of R program.
+#' @param log_path Parent folder for the program's log file. Required; must
+#' be supplied explicitly so that logs are never written to an unexpected
+#' location in the user's filespace.
 #' @param r_version Version of R that will be used to run the program. Can be specified as a full path to Rscript executable, or as a label of R version that is displayed in the Workbench GUI.
 #' @param user_tag custom string that will be added to the job name.
 #' @param cpu_cores Amount of CPU cores that will be requested for the job.
@@ -15,10 +17,11 @@
 #' @export
 #'
 #' @examples \dontrun{
-#' job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas")
+#' job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas",
+#'                                 log_path = "/home/user/tfl/logs")
 #'  }
 abba_slurm_submit_job <- function(program_path,
-                                  log_path=NULL,
+                                  log_path,
                                   r_version=NULL,
                                   user_tag=NULL,
                                   cpu_cores=getOption("abba.slurm.cpu.cores"),
@@ -27,6 +30,10 @@ abba_slurm_submit_job <- function(program_path,
                                   working_dir=NULL,
                                   job_timeout=3600,
                                   ...) {
+
+  if (missing(log_path) || is.null(log_path) || log_path == '') {
+    stop("log_path must be supplied; abba does not write SLURM job logs to a default location.")
+  }
 
   # default to current session version of R if not provided by user
   rscript_path <- select_rscript_version(r_version)

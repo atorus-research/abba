@@ -41,8 +41,8 @@ In setting up the **abba** API, the Kubernetes command line too [kubectl](https:
 With these pre-requisites in place, the API can be deployed. **abba** has the convenience function `create_batch_api()` for this purpose.
 
 ```{r create_api, eval=FALSE}
-create_batch_api()
-# Batch API file created at ./plumber.R
+create_batch_api("path/to/api_directory")
+# Batch API file created at path/to/api_directory/plumber.R
 ```
 
 Once this is done, the options within the API file should be set according to your desired configuration and the resources available in your cluster:

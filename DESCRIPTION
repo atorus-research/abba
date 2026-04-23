@@ -1,6 +1,6 @@
 Package: abba
-Title: Batch Execution of R Programs on Kubernetes, SLURM, and Posit Workbench
-Version: 0.1.0
+Title: Batch Execution of R Programs on 'Kubernetes', 'SLURM', and 'Posit Workbench'
+Version: 0.2.0
 Authors@R:
     c(
     person(given = "Eli",
@@ -24,13 +24,13 @@ Authors@R:
     person("Atorus Research, Inc.", role = "cph")
            )
 Description: Submit and monitor batch execution of R programs across
-    distributed computing backends including Kubernetes, SLURM, and Posit
-    Workbench. Provides end-user job submission functions, cluster interface
-    functions using 'kubectl' and SLURM commands, and a 'plumber' API
-    template for secure identity segregation. Supports parallel and
-    sequential batch execution, file-based caching to skip unchanged
-    programs, and 'logrx' integration for execution logging.
-License: Apache License (>= 2) | file LICENSE
+    distributed computing backends including 'Kubernetes', 'SLURM', and
+    'Posit Workbench'. Provides end-user job submission functions, cluster
+    interface functions using 'kubectl' and 'SLURM' commands, and a
+    'plumber' API template for secure identity segregation. Supports
+    parallel and sequential batch execution, file-based caching to skip
+    unchanged programs, and 'logrx' integration for execution logging.
+License: Apache License (>= 2)
 URL: https://atorus-research.github.io/abba/,
     https://github.com/atorus-research/abba
 BugReports: https://github.com/atorus-research/abba/issues

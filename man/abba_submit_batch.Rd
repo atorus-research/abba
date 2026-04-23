@@ -40,14 +40,15 @@ entire batch will stop executing. TRUE by default}
 \item{rerun_unchanged_programs}{If FALSE: will not re-run programs whose code
 and inputs have not been modified since last batch run with update_cache=TRUE.}
 
-\item{update_cache}{if TRUE, file hash for programs and their inputs will be calculated
-and saved in .abba_cache folder. It will be done after batch run(.abba_cache folder will be created
-if it does not exist). If FALSE, .abba_cache folder will not be created/updated.
-FALSE by default.}
+\item{update_cache}{if TRUE, file hash for programs and their inputs will be
+calculated and written to \code{cache_folder} after the batch run. If FALSE, the
+cache will not be created or updated. FALSE by default.}
 
-\item{cache_folder}{specify a path to the folder where hash-sums of programs
-and their inputs will be stored. By default, those hashes are saved in the subfolder .abba_cache
-of the same folder as target(program/programs input). The default value can be set by specifying abba.default_cache_folder option.}
+\item{cache_folder}{Path to the folder where hash-sums of programs and
+their inputs will be stored. Required when \code{update_cache=TRUE} or
+\code{rerun_unchanged_programs=FALSE}. The default value can be set via the
+\code{abba.default_cache_folder} option; abba never falls back to writing caches
+under the user's filespace.}
 
 \item{...}{arguments that will be passed to submit_func and wait_func functions}
 }

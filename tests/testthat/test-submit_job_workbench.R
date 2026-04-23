@@ -2,7 +2,14 @@ library(mockery)
 
 test_that("rslauncher_submit_job is producing an error when execution type is not 'logrx' or 'standard'", {
 
-  expect_error(rslauncher_submit_job('/path/to/program.R', execution_type='special'))
+  expect_error(rslauncher_submit_job('/path/to/program.R',
+                                     execution_type='special',
+                                     log_path='/path/to'))
+})
+
+test_that("rslauncher_submit_job errors when log_path is not supplied", {
+  expect_error(rslauncher_submit_job('/path/to/program.R'),
+               "log_path must be supplied")
 })
 
 test_that("rslauncher_submit_job is working as expected in 'standard' mode", {
@@ -14,7 +21,8 @@ test_that("rslauncher_submit_job is working as expected in 'standard' mode", {
   stub(rslauncher_submit_job, "select_r_version", mock_select_r_version)
   stub(rslauncher_submit_job, "dir.create", mock_dir_create)
 
-  result_actual <- rslauncher_submit_job('/path/to/program.R')
+  result_actual <- rslauncher_submit_job('/path/to/program.R',
+                                         log_path='/path/to')
 
   expect_called(mock_launcher_submit_job, 1)
 
@@ -76,7 +84,9 @@ test_that("rslauncher_submit_job is working as expected in 'logrx' mode", {
   stub(rslauncher_submit_job, "select_r_version", mock_select_r_version)
   stub(rslauncher_submit_job, "dir.create", mock_dir_create)
 
-  result_actual <- rslauncher_submit_job('/path/to/program.R', execution_type='logrx')
+  result_actual <- rslauncher_submit_job('/path/to/program.R',
+                                         execution_type='logrx',
+                                         log_path='/path/to')
   expected_result <- c('job-id2')
 
   expect_called(mock_launcher_submit_job, 1)
