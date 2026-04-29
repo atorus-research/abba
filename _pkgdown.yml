@@ -34,7 +34,7 @@ template:
     - abba_get_k8s_batch_log_local
     - abba_get_k8s_batch_status_local
     - abba_get_k8s_job_log_local
-    - abba_get_k8s_get_status_local
+    - abba_get_k8s_job_status_local
     - abba_submit_k8s_job_and_poll_local
     - abba_submit_k8s_job_local
     - abba_watch_k8s_batch_local

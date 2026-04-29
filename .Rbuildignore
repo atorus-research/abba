@@ -6,3 +6,9 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^rsconnect$
+^test_programs$
+^\.claude$
+^CLAUDE\.md$
+^\.github$
+^cran-comments\.md$

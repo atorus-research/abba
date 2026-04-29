@@ -20,3 +20,8 @@ list of statuses for every pod in a job(typically just one).
 \description{
 Get status of all pods that belong to a job
 }
+\examples{
+\dontrun{
+status <- abba_get_k8s_job_status_local("job-sdtm-abc123")
+}
+}

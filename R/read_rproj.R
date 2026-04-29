@@ -7,9 +7,6 @@
 #'
 read_rproj <- function(rproj_path){
 
-  # get current directory to return to it later
-  cwd <- getwd()
-
   # process different cases that would lead to premature return
   if (is.list(rproj_path)){return(rproj_path)}
 
@@ -20,15 +17,16 @@ read_rproj <- function(rproj_path){
     stop(sprintf("Rproject file %s not found.", rproj_path))
   }
 
+  # get current directory and ensure it is restored even if an error occurs
+  cwd <- getwd()
+  on.exit(setwd(cwd), add = TRUE)
+
   # change working dir to that of the parent directory of target file
   setwd(dirname(rproj_path))
   # create environment that would store all variables from sourcing the target file
   rproj_env <- new.env()
   # source target file
   source(rproj_path, local=rproj_env)
-
-  # return to original folder
-  setwd(cwd)
 
   # return environment variables that were created during source of target file
   return(as.list(rproj_env))

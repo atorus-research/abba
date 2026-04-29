@@ -1,16 +1,21 @@
 .onLoad <- function(libname, pkgname) {
-  options(abba.lower.cpu.limit=0.001,
-          abba.cpu.limit = 2,
-          abba.lower.memory.limit='128M',
-          abba.memory.limit='1G',
-          abba.permitted.containers=NULL,
-          abba.default.container=NULL,
-          abba.k8s.namespace='rstudio',
-          abba.home.nfs.ip.address='10.14.0.6',
-          abba.default_cache_folder=NULL,
-          abba.slurm.cpu.cores=1L,
-          abba.slurm.memory=1024L
+  op <- options()
+  op.abba <- list(
+    abba.lower.cpu.limit = 0.001,
+    abba.cpu.limit = 2,
+    abba.lower.memory.limit = '128M',
+    abba.memory.limit = '1G',
+    abba.permitted.containers = NULL,
+    abba.default.container = NULL,
+    abba.k8s.namespace = 'rstudio',
+    abba.home.nfs.ip.address = NULL,
+    abba.r.versions.path = '/etc/rstudio/r-versions',
+    abba.default_cache_folder = NULL,
+    abba.slurm.cpu.cores = 1L,
+    abba.slurm.memory = 1024L
   )
+  toset <- !(names(op.abba) %in% names(op))
+  if (any(toset)) options(op.abba[toset])
   invisible()
 }
 

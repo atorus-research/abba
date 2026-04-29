@@ -1,12 +1,16 @@
 rslauncher_submit_job <- function(p,
                                   execution_type='standard',
-                                  log_path=NULL,
+                                  log_path,
                                   user_tag=NULL,
                                   r_version=NULL,
                                   environment_vars=NULL,
                                   source_file=NULL,
                                   working_dir=NULL,
                                   ...) {
+
+  if (missing(log_path) || is.null(log_path) || log_path == '') {
+    stop("log_path must be supplied; abba does not write Workbench job logs to a default location.")
+  }
 
   # default to current session version of R if not provided by user
   r_version <- select_r_version(r_version)
@@ -24,14 +28,12 @@ rslauncher_submit_job <- function(p,
   scriptFile <- basename(scriptPath)
   jobTag <- c(paste("rstudio-r-script-job", scriptPath, sep = ":"), user_tag)
 
-  # put log file in r script folder if no log path is supplied
-  if (is.null(log_path) || log_path == ''){
-    log_path=file.path(dirname(scriptPath), paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
-  } else {log_path=file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))}
+  # interpret log_path as the target directory for the program's log file
+  log_path <- file.path(log_path, paste0(tools::file_path_sans_ext(basename(scriptPath)), '.log'))
 
   # create log directory if it does not exist. supplying non-existing directory
   # to launcherSubmitJob would produce a silent error
-  if (!file.exists(dirname(log_path))){dir.create(dirname(log_path))}
+  if (!file.exists(dirname(log_path))){dir.create(dirname(log_path), recursive = TRUE)}
 
   # assign working directory to parent dir of submitted program
   if (is.null(working_dir)){working_dir <- dirname(p)}
@@ -74,15 +76,21 @@ rslauncher_submit_job <- function(p,
 #' Create a job for executing an R program
 #'
 #' @param p path to program
-#' @param log_path optional; path to directory where log will be saved
+#' @param log_path Path to the directory where the log will be saved.
+#' Required; must be supplied explicitly so that logs are never written to an
+#' unexpected location in the user's filespace.
 #' @param user_tag optional; any user tags user might want to add to the job
 #' @param ... other arguments that will be passed to internal rslauncher_submit_job function
 #'
 #' @return job id
 #' @export
 #'
+#' @examples \dontrun{
+#' job_id <- abba_rslauncher_submit_job_local("/path/to/program.R",
+#'                                            log_path = "/path/to/logs")
+#' }
 abba_rslauncher_submit_job_local <- function(p,
-                                             log_path=NULL,
+                                             log_path,
                                              user_tag='',
                                              ...) {
 
@@ -101,15 +109,21 @@ abba_rslauncher_submit_job_local <- function(p,
 #' Execute programs via logrx
 #'
 #' @param p path to program
-#' @param log_path optional; path to directory where log will be saved
+#' @param log_path Path to the directory where the log will be saved.
+#' Required; must be supplied explicitly so that logs are never written to an
+#' unexpected location in the user's filespace.
 #' @param user_tag optional; any user tags user might want to add to the job
 #' @param ... other arguments that will be passed to internal rslauncher_submit_job function
 #'
 #' @return job id
 #' @export
 #'
+#' @examples \dontrun{
+#' job_id <- abba_rslauncher_submit_logrx_job_local("/path/to/program.R",
+#'                                                  log_path = "/path/to/logs")
+#' }
 abba_rslauncher_submit_logrx_job_local <- function(p,
-                                                   log_path=NULL,
+                                                   log_path,
                                                    user_tag='',
                                                    ...) {
 

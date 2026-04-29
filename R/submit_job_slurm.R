@@ -1,23 +1,27 @@
 #' Submit R program as a SLURM job
 #'
 #' @param program_path Full path to the R program file. Must be accessible from the SLURM node
-#' @param log_path desirable parent folder for program's log file. Defaults to parent folder of R program.
+#' @param log_path Parent folder for the program's log file. Required; must
+#' be supplied explicitly so that logs are never written to an unexpected
+#' location in the user's filespace.
 #' @param r_version Version of R that will be used to run the program. Can be specified as a full path to Rscript executable, or as a label of R version that is displayed in the Workbench GUI.
 #' @param user_tag custom string that will be added to the job name.
 #' @param cpu_cores Amount of CPU cores that will be requested for the job.
 #' @param memory Amount of RAM in megabytes that will be requested for the job.
 #' @param username user whose permission level is used to execute the script. Defaults to user submitting the job.
+#' @param working_dir working directory for the SLURM job. Defaults to parent directory of `program_path`.
 #' @param job_timeout time limit for a job. Must be specified in a format of "days-hours:minutes:seconds" If exceeded, job will be cancelled.
-#' @param ...
+#' @param ... additional arguments (currently unused)
 #'
 #' @return job ID
 #' @export
 #'
 #' @examples \dontrun{
-#' job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas")
+#' job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas",
+#'                                 log_path = "/home/user/tfl/logs")
 #'  }
 abba_slurm_submit_job <- function(program_path,
-                                  log_path=NULL,
+                                  log_path,
                                   r_version=NULL,
                                   user_tag=NULL,
                                   cpu_cores=getOption("abba.slurm.cpu.cores"),
@@ -26,6 +30,10 @@ abba_slurm_submit_job <- function(program_path,
                                   working_dir=NULL,
                                   job_timeout=3600,
                                   ...) {
+
+  if (missing(log_path) || is.null(log_path) || log_path == '') {
+    stop("log_path must be supplied; abba does not write SLURM job logs to a default location.")
+  }
 
   # default to current session version of R if not provided by user
   rscript_path <- select_rscript_version(r_version)
@@ -120,8 +128,8 @@ abba_slurm_get_job_succeeded0 <- function(job_id, ...){
                                      stdout=TRUE, stderr=TRUE))
 
   system_command_error_check(output, sprintf("Error getting job exit code for job ID %s.", job_id))
-  parsed_output <- slurm_parse_squeue_output(output) %>%
-    dplyr::filter(JOBID == job_id)
+  parsed_output <- slurm_parse_squeue_output(output)
+  parsed_output <- parsed_output[parsed_output$JOBID == job_id, , drop = FALSE]
   if(parsed_output$STATE == 'COMPLETED') {job_succeeded <- TRUE}
   else if(parsed_output$STATE %in% c('CONFIGURING', 'COMPLETING', 'PENDING', 'RUNNING', 'SIGNALING', 'RESIZING')) {job_succeeded <- NULL}
   else {job_succeeded <- FALSE}
@@ -165,7 +173,8 @@ slurm_get_job_status0 <- function(job_id, ...){
                                      stdout=TRUE, stderr=TRUE))
 
   system_command_error_check(output, sprintf("Error getting job status for job ID %s.", job_id))
-  parsed_output <- slurm_parse_squeue_output(output) %>% dplyr::filter(JOBID %in% job_id)
+  parsed_output <- slurm_parse_squeue_output(output)
+  parsed_output <- parsed_output[parsed_output$JOBID %in% job_id, , drop = FALSE]
 
   return(parsed_output$STATE)
 }

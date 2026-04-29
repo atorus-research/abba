@@ -20,3 +20,8 @@ A list of job logs. Each list entry will contain complete log for a job
 \description{
 Get log for every job specified in an input vector/list
 }
+\examples{
+\dontrun{
+logs <- abba_get_k8s_job_log_local(c("job-sdtm-abc123", "job-adam-def456"))
+}
+}

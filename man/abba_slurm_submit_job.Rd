@@ -6,7 +6,7 @@
 \usage{
 abba_slurm_submit_job(
   program_path,
-  log_path = NULL,
+  log_path,
   r_version = NULL,
   user_tag = NULL,
   cpu_cores = getOption("abba.slurm.cpu.cores"),
@@ -20,7 +20,9 @@ abba_slurm_submit_job(
 \arguments{
 \item{program_path}{Full path to the R program file. Must be accessible from the SLURM node}
 
-\item{log_path}{desirable parent folder for program's log file. Defaults to parent folder of R program.}
+\item{log_path}{Parent folder for the program's log file. Required; must
+be supplied explicitly so that logs are never written to an unexpected
+location in the user's filespace.}
 
 \item{r_version}{Version of R that will be used to run the program. Can be specified as a full path to Rscript executable, or as a label of R version that is displayed in the Workbench GUI.}
 
@@ -32,9 +34,11 @@ abba_slurm_submit_job(
 
 \item{username}{user whose permission level is used to execute the script. Defaults to user submitting the job.}
 
+\item{working_dir}{working directory for the SLURM job. Defaults to parent directory of \code{program_path}.}
+
 \item{job_timeout}{time limit for a job. Must be specified in a format of "days-hours:minutes:seconds" If exceeded, job will be cancelled.}
 
-\item{...}{}
+\item{...}{additional arguments (currently unused)}
 }
 \value{
 job ID
@@ -44,6 +48,7 @@ Submit R program as a SLURM job
 }
 \examples{
 \dontrun{
-job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas")
+job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas",
+                                log_path = "/home/user/tfl/logs")
  }
 }

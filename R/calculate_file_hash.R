@@ -1,15 +1,19 @@
 #' Calculate and Save File's Hash Sum.
 #'
-#' Read in the file's contents, calculate its hash sum and save permanently
-#' to the `.abba_cache` folder. Later this information could be used to decide
-#' if the program needs to be re-run (due to updates make to the code).
+#' Read in the file's contents, calculate its hash sum and save it under
+#' `cache_folder`. Later this information could be used to decide if the
+#' program needs to be re-run (due to updates made to the code).
 #'
 #' @param file_path A full path to the file we want to read in and generate
 #' a hash sum.
-#' @param cache_folder A full path to the folder containing hash sum for the input file
+#' @param cache_folder A full path to the folder where the hash sum file will
+#' be written. Required; must be supplied explicitly by the caller.
 #' @return A hash sum of the file's contents.
 #' @noRd
-abba_save_file_cache <- function(file_path, cache_folder=NULL, ...) {
+abba_save_file_cache <- function(file_path, cache_folder, ...) {
+  if (is.null(cache_folder)){
+    stop("cache_folder must be supplied; abba does not write caches to a default location.")
+  }
   if (is.null(file_path)||is.na(file_path)||file_path==""||!file.exists(file_path)){
     # silently return NULL if supplied invalid file path
     message(sprintf("Could not calculate file hash, file %s does not exist.", file_path))
@@ -17,12 +21,8 @@ abba_save_file_cache <- function(file_path, cache_folder=NULL, ...) {
   }
   hash_value <- digest::digest(file_path, algo = "md5", file = TRUE)
 
-  # by default, put cache in .abba_cache folder inside programs folder
-  if (is.null(cache_folder)){
-    cache_folder <- file.path(dirname(file_path), ".abba_cache")
-  }
   if (!dir.exists(cache_folder)) {
-    dir.create(cache_folder)
+    dir.create(cache_folder, recursive = TRUE)
   }
 
   cache_file <- file.path(cache_folder, paste0(basename(file_path), ".cache"))
@@ -41,11 +41,16 @@ abba_save_file_cache <- function(file_path, cache_folder=NULL, ...) {
 #'
 #' @param file_path A full path to the file we want to read in and generate
 #' a hash sum.
-#' @param cache_folder A full path to the folder containing hash sum for the input file
+#' @param cache_folder A full path to the folder containing hash sum for the
+#' input file. Required; must be supplied explicitly by the caller.
 #' @param update_cache Controls whether hash sum would be updated if program update is detected. TRUE by default
 #' @return `NA` if file_path does not exist, `TRUE` if hash sum matches with what is stored in cache, `FALSE` otherwise.
 #' @noRd
-cache_match <- function(file_path, cache_folder=NULL, update_cache=TRUE, ...) {
+cache_match <- function(file_path, cache_folder, update_cache=TRUE, ...) {
+
+  if (is.null(cache_folder)){
+    stop("cache_folder must be supplied; abba does not read caches from a default location.")
+  }
 
   # produce a warning if file_path does not exist and return FALSE
   if (is.null(file_path) || !file.exists(file_path)){
@@ -59,14 +64,11 @@ cache_match <- function(file_path, cache_folder=NULL, update_cache=TRUE, ...) {
 
   current_hash <- digest::digest(file_path, algo = "md5", file = TRUE)
 
-  if (is.null(cache_folder)){
-  cache_folder <- file.path(dirname(file_path), ".abba_cache")
-  }
   cache_file <- file.path(cache_folder, paste0(basename(file_path), ".cache"))
 
   # save hash for a file and return FALSE if cash does not exist
   if (!file.exists(cache_file)) {
-    if(update_cache){abba_save_file_cache(file_path)}
+    if(update_cache){abba_save_file_cache(file_path, cache_folder=cache_folder)}
     return(FALSE)
   }
 
@@ -75,7 +77,7 @@ cache_match <- function(file_path, cache_folder=NULL, update_cache=TRUE, ...) {
 
   if (current_hash == cached_hash) {return(TRUE)}
   else {
-    if(update_cache){abba_save_file_cache(file_path)}
+    if(update_cache){abba_save_file_cache(file_path, cache_folder=cache_folder)}
     return(FALSE)
     }
 }

@@ -29,6 +29,7 @@ abba_submit_batch(
        "/home/mike.stackhouse/test_progs/r_job_test3.R"),
   submit_func=abba_rslauncher_submit_job_local,
   wait_func=abba_rslauncher_watch_job_local,
+  log_path="/home/mike.stackhouse/test_logs",
   timeout_seconds = 15
   )
 #  /home/yevhenii.boiko/k8s_test/r_job_test.R /home/yevhenii.boiko/k8s_test/r_job_test2.R /home/yevhenii.boiko/k8s_test/r_job_test3.R 
@@ -61,6 +62,7 @@ This dataset can be supplied to `abba_submit_batch` for execution in the order o
 abba_submit_batch(calculate_run_group(ds, col_name='run_group'),
                   submit_func=abba_rslauncher_submit_job_local,
                   wait_func=abba_rslauncher_watch_job_local,
+                  log_path="/home/mike.stackhouse/test_logs"
   )
 #  /home/yevhenii.boiko/k8s_test/r_job_test.R /home/yevhenii.boiko/k8s_test/r_job_test2.R /home/yevhenii.boiko/k8s_test/r_job_test3.R 
 #  "TG9jYWw6UGVPUVFoeVVMKys2c3M0TnZZcm9ZUT09"  "TG9jYWw6VmgrUnlueDBOLXZuVkVIYWxRa1NEZz09"  "TG9jYWw6bGlWcjdsVTRwQzIwcmlLUThzUUN4UT09" 
@@ -89,6 +91,7 @@ To run programs sequentially regardless of supplied grouping, `sequential` param
 abba_submit_batch(calculate_run_group(ds, col_name='run_group'),
                   submit_func=abba_rslauncher_submit_job_local,
                   wait_func=abba_rslauncher_watch_job_local,
+                  log_path="/home/mike.stackhouse/test_logs",
                   sequential=TRUE
   )
 #  /home/yevhenii.boiko/k8s_test/r_job_test.R /home/yevhenii.boiko/k8s_test/r_job_test2.R /home/yevhenii.boiko/k8s_test/r_job_test3.R 
