@@ -46,8 +46,8 @@ Batch files can be created using the function
 [`create_batch_job()`](../reference/create_batch.md).
 
 ``` r
-create_batch_job()
-# Job file created at ./job.Rmd
+create_batch_job("path/to/job_directory")
+# Job file created at path/to/job_directory/job.Rmd
 ```
 
 This creates a template R Markdown file with an example call to **abba**

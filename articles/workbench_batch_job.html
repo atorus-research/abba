@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">abba</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/atorus-research/abba/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -64,14 +65,14 @@
       <h1>Workbench Batch Jobs</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/atorus-research/abba/blob/main/vignettes/workbench_batch_job.Rmd" class="external-link"><code>vignettes/workbench_batch_job.Rmd</code></a></small>
       <div class="d-none name"><code>workbench_batch_job.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abba</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://atorus-research.github.io/abba/" class="external-link">abba</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="end-user-facing-functions">End User Facing Functions<a class="anchor" aria-label="anchor" href="#end-user-facing-functions"></a>
 </h2>
@@ -90,6 +91,7 @@ finished.</p>
 <span>       <span class="st">"/home/mike.stackhouse/test_progs/r_job_test3.R"</span><span class="op">)</span>,</span>
 <span>  submit_func<span class="op">=</span><span class="va">abba_rslauncher_submit_job_local</span>,</span>
 <span>  wait_func<span class="op">=</span><span class="va">abba_rslauncher_watch_job_local</span>,</span>
+<span>  log_path<span class="op">=</span><span class="st">"/home/mike.stackhouse/test_logs"</span>,</span>
 <span>  timeout_seconds <span class="op">=</span> <span class="fl">15</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="co">#  /home/yevhenii.boiko/k8s_test/r_job_test.R /home/yevhenii.boiko/k8s_test/r_job_test2.R /home/yevhenii.boiko/k8s_test/r_job_test3.R </span></span>
@@ -127,6 +129,7 @@ execution in the order of <code>run_group</code> column:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/abba_submit_batch.html">abba_submit_batch</a></span><span class="op">(</span><span class="fu"><a href="../reference/calculate_run_group.html">calculate_run_group</a></span><span class="op">(</span><span class="va">ds</span>, col_name<span class="op">=</span><span class="st">'run_group'</span><span class="op">)</span>,</span>
 <span>                  submit_func<span class="op">=</span><span class="va">abba_rslauncher_submit_job_local</span>,</span>
 <span>                  wait_func<span class="op">=</span><span class="va">abba_rslauncher_watch_job_local</span>,</span>
+<span>                  log_path<span class="op">=</span><span class="st">"/home/mike.stackhouse/test_logs"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="co">#  /home/yevhenii.boiko/k8s_test/r_job_test.R /home/yevhenii.boiko/k8s_test/r_job_test2.R /home/yevhenii.boiko/k8s_test/r_job_test3.R </span></span>
 <span><span class="co">#  "TG9jYWw6UGVPUVFoeVVMKys2c3M0TnZZcm9ZUT09"  "TG9jYWw6VmgrUnlueDBOLXZuVkVIYWxRa1NEZz09"  "TG9jYWw6bGlWcjdsVTRwQzIwcmlLUThzUUN4UT09" </span></span></code></pre></div>
@@ -150,6 +153,7 @@ execution in the order of <code>run_group</code> column:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/abba_submit_batch.html">abba_submit_batch</a></span><span class="op">(</span><span class="fu"><a href="../reference/calculate_run_group.html">calculate_run_group</a></span><span class="op">(</span><span class="va">ds</span>, col_name<span class="op">=</span><span class="st">'run_group'</span><span class="op">)</span>,</span>
 <span>                  submit_func<span class="op">=</span><span class="va">abba_rslauncher_submit_job_local</span>,</span>
 <span>                  wait_func<span class="op">=</span><span class="va">abba_rslauncher_watch_job_local</span>,</span>
+<span>                  log_path<span class="op">=</span><span class="st">"/home/mike.stackhouse/test_logs"</span>,</span>
 <span>                  sequential<span class="op">=</span><span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="co">#  /home/yevhenii.boiko/k8s_test/r_job_test.R /home/yevhenii.boiko/k8s_test/r_job_test2.R /home/yevhenii.boiko/k8s_test/r_job_test3.R </span></span>

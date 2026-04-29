@@ -5,7 +5,7 @@ Execute programs via logrx
 ## Usage
 
 ``` r
-abba_rslauncher_submit_logrx_job_local(p, log_path = NULL, user_tag = "", ...)
+abba_rslauncher_submit_logrx_job_local(p, log_path, user_tag = "", ...)
 ```
 
 ## Arguments
@@ -16,7 +16,9 @@ abba_rslauncher_submit_logrx_job_local(p, log_path = NULL, user_tag = "", ...)
 
 - log_path:
 
-  optional; path to directory where log will be saved
+  Path to the directory where the log will be saved. Required; must be
+  supplied explicitly so that logs are never written to an unexpected
+  location in the user's filespace.
 
 - user_tag:
 
@@ -35,6 +37,7 @@ job id
 
 ``` r
 if (FALSE) { # \dontrun{
-job_id <- abba_rslauncher_submit_logrx_job_local("/path/to/program.R")
+job_id <- abba_rslauncher_submit_logrx_job_local("/path/to/program.R",
+                                                 log_path = "/path/to/logs")
 } # }
 ```

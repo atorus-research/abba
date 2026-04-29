@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">abba</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/atorus-research/abba/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -64,14 +65,14 @@
       <h1>Kubernetes Batch Jobs</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/atorus-research/abba/blob/main/vignettes/k8s_batch_job.Rmd" class="external-link"><code>vignettes/k8s_batch_job.Rmd</code></a></small>
       <div class="d-none name"><code>k8s_batch_job.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abba</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://atorus-research.github.io/abba/" class="external-link">abba</a></span><span class="op">)</span></span></code></pre></div>
 <p>If you’re an end user simply trying to run your work using
 <strong>abba</strong>, then this vignette is for you.</p>
 <p>Our ultimate goal with <strong>abba</strong> is to make it as simple
@@ -138,8 +139,8 @@ Markdown reports, for which Connect has that scheduling capability.</p>
 <p>Batch files can be created using the function
 <code><a href="../reference/create_batch.html">create_batch_job()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_batch.html">create_batch_job</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co"># Job file created at ./job.Rmd</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_batch.html">create_batch_job</a></span><span class="op">(</span><span class="st">"path/to/job_directory"</span><span class="op">)</span></span>
+<span><span class="co"># Job file created at path/to/job_directory/job.Rmd</span></span></code></pre></div>
 <p>This creates a template R Markdown file with an example call to
 <strong>abba</strong> ready to go.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">

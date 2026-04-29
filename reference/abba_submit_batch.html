@@ -11,7 +11,7 @@ would be submitted sequentially."><meta name="twitter:card" content="summary_lar
 
     <a class="navbar-brand me-2" href="../index.html">abba</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,7 @@ would be submitted sequentially."><meta name="twitter:card" content="summary_lar
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/atorus-research/abba/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -42,7 +43,7 @@ would be submitted sequentially."><meta name="twitter:card" content="summary_lar
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Submit programs for execution in order defined by structure of input list. Programs inside sublists will be executed in parallel, and sublists themselves would be submitted sequentially.</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/atorus-research/abba/blob/main/R/batch_submission.R" class="external-link"><code>R/batch_submission.R</code></a></small>
       <div class="d-none name"><code>abba_submit_batch.Rd</code></div>
     </div>
 
@@ -109,16 +110,17 @@ and inputs have not been modified since last batch run with update_cache=TRUE.</
 
 
 <dt id="arg-update-cache">update_cache<a class="anchor" aria-label="anchor" href="#arg-update-cache"></a></dt>
-<dd><p>if TRUE, file hash for programs and their inputs will be calculated
-and saved in .abba_cache folder. It will be done after batch run(.abba_cache folder will be created
-if it does not exist). If FALSE, .abba_cache folder will not be created/updated.
-FALSE by default.</p></dd>
+<dd><p>if TRUE, file hash for programs and their inputs will be
+calculated and written to <code>cache_folder</code> after the batch run. If FALSE, the
+cache will not be created or updated. FALSE by default.</p></dd>
 
 
 <dt id="arg-cache-folder">cache_folder<a class="anchor" aria-label="anchor" href="#arg-cache-folder"></a></dt>
-<dd><p>specify a path to the folder where hash-sums of programs
-and their inputs will be stored. By default, those hashes are saved in the subfolder .abba_cache
-of the same folder as target(program/programs input). The default value can be set by specifying abba.default_cache_folder option.</p></dd>
+<dd><p>Path to the folder where hash-sums of programs and
+their inputs will be stored. Required when <code>update_cache=TRUE</code> or
+<code>rerun_unchanged_programs=FALSE</code>. The default value can be set via the
+<code>abba.default_cache_folder</code> option; abba never falls back to writing caches
+under the user's filespace.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

@@ -25,11 +25,13 @@ submit program for execution via logrx,
 
 ``` r
 abba_rslauncher_submit_job_local(
-  "/home/mike.stackhouse/repos/abba/test_programs/test_program.R"
+  "/home/mike.stackhouse/repos/abba/test_programs/test_program.R",
+  log_path = "/home/mike.stackhouse/test_logs"
   )
 # [1] "TG9jYWw6bU9YcFMzeEZacVFaa1lLc2pRak1LZz09"
 abba_rslauncher_submit_logrx_job_local(
-  "/home/mike.stackhouse/repos/abba/test_programs/test_program.R"
+  "/home/mike.stackhouse/repos/abba/test_programs/test_program.R",
+  log_path = "/home/mike.stackhouse/test_logs"
   )
 # [1] "TG9jYWw6VG5leWVvWFFseEN5M0JRVFptVjVIUT09"
 ```
@@ -38,8 +40,9 @@ Note that this returns a vector with job id and name being path of the
 program. The Job ID is the identifier used downstream to interact with
 Workbench.
 
-By default, program log is physically saved in the program folder. The
-log destination is customizable via `log_path` keyword parameter.
+`log_path` is required and specifies the directory where the program’s
+log file will be written. abba does not fall back to a default location
+in the user’s filespace.
 
 ### Get Job Status
 

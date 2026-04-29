@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">abba</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/atorus-research/abba/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -64,14 +65,14 @@
       <h1>Kubernetes API Setup</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/atorus-research/abba/blob/main/vignettes/k8s_api_setup.Rmd" class="external-link"><code>vignettes/k8s_api_setup.Rmd</code></a></small>
       <div class="d-none name"><code>k8s_api_setup.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abba</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://atorus-research.github.io/abba/" class="external-link">abba</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -118,8 +119,8 @@ and kubectl should configured for this service account.</li>
 <strong>abba</strong> has the convenience function
 <code><a href="../reference/create_batch.html">create_batch_api()</a></code> for this purpose.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_batch.html">create_batch_api</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co"># Batch API file created at ./plumber.R</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_batch.html">create_batch_api</a></span><span class="op">(</span><span class="st">"path/to/api_directory"</span><span class="op">)</span></span>
+<span><span class="co"># Batch API file created at path/to/api_directory/plumber.R</span></span></code></pre></div>
 <p>Once this is done, the options within the API file should be set
 according to your desired configuration and the resources available in
 your cluster:</p>

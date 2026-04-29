@@ -25,8 +25,8 @@ This is the function used to submit a job on the API side.
 
 ``` r
 abba_submit_k8s_job_local(
-  "/home/mike.stackhouse/repos/abba/test_programs/test_program.R",
-  container = "atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02"
+  "/home/user/programs/my_program.R",
+  container = "registry.example.com/my_image:latest"
 )
 # job.batch/test-program-fbc3131d-a850-4081-8224-c06ef32821da created
 # $job_id

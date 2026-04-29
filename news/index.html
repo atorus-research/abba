@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">abba</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,6 +29,7 @@
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/atorus-research/abba/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -38,9 +39,56 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-
+      <small>Source: <a href="https://github.com/atorus-research/abba/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="abba-020">abba 0.2.0<a class="anchor" aria-label="anchor" href="#abba-020"></a></h2><p class="text-muted">CRAN release: 2026-04-28</p>
+<div class="section level3">
+<h3 id="breaking-changes-0-2-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-2-0"></a></h3>
+<p>This release removes implicit file writes to the user’s filespace in order to comply with CRAN policy. Several functions now require arguments that previously defaulted to a location derived from other inputs. Update call sites to pass these arguments explicitly.</p>
+<div class="section level4">
+<h4 id="create_batch_api-and-create_batch_job-0-2-0">
+<code>create_batch_api()</code> and <code>create_batch_job()</code>
+<a class="anchor" aria-label="anchor" href="#create_batch_api-and-create_batch_job-0-2-0"></a></h4>
+<ul><li>
+<code>path</code> is now required. The previous default of <code>"."</code> (the working directory) has been removed.</li>
+<li>Before: <code><a href="../reference/create_batch.html">create_batch_api()</a></code> wrote <code>plumber.R</code> to <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>.</li>
+<li>After: callers must supply an explicit path, e.g. <code>create_batch_api("path/to/api_directory")</code>.</li>
+<li>Also fixes a bug where a <code>path</code> containing <code>.</code> (for example <code>"~/api_directory/plumber.R"</code>) was silently rewritten to <code>"./plumber.R"</code>. The user-supplied path is now respected.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="abba_slurm_submit_job-abba_rslauncher_submit_job_local-abba_rslauncher_submit_logrx_job_local-0-2-0">
+<code>abba_slurm_submit_job()</code>, <code>abba_rslauncher_submit_job_local()</code>, <code>abba_rslauncher_submit_logrx_job_local()</code>
+<a class="anchor" aria-label="anchor" href="#abba_slurm_submit_job-abba_rslauncher_submit_job_local-abba_rslauncher_submit_logrx_job_local-0-2-0"></a></h4>
+<ul><li>
+<code>log_path</code> is now required. There is no longer a default that writes the log next to the submitted program.</li>
+<li>Before: omitting <code>log_path</code> caused the log to be written to <code>dirname(program_path)</code>.</li>
+<li>After: callers must pass <code>log_path</code> explicitly, e.g. <code>abba_slurm_submit_job("/path/to/script.R", log_path = "/path/to/logs")</code>.</li>
+<li>When using <code><a href="../reference/abba_submit_batch.html">abba_submit_batch()</a></code> with a Workbench or SLURM submit function, pass <code>log_path</code> through the <code>...</code> arguments, e.g. <code>abba_submit_batch(progs, submit_func = abba_rslauncher_submit_job_local, log_path = "/path/to/logs")</code>.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="abba_submit_batch-and-abba_submit_batch_and_get_results-0-2-0">
+<code>abba_submit_batch()</code> and <code>abba_submit_batch_and_get_results()</code>
+<a class="anchor" aria-label="anchor" href="#abba_submit_batch-and-abba_submit_batch_and_get_results-0-2-0"></a></h4>
+<ul><li>
+<code>cache_folder</code> is now required whenever <code>update_cache = TRUE</code> or <code>rerun_unchanged_programs = FALSE</code>. The previous fallback that wrote a <code>.abba_cache</code> directory next to each program has been removed.</li>
+<li>Before: caching silently wrote to <code>dirname(program_path)/.abba_cache</code>.</li>
+<li>After: callers must supply <code>cache_folder</code> explicitly or set it via the <code>abba.default_cache_folder</code> option. A clear error is raised if caching is requested without a <code>cache_folder</code>.</li>
+<li>When <code>update_cache = FALSE</code> and <code>rerun_unchanged_programs = TRUE</code> (the defaults), no cache writes occur and no <code>cache_folder</code> is required.</li>
+</ul></div>
+</div>
+<div class="section level3">
+<h3 id="internal-0-2-0">Internal<a class="anchor" aria-label="anchor" href="#internal-0-2-0"></a></h3>
+<ul><li>Cache helper functions (<code>cache_match()</code>, <code>abba_save_file_cache()</code>) now require <code>cache_folder</code> and error clearly when it is missing. This also stops an existing code path from writing a cache into the program’s directory when the top-level call did not request caching.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-2-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-0"></a></h3>
+<ul><li>Package Title and Description now quote external software names (<code>'Kubernetes'</code>, <code>'SLURM'</code>, <code>'Posit Workbench'</code>) per CRAN conventions.</li>
+<li>Examples and vignettes updated to show explicit paths for <code>create_batch_*</code>, <code>log_path</code>, and <code>cache_folder</code> rather than defaults.</li>
+<li>The standalone <code>LICENSE</code> file has been removed; <code>License</code> in <code>DESCRIPTION</code> is now <code>Apache License (&gt;= 2)</code> without the <code>file LICENSE</code> pointer, which is the correct form when there are no additional restrictions.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="abba-010">abba 0.1.0<a class="anchor" aria-label="anchor" href="#abba-010"></a></h2>
 <ul><li>Initial CRAN release</li>
@@ -55,7 +103,8 @@
 <code>logrx</code> integration for detailed execution logging</li>
 <li>Plumber API template for secure identity segregation on Posit Connect</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

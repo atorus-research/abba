@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">abba</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,6 +29,7 @@
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/atorus-research/abba/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -38,7 +39,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>abba - Atorus Batch Backend API</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/atorus-research/abba/blob/main/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
     </div>
 
 <div id="abba---atorus-batch-backend-api" class="section level1">
@@ -159,15 +160,18 @@ inst/               - Templates: plumber.R, job.yaml, job.Rmd, slurm_job.submit,
 <td>‘rstudio’</td>
 <td>Kubernetes namespace</td>
 </tr><tr class="even"><td><code>abba.home.nfs.ip.address</code></td>
-<td>‘10.14.0.6’</td>
+<td>NULL</td>
 <td>NFS mount IP for home dirs</td>
-</tr><tr class="odd"><td><code>abba.default_cache_folder</code></td>
+</tr><tr class="odd"><td><code>abba.r.versions.path</code></td>
+<td>‘/etc/rstudio/r-versions’</td>
+<td>Path to Workbench R versions file</td>
+</tr><tr class="even"><td><code>abba.default_cache_folder</code></td>
 <td>NULL</td>
 <td>Hash cache storage location</td>
-</tr><tr class="even"><td><code>abba.slurm.cpu.cores</code></td>
+</tr><tr class="odd"><td><code>abba.slurm.cpu.cores</code></td>
 <td>1L</td>
 <td>Default SLURM CPU cores</td>
-</tr><tr class="odd"><td><code>abba.slurm.memory</code></td>
+</tr><tr class="even"><td><code>abba.slurm.memory</code></td>
 <td>1024L</td>
 <td>Default SLURM memory (MB)</td>
 </tr></tbody></table></div>
@@ -194,7 +198,7 @@ inst/               - Templates: plumber.R, job.yaml, job.Rmd, slurm_job.submit,
 <h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a></h2>
 <ul><li>All test external calls are mocked via <code>mockery</code> - no real kubectl/SLURM needed to run tests</li>
 <li>
-<code>rsconnect/</code> directory contains deployment metadata for connect-dev.atorusresearch.com (not needed for package distribution)</li>
+<code>rsconnect/</code> directory (gitignored) contains local Posit Connect deployment metadata</li>
 <li>Root-level <code>plumber.R</code> is a production deployment file (excluded via .Rbuildignore); <code>inst/plumber.R</code> is the distributable template</li>
 <li>
 <code>test_programs/</code> contains a simple test script used during development</li>

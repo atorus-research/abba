@@ -46,8 +46,8 @@ has the convenience function
 [`create_batch_api()`](../reference/create_batch.md) for this purpose.
 
 ``` r
-create_batch_api()
-# Batch API file created at ./plumber.R
+create_batch_api("path/to/api_directory")
+# Batch API file created at path/to/api_directory/plumber.R
 ```
 
 Once this is done, the options within the API file should be set

@@ -7,7 +7,7 @@ Submit R program as a SLURM job
 ``` r
 abba_slurm_submit_job(
   program_path,
-  log_path = NULL,
+  log_path,
   r_version = NULL,
   user_tag = NULL,
   cpu_cores = getOption("abba.slurm.cpu.cores"),
@@ -28,8 +28,9 @@ abba_slurm_submit_job(
 
 - log_path:
 
-  desirable parent folder for program's log file. Defaults to parent
-  folder of R program.
+  Parent folder for the program's log file. Required; must be supplied
+  explicitly so that logs are never written to an unexpected location in
+  the user's filespace.
 
 - r_version:
 
@@ -76,6 +77,7 @@ job ID
 
 ``` r
 if (FALSE) { # \dontrun{
-job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas")
+job_id <- abba_slurm_submit_job("/home/user/tfl/t1_dm.sas",
+                                log_path = "/home/user/tfl/logs")
  } # }
 ```

@@ -71,17 +71,16 @@ abba_submit_batch_and_get_results(
 - update_cache:
 
   if TRUE, file hash for programs and their inputs will be calculated
-  and saved in .abba_cache folder. It will be done after batch
-  run(.abba_cache folder will be created if it does not exist). If
-  FALSE, .abba_cache folder will not be created/updated. FALSE by
-  default.
+  and written to `cache_folder` after the batch run. If FALSE, the cache
+  will not be created or updated. FALSE by default.
 
 - cache_folder:
 
-  specify a path to the folder where hash-sums of programs and their
-  inputs will be stored. if NULL, those hashes are saved in the
-  subfolder .abba_cache of the same folder as target(program/programs
-  input). Default is set by abba.default_cache_folder option
+  Path to the folder where hash-sums of programs and their inputs will
+  be stored. Required when `update_cache=TRUE` or
+  `rerun_unchanged_programs=FALSE`. The default value can be set via the
+  `abba.default_cache_folder` option; abba never falls back to writing
+  caches under the user's filespace.
 
 - ...:
 

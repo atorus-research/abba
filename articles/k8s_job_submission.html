@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">abba</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/atorus-research/abba/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -64,14 +65,14 @@
       <h1>Kubernetes Job Submission</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/atorus-research/abba/blob/main/vignettes/k8s_job_submission.Rmd" class="external-link"><code>vignettes/k8s_job_submission.Rmd</code></a></small>
       <div class="d-none name"><code>k8s_job_submission.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abba</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://atorus-research.github.io/abba/" class="external-link">abba</a></span><span class="op">)</span></span></code></pre></div>
 <p>In support for Kubernetes, <strong>abba</strong> has several local
 submission functions to manage interface with a cluster. At a high
 level, these functions break down into three different categories:</p>
@@ -92,8 +93,8 @@ functions intended for local submission (i.e. not interface with the
 submit a job on the API side.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/abba_submit_k8s_job_local.html">abba_submit_k8s_job_local</a></span><span class="op">(</span></span>
-<span>  <span class="st">"/home/mike.stackhouse/repos/abba/test_programs/test_program.R"</span>,</span>
-<span>  container <span class="op">=</span> <span class="st">"atoruscontainers.azurecr.io/openval_4.2.1_focal:2023.09.0.02"</span></span>
+<span>  <span class="st">"/home/user/programs/my_program.R"</span>,</span>
+<span>  container <span class="op">=</span> <span class="st">"registry.example.com/my_image:latest"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co"># job.batch/test-program-fbc3131d-a850-4081-8224-c06ef32821da created</span></span>
 <span><span class="co"># $job_id</span></span>

@@ -94,19 +94,20 @@ rmarkdown
 
 ## Package Options (set in .onLoad)
 
-| Option                      | Default     | Purpose                       |
-|-----------------------------|-------------|-------------------------------|
-| `abba.lower.cpu.limit`      | 0.001       | Min CPU for K8s containers    |
-| `abba.cpu.limit`            | 2           | Max CPU for K8s containers    |
-| `abba.lower.memory.limit`   | ‘128M’      | Min memory for K8s containers |
-| `abba.memory.limit`         | ‘1G’        | Max memory for K8s containers |
-| `abba.permitted.containers` | NULL        | Allowed container images      |
-| `abba.default.container`    | NULL        | Default container image       |
-| `abba.k8s.namespace`        | ‘rstudio’   | Kubernetes namespace          |
-| `abba.home.nfs.ip.address`  | ‘10.14.0.6’ | NFS mount IP for home dirs    |
-| `abba.default_cache_folder` | NULL        | Hash cache storage location   |
-| `abba.slurm.cpu.cores`      | 1L          | Default SLURM CPU cores       |
-| `abba.slurm.memory`         | 1024L       | Default SLURM memory (MB)     |
+| Option                      | Default                   | Purpose                           |
+|-----------------------------|---------------------------|-----------------------------------|
+| `abba.lower.cpu.limit`      | 0.001                     | Min CPU for K8s containers        |
+| `abba.cpu.limit`            | 2                         | Max CPU for K8s containers        |
+| `abba.lower.memory.limit`   | ‘128M’                    | Min memory for K8s containers     |
+| `abba.memory.limit`         | ‘1G’                      | Max memory for K8s containers     |
+| `abba.permitted.containers` | NULL                      | Allowed container images          |
+| `abba.default.container`    | NULL                      | Default container image           |
+| `abba.k8s.namespace`        | ‘rstudio’                 | Kubernetes namespace              |
+| `abba.home.nfs.ip.address`  | NULL                      | NFS mount IP for home dirs        |
+| `abba.r.versions.path`      | ‘/etc/rstudio/r-versions’ | Path to Workbench R versions file |
+| `abba.default_cache_folder` | NULL                      | Hash cache storage location       |
+| `abba.slurm.cpu.cores`      | 1L                        | Default SLURM CPU cores           |
+| `abba.slurm.memory`         | 1024L                     | Default SLURM memory (MB)         |
 
 ## Building and Testing
 
@@ -137,8 +138,8 @@ SLURM scheduler commands - **id** - Linux user identity (`get_guid.R`) -
 
 - All test external calls are mocked via `mockery` - no real
   kubectl/SLURM needed to run tests
-- `rsconnect/` directory contains deployment metadata for
-  connect-dev.atorusresearch.com (not needed for package distribution)
+- `rsconnect/` directory (gitignored) contains local Posit Connect
+  deployment metadata
 - Root-level `plumber.R` is a production deployment file (excluded via
   .Rbuildignore); `inst/plumber.R` is the distributable template
 - `test_programs/` contains a simple test script used during development
